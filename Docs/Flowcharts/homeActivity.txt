@@ -1,0 +1,10 @@
+---
+title: HomeActivity
+---
+flowchart TD
+    viewProducts[Show list of products] 
+    viewProducts --> userProfile[User taps on profile page] -->profilePageActivity[Go to user profile page activity]
+    viewProducts --> selectProd[User taps on a product] --> prodActivity[Go to ProductActivity and show info]
+    viewProducts --> fav[User taps on ''add to favourite'' button] --> addToFav[Add product to favourite]
+    viewProducts --> allFavs[User taps on ''view all favourites''] --> allFavsActivity[Go to all favourites activity]
+    viewProducts --> cart[user taps on ''view cart''] --> cartActivity[Go to cart activity]

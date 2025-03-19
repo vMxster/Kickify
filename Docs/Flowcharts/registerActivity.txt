@@ -1,0 +1,7 @@
+---
+title: RegisterActivity
+---
+flowchart TD
+    Typein[Type in valid username, email and password] --> valuesOk{Are username, email and password valid?}
+    valuesOk -->|All values valid| Home[Go to HomeActivity]
+    valuesOk -->|At least one value not valid| Typein
