@@ -1,0 +1,8 @@
+---
+title: LoginActivity
+---
+flowchart TD
+    Typein[Type in username and password] --> credOk{are credentials correct?}
+    credOk -->|Yes| Home[Go to HomeActivity]
+    credOk -->|No| Typein
+  

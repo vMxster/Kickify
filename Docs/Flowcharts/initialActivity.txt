@@ -1,0 +1,8 @@
+---
+title: InitialActivity
+---
+flowchart TD
+    Start[User opens app] --> Choose{User chooses action}
+    Choose -->|Login| Log[Go to LoginActivity]
+    Choose -->|OAuth login| OAuthLogin[Login with OAuth 2.0]
+    Choose -->|Register| Reg[Go to RegisterActivity]
