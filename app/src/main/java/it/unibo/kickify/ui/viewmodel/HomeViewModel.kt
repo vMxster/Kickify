@@ -2,7 +2,6 @@ package it.unibo.kickify.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import it.unibo.kickify.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -22,21 +21,12 @@ class HomeViewModel : ViewModel() {
     init {
         viewModelScope.launch {
             val brands = listOf("Nike", "Fila", "Puma", "Adidas", "DC")
-            val logos = listOf(
-                R.drawable.nike, R.drawable.fila, R.drawable.puma,
-                R.drawable.adidas, R.drawable.on, R.drawable.asics,
-                R.drawable.crocs, R.drawable.new_balance, R.drawable.vans,
-                R.drawable.converse, R.drawable.reebok, R.drawable.under_armour,
-                R.drawable.lacoste, R.drawable.diadora, R.drawable.kappa,
-                R.drawable.hoka, R.drawable.havaianas, R.drawable.salomon,
-                R.drawable.saucony, R.drawable.sergio_tacchini, R.drawable.ugg,
-                R.drawable.vans
-            )
+            //val logos = listOf()
 
             _uiState.value = HomeUiState(
                 isLoading = false,
                 brandList = brands,
-                brandLogos = logos
+                //brandLogos = logos
             )
         }
     }
