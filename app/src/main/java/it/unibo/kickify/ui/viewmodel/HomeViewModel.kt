@@ -1,8 +1,8 @@
-package com.example.urbankicks.viewmodel
+package it.unibo.kickify.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.urbankicks.R
+import it.unibo.kickify.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

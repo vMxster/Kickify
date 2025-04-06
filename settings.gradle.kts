@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "UrbanKicks"
+rootProject.name = "Kickify"
 include(":app")

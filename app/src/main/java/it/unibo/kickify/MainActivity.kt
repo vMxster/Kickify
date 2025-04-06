@@ -1,4 +1,4 @@
-package com.example.urbankicks
+package it.unibo.kickify
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,9 +7,9 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.navigation.compose.rememberNavController
-import com.example.urbankicks.navigation.AppNavGraph
-import com.example.urbankicks.ui.theme.UrbanKicksTheme
-import com.example.urbankicks.viewmodel.HomeViewModel
+import it.unibo.kickify.ui.navigation.AppNavGraph
+import it.unibo.kickify.ui.theme.UrbanKicksTheme
+import it.unibo.kickify.ui.viewmodel.HomeViewModel
 
 class MainActivity : ComponentActivity() {
 

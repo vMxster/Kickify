@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.urbankicks"
+    namespace = "it.unibo.kickify"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.urbankicks"
+        applicationId = "it.unibo.kickify"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

@@ -1,4 +1,4 @@
-package com.example.urbankicks.ui.theme
+package it.unibo.kickify.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

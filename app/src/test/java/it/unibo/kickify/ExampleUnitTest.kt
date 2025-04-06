@@ -1,4 +1,4 @@
-package com.example.urbankicks
+package it.unibo.kickify
 
 import org.junit.Test
 

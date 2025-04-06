@@ -1,4 +1,4 @@
-package com.example.urbankicks
+package it.unibo.kickify
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
