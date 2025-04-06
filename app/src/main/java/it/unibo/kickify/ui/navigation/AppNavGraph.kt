@@ -5,11 +5,11 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import it.unibo.kickify.ui.screens.HomeScreen
 import it.unibo.kickify.ui.viewmodel.HomeUiState
+import kotlinx.serialization.Serializable
 
 sealed class Screen(val route: String) {
-    object Home : Screen("home")
+    @Serializable data object Home : Screen("home")
     // object Detail : Screen("detail/{brandId}")
 }
 
