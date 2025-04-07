@@ -9,4 +9,12 @@
     <string name="nextPage">Next</string>
     <string name="previousPage">Previous</string>
     <string name="getStarted">Get Started</string>
+    <string name="signinTitle">Welcome Back!</string>
+    <string name="signinText">We\'ve missed your style. Let\'s get you moving!</string>
+    <string name="signin_emailAddress">Email Address</string>
+    <string name="signin_password">Password</string>
+    <string name="signin_forgotPassword">Forgot Password?</string>
+    <string name="signin_button">Sign In</string>
+    <string name="signin_continueGoogle">Continue with Google</string>
+    <string name="signin_joinForFree">New To Kickify? Join for Free</string>
 </resources>

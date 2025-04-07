@@ -54,7 +54,7 @@ fun PagerWithIndicator() {
                 2 -> painterResource(R.drawable.newbalance_onboard)
                 else -> painterResource(R.drawable.adidas_onboard)
             },
-            contentDescription = "Welcome page 1")
+            contentDescription = "Welcome page")
         Row{
             Text(when (selectedIndex){
                 0 -> stringResource(R.string.onboard_title_1)
