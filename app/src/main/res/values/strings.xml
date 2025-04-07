@@ -1,3 +1,12 @@
 <resources>
-    <string name="app_name">UrbanKicks</string>
+    <string name="app_name">Kickify</string>
+    <string name="onboard_title_1">Start Your Urban Adventure</string>
+    <string name="onboard_text_1">Premium designs for urban rhythm - smart, bold, always in step.</string>
+    <string name="onboard_title_2">Trendsetter\'s Playground</string>
+    <string name="onboard_text_2">Curated drops. Fresh styles weekly. Own the streets, your way.</string>
+    <string name="onboard_title_3">Define Your Streets</string>
+    <string name="onboard_text_3">Innovation, edge, attitude - craft your legacy with every step.</string>
+    <string name="nextPage">Next</string>
+    <string name="previousPage">Previous</string>
+    <string name="getStarted">Get Started</string>
 </resources>
