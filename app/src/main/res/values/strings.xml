@@ -6,9 +6,9 @@
     <string name="onboard_text_2">Curated drops. Fresh styles weekly. Own the streets, your way.</string>
     <string name="onboard_title_3">Define Your Streets</string>
     <string name="onboard_text_3">Innovation, edge, attitude - craft your legacy with every step.</string>
-    <string name="nextPage">Next</string>
-    <string name="previousPage">Previous</string>
-    <string name="getStarted">Get Started</string>
+    <string name="nextPage_button">Next</string>
+    <string name="previousPage_button">Previous</string>
+    <string name="getStarted_button">Get Started</string>
     <string name="signin_Title">Welcome Back!</string>
     <string name="signin_Text">We\'ve missed your style. Let\'s get you moving!</string>
     <string name="emailAddress">Email Address</string>
@@ -22,4 +22,7 @@
     <string name="signup_yourname">Your Name</string>
     <string name="signup_button">Sign Up</string>
     <string name="signup_alreadyPartOfCrew">Already Part Of The Crew? Sign In.</string>
+    <string name="forgotpsw_title">Reset Your Password In A Snap!</string>
+    <string name="forgotpsw_text">Enter your email - we\'ll send a secure link to get you back on track.</string>
+    <string name="continue_button">Continue</string>
 </resources>

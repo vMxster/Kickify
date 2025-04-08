@@ -103,8 +103,8 @@ fun OnBoardScreen() {
                 }) {
                     Text(
                         when (selectedIndex) {
-                            0 -> stringResource(R.string.getStarted)
-                            else -> stringResource(R.string.nextPage)
+                            0 -> stringResource(R.string.getStarted_button)
+                            else -> stringResource(R.string.nextPage_button)
                         }
                     )
                 }
