@@ -2,9 +2,11 @@ package it.unibo.kickify.data.repositories
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import it.unibo.kickify.data.models.Theme
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class SettingsRepository(
@@ -14,6 +16,7 @@ class SettingsRepository(
         private val USER_ID = stringPreferencesKey("userid")
         private val USER_NAME = stringPreferencesKey("username")
         private val THEME_KEY = stringPreferencesKey("theme")
+        private val LOGIN_WITH_FINGERPRINT : Preferences.Key<Boolean> = booleanPreferencesKey("login_fingerprint")
     }
 
     // get userid
@@ -41,5 +44,15 @@ class SettingsRepository(
     // set theme
     suspend fun setTheme(theme: Theme) = dataStore.edit { preferences ->
         preferences[THEME_KEY] = theme.toString()
+    }
+
+    // get login with fingerprint
+    val loginWithFingerPrint : Flow<Boolean> = dataStore.data.map {
+        it[LOGIN_WITH_FINGERPRINT] ?: false
+    }
+
+    // set login with fingerprint
+    suspend fun setLoginWithFingerPrint(loginWithFingerPrint: Boolean) = dataStore.edit {
+        it[LOGIN_WITH_FINGERPRINT] = loginWithFingerPrint
     }
 }
