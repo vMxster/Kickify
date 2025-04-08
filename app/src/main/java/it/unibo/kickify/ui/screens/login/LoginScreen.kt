@@ -1,7 +1,6 @@
 package it.unibo.kickify.ui.screens.login
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,9 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -24,15 +24,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.unibo.kickify.R
-import it.unibo.kickify.ui.theme.Black
-import it.unibo.kickify.ui.theme.GhostWhite
-import it.unibo.kickify.ui.theme.KickifyFontFamily
 import it.unibo.kickify.ui.theme.KickifyTheme
 import it.unibo.kickify.ui.theme.MediumGray
 
@@ -48,13 +46,13 @@ fun LoginScreen() {
         ) {
             Text(
                 text = stringResource(R.string.signin_Title),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 fontSize = 32.sp,
                 modifier = Modifier.padding(bottom = 20.dp)
             )
             Text(
                 text = stringResource(R.string.signin_Text),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 20.dp)
@@ -62,7 +60,7 @@ fun LoginScreen() {
             )
             Text(
                 text = stringResource(R.string.emailAddress),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.fillMaxWidth().padding(start = 32.dp)
             )
             OutlinedTextField(
@@ -74,6 +72,7 @@ fun LoginScreen() {
                         color = Color.Gray,
                     )
                 },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(30.dp))
@@ -83,7 +82,7 @@ fun LoginScreen() {
 
             Text(
                 stringResource(R.string.password),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.fillMaxWidth().padding(start = 32.dp)
             )
             OutlinedTextField(
@@ -91,10 +90,12 @@ fun LoginScreen() {
                 onValueChange = {},
                 label = {
                     Text(
-                        stringResource(R.string.emailAddress),
+                        stringResource(R.string.password),
                         color = Color.Gray,
                     )
                 },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(30.dp))
@@ -107,7 +108,7 @@ fun LoginScreen() {
             ) {
                 Text(
                     text = stringResource(R.string.signin_forgotPassword),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     textAlign = TextAlign.End
                 )
             }
@@ -121,7 +122,7 @@ fun LoginScreen() {
             ) {
                 Text(
                     text = stringResource(R.string.signin_button),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
             Spacer(modifier = Modifier.height(15.dp))
@@ -139,8 +140,7 @@ fun LoginScreen() {
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     text = stringResource(R.string.signin_signup_continueGoogle),
-                    color = Color.White,
-
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
 
@@ -153,7 +153,7 @@ fun LoginScreen() {
             ) {
                 Text(
                     text = stringResource(R.string.signin_joinForFree),
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }

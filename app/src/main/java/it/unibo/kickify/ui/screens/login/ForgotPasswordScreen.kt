@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,21 +39,21 @@ fun ForgotPasswordScreen() {
         ) {
             Text(
                 text = stringResource(R.string.forgotpsw_title),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 fontSize = 24.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 20.dp)
             )
             Text(
                 text = stringResource(R.string.forgotpsw_text),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 20.dp)
             )
             Text(
                 text = stringResource(R.string.emailAddress),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.fillMaxWidth()
                     .padding(start = 32.dp)
             )
@@ -63,6 +66,7 @@ fun ForgotPasswordScreen() {
                         color = Color.Gray,
                     )
                 },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(30.dp))
@@ -78,7 +82,7 @@ fun ForgotPasswordScreen() {
             ) {
                 Text(
                     text = stringResource(R.string.continue_button),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }

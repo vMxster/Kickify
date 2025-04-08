@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -22,7 +24,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,13 +46,13 @@ fun RegisterScreen() {
         ) {
             Text(
                 text = stringResource(R.string.signup_title),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 fontSize = 32.sp,
                 modifier = Modifier.padding(bottom = 20.dp)
             )
             Text(
                 text = stringResource(R.string.signup_text),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 20.dp)
@@ -57,7 +60,7 @@ fun RegisterScreen() {
             )
             Text(
                 text = stringResource(R.string.signup_yourname),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.fillMaxWidth().padding(start = 32.dp)
             )
             OutlinedTextField(
@@ -78,7 +81,7 @@ fun RegisterScreen() {
 
             Text(
                 text = stringResource(R.string.emailAddress),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.fillMaxWidth().padding(start = 32.dp)
             )
             OutlinedTextField(
@@ -90,6 +93,7 @@ fun RegisterScreen() {
                         color = Color.Gray,
                     )
                 },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(30.dp))
@@ -99,7 +103,7 @@ fun RegisterScreen() {
 
             Text(
                 stringResource(R.string.password),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.fillMaxWidth().padding(start = 32.dp)
             )
             OutlinedTextField(
@@ -107,10 +111,12 @@ fun RegisterScreen() {
                 onValueChange = {},
                 label = {
                     Text(
-                        stringResource(R.string.emailAddress),
+                        stringResource(R.string.password),
                         color = Color.Gray,
                     )
                 },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(30.dp))
@@ -156,7 +162,7 @@ fun RegisterScreen() {
             ) {
                 Text(
                     text = stringResource(R.string.signup_alreadyPartOfCrew),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
