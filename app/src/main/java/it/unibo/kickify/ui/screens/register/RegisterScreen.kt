@@ -1,7 +1,6 @@
-package it.unibo.kickify.ui.screens.login
+package it.unibo.kickify.ui.screens.register
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -30,15 +28,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.unibo.kickify.R
-import it.unibo.kickify.ui.theme.Black
-import it.unibo.kickify.ui.theme.GhostWhite
-import it.unibo.kickify.ui.theme.KickifyFontFamily
 import it.unibo.kickify.ui.theme.KickifyTheme
 import it.unibo.kickify.ui.theme.MediumGray
 
 @Preview
 @Composable
-fun LoginScreen() {
+fun RegisterScreen() {
     KickifyTheme {
         Column(
             modifier = Modifier.fillMaxSize()
@@ -47,19 +42,40 @@ fun LoginScreen() {
             verticalArrangement = Arrangement.Bottom
         ) {
             Text(
-                text = stringResource(R.string.signin_Title),
+                text = stringResource(R.string.signup_title),
                 color = Color.White,
                 fontSize = 32.sp,
                 modifier = Modifier.padding(bottom = 20.dp)
             )
             Text(
-                text = stringResource(R.string.signin_Text),
+                text = stringResource(R.string.signup_text),
                 color = Color.White,
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 20.dp)
                     .padding(horizontal = 32.dp)
             )
+            Text(
+                text = stringResource(R.string.signup_yourname),
+                color = Color.White,
+                modifier = Modifier.fillMaxWidth().padding(start = 32.dp)
+            )
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = {
+                    Text(
+                        stringResource(R.string.signup_yourname),
+                        color = Color.Gray,
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(30.dp))
+                    .padding(horizontal = 32.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
             Text(
                 text = stringResource(R.string.emailAddress),
                 color = Color.White,
@@ -100,17 +116,7 @@ fun LoginScreen() {
                     .clip(RoundedCornerShape(30.dp))
                     .padding(horizontal = 32.dp)
             )
-            TextButton(
-                onClick = { /* go to login page */ },
-                modifier = Modifier.align(Alignment.End)
-                    .padding(top = 5.dp, end = 28.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.signin_forgotPassword),
-                    color = Color.White,
-                    textAlign = TextAlign.End
-                )
-            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
@@ -120,8 +126,7 @@ fun LoginScreen() {
                     .padding(horizontal = 32.dp),
             ) {
                 Text(
-                    text = stringResource(R.string.signin_button),
-                    color = Color.White,
+                    text = stringResource(R.string.signup_button),
                 )
             }
             Spacer(modifier = Modifier.height(15.dp))
@@ -129,7 +134,7 @@ fun LoginScreen() {
                 onClick = { /* google oauth login */ },
                 modifier = Modifier
                     .fillMaxWidth()
-                        .padding(horizontal = 32.dp),
+                    .padding(horizontal = 32.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MediumGray)
             ) {
                 Image(
@@ -139,25 +144,21 @@ fun LoginScreen() {
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     text = stringResource(R.string.signin_signup_continueGoogle),
-                    color = Color.White,
-
                 )
             }
 
             TextButton(
-                onClick = { /* go to register page */ },
+                onClick = { /* go to login page */ },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp)
                     .padding(vertical = 20.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.signin_joinForFree),
-                    color = Color.White
+                    text = stringResource(R.string.signup_alreadyPartOfCrew),
+                    color = Color.White,
                 )
             }
         }
     }
 }
-
-

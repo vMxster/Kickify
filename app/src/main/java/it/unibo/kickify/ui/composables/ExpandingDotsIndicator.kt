@@ -13,6 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import it.unibo.kickify.ui.theme.BluePrimary
 
 @Composable
 fun ExpandingDotIndicator(
@@ -20,7 +21,7 @@ fun ExpandingDotIndicator(
     selectedIndex: Int,
     modifier: Modifier = Modifier,
     dotColor: Color = Color.Gray,
-    selectedDotColor: Color = Color.Blue,
+    selectedDotColor: Color = BluePrimary,
     dotSize: Dp = 8.dp,
     selectedDotWidth: Dp = 24.dp,
     dotSpacing: Dp = 8.dp

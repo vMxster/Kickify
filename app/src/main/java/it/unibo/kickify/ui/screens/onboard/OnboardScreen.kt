@@ -1,6 +1,5 @@
 package it.unibo.kickify.ui.screens.onboard
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,85 +29,85 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.composables.ExpandingDotIndicator
-import it.unibo.kickify.ui.theme.KickifyFontFamily
-
-val kickifyFont = KickifyFontFamily
+import it.unibo.kickify.ui.theme.KickifyTheme
 
 @Preview
 @Composable
-fun PagerWithIndicator() {
+fun OnBoardScreen() {
     val totalDots = 3
     var selectedIndex by remember { mutableIntStateOf(0) }
 
-    Column (
-        modifier = Modifier.fillMaxSize()
-            .padding(horizontal = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom
-    ){
-        Image(
-            painter = when(selectedIndex){
-                1 -> painterResource(R.drawable.nike_onboard)
-                2 -> painterResource(R.drawable.newbalance_onboard)
-                else -> painterResource(R.drawable.adidas_onboard)
-            },
-            modifier = Modifier.fillMaxWidth(),
-            contentScale = ContentScale.FillWidth,
-            contentDescription = "Welcome page"
-        )
-        Text(when (selectedIndex){
-            0 -> stringResource(R.string.onboard_title_1)
-            1 -> stringResource(R.string.onboard_title_2)
-            2 -> stringResource(R.string.onboard_title_3)
-            else -> " "
-        }, style = TextStyle(
-            fontSize = 30.sp,
-            fontFamily = kickifyFont,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
-            )
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-
-        Text( when (selectedIndex) { // messages
-            0 -> stringResource(R.string.onboard_text_1)
-            1 -> stringResource(R.string.onboard_text_2)
-            2 -> stringResource(R.string.onboard_text_3)
-            else -> " "
-        }, style = TextStyle(
-            fontSize = 22.sp,
-            fontFamily = kickifyFont,
-            fontWeight = FontWeight.Normal,
-            color = Color.White
-            )
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row (
-            modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+    KickifyTheme {
+        Column (
+            modifier = Modifier.fillMaxSize()
+                .padding(horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom
         ) {
-            ExpandingDotIndicator(
-                totalDots = totalDots,
-                selectedIndex = selectedIndex,
-                modifier = Modifier.padding(16.dp)
+            Image(
+                painter = when (selectedIndex) {
+                    1 -> painterResource(R.drawable.nike_onboard)
+                    2 -> painterResource(R.drawable.newbalance_onboard)
+                    else -> painterResource(R.drawable.adidas_onboard)
+                },
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.FillWidth,
+                contentDescription = "Welcome page"
             )
-
+            Text(
+                when (selectedIndex) {
+                    0 -> stringResource(R.string.onboard_title_1)
+                    1 -> stringResource(R.string.onboard_title_2)
+                    2 -> stringResource(R.string.onboard_title_3)
+                    else -> " "
+                }, style = TextStyle(
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            )
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(onClick = {
-                selectedIndex = (selectedIndex + 1) % totalDots
-                if(selectedIndex == (totalDots - 1)){ // when on last page
-                }
-            }) {
-                Text(when(selectedIndex) {
-                    0 -> stringResource(R.string.getStarted)
-                    else -> stringResource(R.string.nextPage)
+
+            Text(
+                when (selectedIndex) { // messages
+                    0 -> stringResource(R.string.onboard_text_1)
+                    1 -> stringResource(R.string.onboard_text_2)
+                    2 -> stringResource(R.string.onboard_text_3)
+                    else -> " "
                 }, style = TextStyle(
-                    fontFamily = kickifyFont,
-                    )
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.White
                 )
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                ExpandingDotIndicator(
+                    totalDots = totalDots,
+                    selectedIndex = selectedIndex,
+                    modifier = Modifier.padding(16.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(onClick = {
+                    selectedIndex = (selectedIndex + 1) % totalDots
+                    if (selectedIndex == (totalDots - 1)) {
+                     // when on last page, go to login page
+                    }
+                }) {
+                    Text(
+                        when (selectedIndex) {
+                            0 -> stringResource(R.string.getStarted)
+                            else -> stringResource(R.string.nextPage)
+                        }
+                    )
+                }
             }
         }
     }
