@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import it.unibo.kickify.ui.composables.CartItem
@@ -25,11 +26,11 @@ fun CartScreen(){
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            CartItem("Nike Pegasus", 69.99, 41)
+            CartItem("Nike Pegasus", 69.99, 41, Color.Green)
             Spacer(Modifier.height(15.dp))
-            CartItem("Nike Zoom 2K", 129.99, 38)
+            CartItem("Nike Zoom 2K", 129.99, 38, Color.Red)
             Spacer(Modifier.height(15.dp))
-            CartItem("Nike Air Zoom", 87.99, 45 )
+            CartItem("Nike Air Zoom", 87.99, 45, Color.Yellow)
 
             Spacer(Modifier.height(20.dp))
             CartResume(subTotal = (69.99+129.99+87.99), shipping = 10.0)
