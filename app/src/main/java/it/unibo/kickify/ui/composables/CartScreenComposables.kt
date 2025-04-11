@@ -1,5 +1,6 @@
 package it.unibo.kickify.ui.composables
 
+import android.app.Dialog
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -138,6 +140,13 @@ fun QuantityManager(){
 
 @Composable
 fun CartResume(subTotal: Double, shipping: Double){
+    val showSuccessAlertMessage = remember { mutableStateOf(false) }
+    if(showSuccessAlertMessage.value){
+        DialogWithImage(
+            onDismissRequest = {showSuccessAlertMessage.value = false},
+            painterResource(R.drawable.nike_pegasus)
+        )
+    }
     Card(
         //onClick = onClick,
         modifier = Modifier.size(300.dp, 160.dp)
@@ -203,7 +212,7 @@ fun CartResume(subTotal: Double, shipping: Double){
             }
             Row{
                 Button(
-                    onClick = {},
+                    onClick = { showSuccessAlertMessage.value = true },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(stringResource(R.string.cartscreen_checkOutBtn))
