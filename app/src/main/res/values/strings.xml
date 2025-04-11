@@ -34,4 +34,17 @@
     <string name="lang_en">English</string>
     <string name="lang_it">Italiano</string>
     <string name="lang_es">Español</string>
+    <string name="homescreen_men">Men</string>
+    <string name="homescreen_women">Women</string>
+    <string name="homescreen_kids">Kids</string>
+    <string name="homescreen_popular">Popular Shoes</string>
+    <string name="homescreen_novelties">Novelties</string>
+    <string name="homescreen_discounted">Discounted</string>
+    <string name="homescreen_seeAll">See all</string>
+    <string name="cartscreen_size">Size</string>
+    <string name="cartscreen_subtotal">Subtotal</string>
+    <string name="cartscreen_shipping">Shipping</string>
+    <string name="cartscreen_totalCost">Total Cost</string>
+    <string name="cartscreen_title">My Cart</string>
+    <string name="cartscreen_checkOutBtn">Checkout</string>
 </resources>
