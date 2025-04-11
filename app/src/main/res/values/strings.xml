@@ -42,9 +42,9 @@
     <string name="homescreen_discounted">Discounted</string>
     <string name="homescreen_seeAll">See all</string>
     <string name="cartscreen_size">Size</string>
-    <string name="cartscreen_subtotal">Size</string>
-    <string name="cartscreen_shipping">Size</string>
-    <string name="cartscreen_totalCost">Size</string>
+    <string name="cartscreen_subtotal">Subtotal</string>
+    <string name="cartscreen_shipping">Shipping</string>
+    <string name="cartscreen_totalCost">Total Cost</string>
     <string name="cartscreen_title">My Cart</string>
     <string name="cartscreen_checkOutBtn">Checkout</string>
 </resources>

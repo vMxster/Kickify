@@ -38,24 +38,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import it.unibo.kickify.R
 
-@Preview
 @Composable
-fun CartItem(
-    itemName: String ="Nike Pegasus",
-    price: Double = 69.99,
-    size: Int = 41
+fun CartItem(itemName: String, price: Double, size: Int
 ){
     Card(
         //onClick = onClick,
         modifier = Modifier.size(300.dp, 90.dp)
-            .fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor =  MaterialTheme.colorScheme.surfaceVariant
-        )
+            .fillMaxWidth()
     ) {
         Row(
             modifier = Modifier.fillMaxSize().padding(end = 6.dp),
@@ -69,7 +61,6 @@ fun CartItem(
                 modifier = Modifier
                     .size(90.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer)
                     .padding(6.dp)
             )
             Column(
@@ -78,12 +69,13 @@ fun CartItem(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start,
-                    modifier = Modifier.padding(top = 6.dp)
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(top = 6.dp)
+                        .padding(end = 6.dp)
                 ){
                     Text(
                         itemName,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center
                     )
@@ -96,7 +88,6 @@ fun CartItem(
                 ){
                     Text(
                         "€$price",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -115,7 +106,8 @@ fun QuantityManager(){
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
     ){
         FilledIconButton(
             onClick = { if(quantity >= 2) quantity-=1 },
@@ -125,10 +117,10 @@ fun QuantityManager(){
             Icon(Icons.Outlined.Remove, contentDescription = "")
         }
 
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(6.dp))
         Text(text=quantity.toString())
 
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(6.dp))
         FilledIconButton(
             modifier = Modifier.size(18.dp),
             onClick = { if(quantity <= 9) quantity += 1 },
@@ -144,9 +136,8 @@ fun QuantityManager(){
     }
 }
 
-@Preview
 @Composable
-fun CartResume(subTotal: Double = 287.97, shipping: Double = 10.00){
+fun CartResume(subTotal: Double, shipping: Double){
     Card(
         //onClick = onClick,
         modifier = Modifier.size(300.dp, 160.dp)
@@ -192,7 +183,7 @@ fun CartResume(subTotal: Double = 287.97, shipping: Double = 10.00){
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            Spacer(Modifier.width(20.dp))
+            Spacer(Modifier.width(30.dp))
             HorizontalDivider()
             Spacer(Modifier.width(20.dp))
             Row(
