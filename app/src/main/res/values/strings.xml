@@ -49,4 +49,11 @@
     <string name="cartscreen_checkOutBtn">Checkout</string>
     <string name="cartscreen_paymentSuccessful">Your Payment Is Successful</string>
     <string name="cartscreen_backToShopping">Back To Shopping</string>
+    <string name="notificationscreen_clearAll">Clear All</string>
+    <string name="notificationscreen_productBackInStock">Product back in stock</string>
+    <string name="notificationscreen_orderShipped">Order shipped</string>
+    <string name="notificationscreen_flashSale">Flash sale alert</string>
+    <string name="notificationscreen_productsInCart">Shoes still in your cart</string>
+    <string name="notificationscreen_orderPlaced">Order placed</string>
+    <string name="notificationscreen_productReviewRequested">Product review requested</string>
 </resources>

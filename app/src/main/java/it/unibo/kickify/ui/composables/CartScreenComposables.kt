@@ -144,13 +144,6 @@ fun QuantityManager(){
 
 @Composable
 fun CartResume(subTotal: Double, shipping: Double){
-    val showSuccessAlertMessage = remember { mutableStateOf(false) }
-    if(showSuccessAlertMessage.value){
-        DialogWithImage(
-            onDismissRequest = {showSuccessAlertMessage.value = false},
-            painterResource(R.drawable.nike_pegasus)
-        )
-    }
     Card(
         //onClick = onClick,
         modifier = Modifier.size(300.dp, 160.dp)
@@ -216,7 +209,7 @@ fun CartResume(subTotal: Double, shipping: Double){
             }
             Row{
                 Button(
-                    onClick = { showSuccessAlertMessage.value = true },
+                    onClick = {  },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(stringResource(R.string.cartscreen_checkOutBtn))
