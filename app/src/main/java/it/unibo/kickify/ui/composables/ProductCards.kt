@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.ShopCategory
+import it.unibo.kickify.ui.theme.Black
+import it.unibo.kickify.ui.theme.GhostWhite
 
 @Composable
 fun ProductCardWishlistPage(
@@ -51,7 +53,7 @@ fun ProductCardWishlistPage(
             .size(200.dp)
             .fillMaxSize(),
         colors = CardDefaults.cardColors(
-            containerColor =  MaterialTheme.colorScheme.surfaceVariant
+            containerColor = GhostWhite
         )
     ) {
         Box(
@@ -107,7 +109,7 @@ fun SquareProductCardHomePage(
             .size(200.dp)
             .fillMaxSize(),
         colors = CardDefaults.cardColors(
-            containerColor =  MaterialTheme.colorScheme.surfaceVariant
+            containerColor = GhostWhite
         )
     ) {
         Column(
@@ -134,7 +136,7 @@ fun RectangularProductCardHomePage(
             .size(300.dp, 130.dp)
             .fillMaxSize(),
         colors = CardDefaults.cardColors(
-            containerColor =  MaterialTheme.colorScheme.surfaceVariant
+            containerColor = GhostWhite
         )
     ) {
         Row(
@@ -170,14 +172,14 @@ fun ProductCardShoesPage(
     Card(
         onClick = onClick,
         modifier = Modifier
-            .size(200.dp)
-            .fillMaxSize(),
+            .fillMaxSize().size(200.dp)
+            ,
         colors = CardDefaults.cardColors(
-            containerColor =  MaterialTheme.colorScheme.surfaceVariant
+            containerColor = GhostWhite
         )
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -195,7 +197,6 @@ fun ProductImage(
     size: Dp = 120.dp,
     modifier: Modifier = Modifier
         .size(size)
-        .background(MaterialTheme.colorScheme.primaryContainer)
 ){
     Image(
         painterResource(R.drawable.nike_lunarglide),
@@ -208,7 +209,7 @@ fun ProductImage(
 @Composable
 fun ProductNameText(
     productName:String,
-    color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    color: Color = Black,
     style: TextStyle = MaterialTheme.typography.bodyMedium,
     textAlign: TextAlign = TextAlign.Center,
     fontWeight: FontWeight = FontWeight.Bold
@@ -224,7 +225,8 @@ fun ProductNameText(
 
 @Composable
 fun ProductCategoryText(
-    category: ShopCategory, color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    category: ShopCategory,
+    color: Color = Black,
     style: TextStyle = MaterialTheme.typography.bodySmall,
     textAlign: TextAlign = TextAlign.Center
 ){
@@ -237,8 +239,8 @@ fun ProductCategoryText(
 }
 
 @Composable
-fun ProductPriceText(price: Double = 129.99,
-                     color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+fun ProductPriceText(price: Double,
+                     color: Color = Black,
                      style: TextStyle = MaterialTheme.typography.bodyMedium,
                      textAlign: TextAlign = TextAlign.Center){
     Text(

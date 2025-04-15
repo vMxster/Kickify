@@ -1,3 +1,3 @@
 package it.unibo.kickify.data.models
 
-enum class HomeSections { Popular, Novelties, Discounted}
+enum class HomeSection { Popular, Novelties, Discounted}
