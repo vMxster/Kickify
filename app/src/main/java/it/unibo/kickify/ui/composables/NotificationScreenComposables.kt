@@ -3,6 +3,7 @@ package it.unibo.kickify.ui.composables
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,7 +44,7 @@ fun NotificationItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ){
-        NotificationImageFromType(notificationType, darkTheme = true)
+        NotificationImageFromType(notificationType, darkTheme = isSystemInDarkTheme())
 
         Spacer(Modifier.width(6.dp))
         Column(
@@ -56,24 +57,26 @@ fun NotificationItem(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
-                Text(text = when(notificationType){
-                    NotificationType.ProductBackinStock -> stringResource(R.string.notificationscreen_productBackInStock)
-                    NotificationType.OrderShipped -> stringResource(R.string.notificationscreen_orderShipped)
-                    NotificationType.FlashSale -> stringResource(R.string.notificationscreen_flashSale)
-                    NotificationType.ItemsinCart -> stringResource(R.string.notificationscreen_productsInCart)
-                    NotificationType.OrderPlaced -> stringResource(R.string.notificationscreen_orderPlaced)
-                    NotificationType.RequestedProductReview -> stringResource(R.string.notificationscreen_productReviewRequested)
-                },
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = when(notificationType){
+                        NotificationType.ProductBackinStock -> stringResource(R.string.notificationscreen_productBackInStock)
+                        NotificationType.OrderShipped -> stringResource(R.string.notificationscreen_orderShipped)
+                        NotificationType.FlashSale -> stringResource(R.string.notificationscreen_flashSale)
+                        NotificationType.ItemsinCart -> stringResource(R.string.notificationscreen_productsInCart)
+                        NotificationType.OrderPlaced -> stringResource(R.string.notificationscreen_orderPlaced)
+                        NotificationType.RequestedProductReview -> stringResource(R.string.notificationscreen_productReviewRequested)
+                    },
+                    style = MaterialTheme.typography.titleMedium
+                )
 
                 Spacer(Modifier.width(6.dp))
                 NotificationDotIndicator(colorDot)
             }
             Spacer(Modifier.height(6.dp))
-            Text(notificationText,
-                color = MaterialTheme.colorScheme.onPrimary,
-                style = MaterialTheme.typography.bodyMedium)
+            Text(
+                notificationText,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }
@@ -83,22 +86,22 @@ private fun NotificationImageFromType(notificationType: NotificationType, darkTh
 ){
     Image(
         painter = if(darkTheme) {
-                        when(notificationType){
-                        NotificationType.ProductBackinStock -> painterResource(R.drawable.stock_dark)
-                        NotificationType.OrderShipped -> painterResource(R.drawable.order_dark)
-                        NotificationType.FlashSale -> painterResource(R.drawable.sale_dark)
-                        NotificationType.ItemsinCart -> painterResource(R.drawable.cart_dark)
-                        NotificationType.OrderPlaced -> painterResource(R.drawable.pack_black)
-                        NotificationType.RequestedProductReview -> painterResource(R.drawable.review_dark)}
-                    } else {
-                        when(notificationType){
-                        NotificationType.ProductBackinStock -> painterResource(R.drawable.stock_light)
-                        NotificationType.OrderShipped -> painterResource(R.drawable.order_light)
-                        NotificationType.FlashSale -> painterResource(R.drawable.sale_light)
-                        NotificationType.ItemsinCart -> painterResource(R.drawable.cart_light)
-                        NotificationType.OrderPlaced -> painterResource(R.drawable.pack_light)
-                        NotificationType.RequestedProductReview -> painterResource(R.drawable.review_light)
-                    }
+            when(notificationType){
+                NotificationType.ProductBackinStock -> painterResource(R.drawable.stock_dark)
+                NotificationType.OrderShipped -> painterResource(R.drawable.order_dark)
+                NotificationType.FlashSale -> painterResource(R.drawable.sale_dark)
+                NotificationType.ItemsinCart -> painterResource(R.drawable.cart_dark)
+                NotificationType.OrderPlaced -> painterResource(R.drawable.pack_black)
+                NotificationType.RequestedProductReview -> painterResource(R.drawable.review_dark)}
+        } else {
+            when(notificationType){
+                NotificationType.ProductBackinStock -> painterResource(R.drawable.stock_light)
+                NotificationType.OrderShipped -> painterResource(R.drawable.order_light)
+                NotificationType.FlashSale -> painterResource(R.drawable.sale_light)
+                NotificationType.ItemsinCart -> painterResource(R.drawable.cart_light)
+                NotificationType.OrderPlaced -> painterResource(R.drawable.pack_light)
+                NotificationType.RequestedProductReview -> painterResource(R.drawable.review_light)
+            }
         },
         contentDescription = "",
         contentScale = ContentScale.Fit,
@@ -120,9 +123,10 @@ fun NotificationTitleLine(title: String){
     Row(
         modifier = Modifier.fillMaxWidth()
             .padding(horizontal = 6.dp)
+            .padding(top = 6.dp)
     ){
         Text(title,
-            color = MaterialTheme.colorScheme.onPrimary,
-            style = MaterialTheme.typography.titleLarge)
+            style = MaterialTheme.typography.titleLarge
+        )
     }
 }

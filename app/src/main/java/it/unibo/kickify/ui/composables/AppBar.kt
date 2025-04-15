@@ -13,16 +13,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
+import it.unibo.kickify.ui.theme.BluePrimary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,9 +65,17 @@ fun AppBar(navController: NavController, title: String) {
             }
         },
         actions = {
-            if (title == "Kickify") {
+            if (title == stringResource(R.string.app_name)) {
                 IconButton(onClick = { /*TODO*/ }) {
                     Icon(Icons.Outlined.ShoppingBag, contentDescription = "Cart")
+                }
+            }
+            if(title == stringResource(R.string.notificationscreen_title)){
+                TextButton(onClick = { /**/ }) {
+                    Text(
+                        text = stringResource(R.string.notificationscreen_clearAll),
+                        color = BluePrimary
+                    )
                 }
             }
             /*if (title != "Settings") {
