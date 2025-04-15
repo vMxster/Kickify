@@ -24,6 +24,7 @@
     <string name="signup_alreadyPartOfCrew">Already Part Of The Crew? Sign In.</string>
     <string name="forgotpsw_title">Reset Your Password In A Snap!</string>
     <string name="forgotpsw_text">Enter your email - we\'ll send a secure link to get you back on track.</string>
+    <string name="forgotpsw_templateEmail">email@example.com</string>
     <string name="continue_button">Continue</string>
     <string name="settings_chooseTheme">Choose theme</string>
     <string name="settings_enableLoginWithFingerPrint">Enable login with fingerprint</string>

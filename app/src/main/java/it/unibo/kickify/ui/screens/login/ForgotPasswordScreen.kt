@@ -10,59 +10,72 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import it.unibo.kickify.R
-import it.unibo.kickify.ui.theme.KickifyTheme
+import it.unibo.kickify.ui.composables.AppBar
+import it.unibo.kickify.ui.theme.Black
 
 @Preview
 @Composable
-fun ForgotPasswordScreen() {
-    KickifyTheme {
+fun ForgotPasswordScreen(
+    navController: NavController = NavController(LocalContext.current)
+) {
+    Scaffold(
+        topBar = {
+            AppBar(
+                navController,
+                title = stringResource(R.string.signin_forgotPassword)
+            )
+        },
+        bottomBar = {
+        }
+    ) { contentPadding ->
         Column(
             modifier = Modifier.fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(contentPadding)
+                .padding(top = 20.dp)
+                .padding(horizontal = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
             Text(
                 text = stringResource(R.string.forgotpsw_title),
-                color = MaterialTheme.colorScheme.onPrimary,
                 fontSize = 24.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 20.dp)
             )
             Text(
                 text = stringResource(R.string.forgotpsw_text),
-                color = MaterialTheme.colorScheme.onPrimary,
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 20.dp)
             )
             Text(
                 text = stringResource(R.string.emailAddress),
-                color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.fillMaxWidth()
                     .padding(start = 32.dp)
             )
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
-                label = {
+                placeholder = {
                     Text(
-                        stringResource(R.string.emailAddress),
+                        stringResource(R.string.forgotpsw_templateEmail),
                         color = Color.Gray,
                     )
                 },
@@ -82,7 +95,6 @@ fun ForgotPasswordScreen() {
             ) {
                 Text(
                     text = stringResource(R.string.continue_button),
-                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
