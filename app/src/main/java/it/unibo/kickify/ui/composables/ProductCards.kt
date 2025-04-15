@@ -43,18 +43,15 @@ import it.unibo.kickify.ui.theme.GhostWhite
 
 @Composable
 fun ProductCardWishlistPage(
-    productName: String = "nike lunarglide",
-    price: Double = 59.99,
+    productName: String,
+    price: Double,
     onClick: () -> Unit
 ){
     Card(
         onClick = onClick,
         modifier = Modifier
             .size(200.dp)
-            .fillMaxSize(),
-        colors = CardDefaults.cardColors(
-            containerColor = GhostWhite
-        )
+            .fillMaxSize()
     ) {
         Box(
             modifier = Modifier.fillMaxSize()
@@ -107,10 +104,7 @@ fun SquareProductCardHomePage(
         onClick = onClick,
         modifier = Modifier
             .size(200.dp)
-            .fillMaxSize(),
-        colors = CardDefaults.cardColors(
-            containerColor = GhostWhite
-        )
+            .fillMaxSize()
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -134,10 +128,7 @@ fun RectangularProductCardHomePage(
         onClick = onClick,
         modifier = Modifier
             .size(300.dp, 130.dp)
-            .fillMaxSize(),
-        colors = CardDefaults.cardColors(
-            containerColor = GhostWhite
-        )
+            .fillMaxSize()
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()
@@ -173,10 +164,6 @@ fun ProductCardShoesPage(
         onClick = onClick,
         modifier = Modifier
             .fillMaxSize().size(200.dp)
-            ,
-        colors = CardDefaults.cardColors(
-            containerColor = GhostWhite
-        )
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),

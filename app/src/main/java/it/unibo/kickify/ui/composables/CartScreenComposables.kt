@@ -44,14 +44,37 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import it.unibo.kickify.R
+import it.unibo.kickify.ui.theme.Black
+import it.unibo.kickify.ui.theme.GhostWhite
 
 @Composable
-fun CartItem(itemName: String, price: Double, size: Int, productColor: Color
+fun CartItemsList(){
+    Column(
+        modifier = Modifier.fillMaxWidth()
+            .padding(horizontal = 6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        CartItem("Nike Pegasus", 69.99, 41, Color.Green)
+        Spacer(Modifier.height(15.dp))
+        CartItem("Nike Zoom 2K", 129.99, 38, Color.Yellow)
+        Spacer(Modifier.height(15.dp))
+        CartItem("Nike Air Zoom", 87.99, 45, Color.Red)
+    }
+}
+
+@Composable
+fun CartItem(
+    itemName: String,
+    price: Double,
+    size: Int,
+    productColor: Color
 ){
     Card(
         //onClick = onClick,
-        modifier = Modifier.size(300.dp, 90.dp)
-            .fillMaxWidth()
+        modifier = Modifier.height(90.dp)
+            .padding(horizontal = 12.dp)
+            .fillMaxWidth(),
     ) {
         Row(
             modifier = Modifier.fillMaxSize().padding(end = 6.dp),
@@ -123,10 +146,8 @@ fun QuantityManager(){
             Icon(Icons.Outlined.Remove, contentDescription = "")
         }
 
-        Spacer(Modifier.width(6.dp))
         Text(text=quantity.toString())
 
-        Spacer(Modifier.width(6.dp))
         FilledIconButton(
             modifier = Modifier.size(18.dp),
             onClick = { if(quantity <= 9) quantity += 1 },
@@ -146,11 +167,9 @@ fun QuantityManager(){
 fun CartResume(subTotal: Double, shipping: Double){
     Card(
         //onClick = onClick,
-        modifier = Modifier.size(300.dp, 160.dp)
-            .fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor =  MaterialTheme.colorScheme.surfaceVariant
-        )
+        modifier = Modifier.height(180.dp)
+            .padding(horizontal = 12.dp)
+            .fillMaxWidth()
     ) {
         Column (
             verticalArrangement = Arrangement.SpaceBetween,
@@ -164,13 +183,9 @@ fun CartResume(subTotal: Double, shipping: Double){
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
                 Text(
-                    stringResource(R.string.cartscreen_subtotal),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                    stringResource(R.string.cartscreen_subtotal))
                 Spacer(Modifier.width(20.dp))
-                Text("€%.2f".format(subTotal),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Text("€%.2f".format(subTotal))
             }
             Spacer(Modifier.height(6.dp))
             Row(
@@ -181,12 +196,10 @@ fun CartResume(subTotal: Double, shipping: Double){
             ){
                 Text(
                     stringResource(R.string.cartscreen_shipping),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.width(20.dp))
                 "%.2f".format(shipping)
-                Text("€%.2f".format(shipping),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                Text("€%.2f".format(shipping)
                 )
             }
             Spacer(Modifier.width(30.dp))
@@ -200,11 +213,9 @@ fun CartResume(subTotal: Double, shipping: Double){
             ){
                 Text(
                     stringResource(R.string.cartscreen_totalCost),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.width(20.dp))
-                Text("€%.2f".format((subTotal+shipping)),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                Text("€%.2f".format((subTotal+shipping))
                 )
             }
             Row{
