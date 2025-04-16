@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -27,19 +28,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.composables.ExpandingDotIndicator
-import it.unibo.kickify.ui.theme.KickifyTheme
 
 @Preview
 @Composable
-fun OnBoardScreen() {
+fun OnBoardScreen(
+    navController: NavController = NavController(LocalContext.current)
+) {
     val totalDots = 3
     var selectedIndex by remember { mutableIntStateOf(0) }
 
-    KickifyTheme {
+    Scaffold { contentPadding ->
         Column (
             modifier = Modifier.fillMaxSize()
+                .padding(contentPadding)
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
@@ -61,9 +65,8 @@ fun OnBoardScreen() {
                     2 -> stringResource(R.string.onboard_title_3)
                     else -> " "
                 }, style = TextStyle(
-                    fontSize = 30.sp,
+                    fontSize = 33.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimary
                 )
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -78,13 +81,12 @@ fun OnBoardScreen() {
                 }, style = TextStyle(
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Normal,
-                    color = MaterialTheme.colorScheme.onPrimary
                 )
             )
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
+                modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 ExpandingDotIndicator(
@@ -93,12 +95,12 @@ fun OnBoardScreen() {
                     modifier = Modifier.padding(16.dp)
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                //Spacer(modifier = Modifier.height(16.dp))
 
                 Button(onClick = {
                     selectedIndex = (selectedIndex + 1) % totalDots
                     if (selectedIndex == (totalDots - 1)) {
-                     // when on last page, go to login page
+                        // when on last page, go to login page
                     }
                 }) {
                     Text(
