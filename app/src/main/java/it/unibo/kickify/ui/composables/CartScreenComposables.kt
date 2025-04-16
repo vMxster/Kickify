@@ -51,7 +51,8 @@ import it.unibo.kickify.ui.theme.GhostWhite
 fun CartItemsList(){
     Column(
         modifier = Modifier.fillMaxWidth()
-            .padding(horizontal = 6.dp),
+            .padding(horizontal = 6.dp)
+            .padding(top = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
@@ -169,6 +170,7 @@ fun CartResume(subTotal: Double, shipping: Double){
         //onClick = onClick,
         modifier = Modifier.height(180.dp)
             .padding(horizontal = 12.dp)
+            .padding(bottom = 4.dp)
             .fillMaxWidth()
     ) {
         Column (
