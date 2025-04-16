@@ -76,7 +76,10 @@ fun ForgotPasswordScreen(
                 modifier = forgotScreenModifier.padding(top = 16.dp)
             )
 
-            EmailRoundedTextField(modifier = forgotScreenModifier) {  }
+            EmailRoundedTextField(
+                modifier = forgotScreenModifier,
+                placeholderString = stringResource(R.string.emailAddress)
+            ) {  }
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(

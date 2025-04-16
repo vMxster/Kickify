@@ -21,7 +21,7 @@
     <string name="signup_text">Create your account and step into the latest trends.</string>
     <string name="signup_yourname">Your Name</string>
     <string name="signup_button">Sign Up</string>
-    <string name="signup_alreadyPartOfCrew">Already Part Of The Crew? Sign In.</string>
+    <string name="signup_alreadyPartOfCrew">Already Part Of The Crew?</string>
     <string name="forgotpsw_title">Reset Your Password In A Snap!</string>
     <string name="forgotpsw_text">Enter your email - we\'ll send a secure link to get you back on track.</string>
     <string name="forgotpsw_templateEmail">email@example.com</string>
