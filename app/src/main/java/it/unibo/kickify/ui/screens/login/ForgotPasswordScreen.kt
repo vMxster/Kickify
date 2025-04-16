@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.composables.AppBar
+import it.unibo.kickify.ui.composables.EmailRoundedTextField
 import it.unibo.kickify.ui.theme.Black
 
 @Preview
@@ -45,6 +46,11 @@ fun ForgotPasswordScreen(
         bottomBar = {
         }
     ) { contentPadding ->
+        val forgotScreenModifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .padding(vertical = 8.dp)
+
         Column(
             modifier = Modifier.fillMaxSize()
                 .padding(contentPadding)
@@ -57,41 +63,25 @@ fun ForgotPasswordScreen(
                 text = stringResource(R.string.forgotpsw_title),
                 fontSize = 24.sp,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = 20.dp)
+                modifier = forgotScreenModifier
             )
             Text(
                 text = stringResource(R.string.forgotpsw_text),
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = 20.dp)
+                modifier = forgotScreenModifier
             )
             Text(
                 text = stringResource(R.string.emailAddress),
-                modifier = Modifier.fillMaxWidth()
-                    .padding(start = 32.dp)
+                modifier = forgotScreenModifier.padding(top = 16.dp)
             )
-            OutlinedTextField(
-                value = "",
-                onValueChange = {},
-                placeholder = {
-                    Text(
-                        stringResource(R.string.forgotpsw_templateEmail),
-                        color = Color.Gray,
-                    )
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(30.dp))
-                    .padding(horizontal = 32.dp)
-            )
+
+            EmailRoundedTextField(modifier = forgotScreenModifier) {  }
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = { /* standard login */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
+                modifier = forgotScreenModifier,
             ) {
                 Text(
                     text = stringResource(R.string.continue_button),
