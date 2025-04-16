@@ -15,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -22,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -30,77 +32,60 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import it.unibo.kickify.R
-import it.unibo.kickify.ui.theme.KickifyTheme
+import it.unibo.kickify.ui.composables.EmailRoundedTextField
+import it.unibo.kickify.ui.composables.PasswordRoundedTextField
 import it.unibo.kickify.ui.theme.MediumGray
 
 @Preview
 @Composable
-fun LoginScreen() {
-    KickifyTheme {
+fun LoginScreen(navController: NavController = NavController(LocalContext.current)) {
+    Scaffold { contentPadding ->
+        val loginScreenModifier = Modifier.fillMaxWidth()
+            .padding(horizontal = 24.dp)
+
         Column(
             modifier = Modifier.fillMaxSize()
+                .padding(contentPadding)
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
             Text(
                 text = stringResource(R.string.signin_Title),
-                color = MaterialTheme.colorScheme.onPrimary,
                 fontSize = 32.sp,
-                modifier = Modifier.padding(bottom = 20.dp)
+                textAlign = TextAlign.Center,
+                modifier = loginScreenModifier
             )
             Text(
                 text = stringResource(R.string.signin_Text),
-                color = MaterialTheme.colorScheme.onPrimary,
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = 20.dp)
-                    .padding(horizontal = 32.dp)
-            )
-            Text(
-                text = stringResource(R.string.emailAddress),
-                color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.fillMaxWidth().padding(start = 32.dp)
-            )
-            OutlinedTextField(
-                value = "",
-                onValueChange = {},
-                label = {
-                    Text(
-                        stringResource(R.string.emailAddress),
-                        color = Color.Gray,
-                    )
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(30.dp))
-                    .padding(horizontal = 32.dp)
+                modifier = loginScreenModifier
             )
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
+                text = stringResource(R.string.emailAddress),
+                modifier =loginScreenModifier
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            EmailRoundedTextField(
+                modifier = loginScreenModifier,
+                placeholderString = stringResource(R.string.emailAddress)
+            ) { }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
                 stringResource(R.string.password),
-                color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.fillMaxWidth().padding(start = 32.dp)
+                modifier = loginScreenModifier
             )
-            OutlinedTextField(
-                value = "",
-                onValueChange = {},
-                label = {
-                    Text(
-                        stringResource(R.string.password),
-                        color = Color.Gray,
-                    )
-                },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(30.dp))
-                    .padding(horizontal = 32.dp)
-            )
+            Spacer(modifier = Modifier.height(16.dp))
+            PasswordRoundedTextField(modifier = loginScreenModifier) { }
+
             TextButton(
                 onClick = { /* go to login page */ },
                 modifier = Modifier.align(Alignment.End)
@@ -108,8 +93,8 @@ fun LoginScreen() {
             ) {
                 Text(
                     text = stringResource(R.string.signin_forgotPassword),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    textAlign = TextAlign.End
+                    textAlign = TextAlign.End,
+                    color = MaterialTheme.colorScheme.inverseSurface
                 )
             }
             Spacer(modifier = Modifier.height(24.dp))
@@ -153,7 +138,7 @@ fun LoginScreen() {
             ) {
                 Text(
                     text = stringResource(R.string.signin_joinForFree),
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.inverseSurface
                 )
             }
         }
