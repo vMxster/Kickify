@@ -1,12 +1,9 @@
 package it.unibo.kickify.ui.screens.home
 
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,7 +25,7 @@ import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.HomeScreenCategory
 import it.unibo.kickify.ui.composables.HomeScreenSection
 import it.unibo.kickify.ui.composables.HomeScreenSmallBrandLogos
-import it.unibo.kickify.ui.composables.RoundedTextField
+import it.unibo.kickify.ui.composables.SearchRoundedTextField
 
 @Preview
 @Composable
@@ -56,15 +53,20 @@ fun HomeScreen(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(contentPadding)
                 .verticalScroll(state)
         ){
-            RoundedTextField()
+            SearchRoundedTextField(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                onSearchAction = {  }
+            )
 
             Row(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(vertical = 6.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 6.dp).padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ){
@@ -74,9 +76,10 @@ fun HomeScreen(
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .horizontalScroll(brandIconsScrollState)
-                    .padding(vertical = 6.dp),
+                    .padding(vertical = 6.dp).padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -86,16 +89,16 @@ fun HomeScreen(
             }
 
             // begin shoes section
-
-            HomeScreenSection(
+            val homeSectionsModifier = Modifier.padding(vertical = 6.dp).padding(horizontal = 8.dp)
+            HomeScreenSection(modifier = homeSectionsModifier,
                 sectionTitle = "Popular Shoes",
                 prodList = listOf("p1", "p2"))
 
-            HomeScreenSection(
+            HomeScreenSection(modifier = homeSectionsModifier,
                 sectionTitle = "Novelties",
                 prodList = listOf("p1", "p2"))
 
-            HomeScreenSection(
+            HomeScreenSection(modifier = homeSectionsModifier,
                 sectionTitle = "Discounted",
                 prodList = listOf("p1", "p2"))
         }

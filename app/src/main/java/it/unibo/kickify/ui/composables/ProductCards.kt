@@ -1,7 +1,6 @@
 package it.unibo.kickify.ui.composables
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
@@ -38,8 +36,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.ShopCategory
-import it.unibo.kickify.ui.theme.Black
-import it.unibo.kickify.ui.theme.GhostWhite
 
 @Composable
 fun ProductCardWishlistPage(
@@ -105,6 +101,7 @@ fun SquareProductCardHomePage(
         modifier = Modifier
             .size(200.dp)
             .fillMaxSize()
+            .padding(horizontal = 8.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -196,14 +193,12 @@ fun ProductImage(
 @Composable
 fun ProductNameText(
     productName:String,
-    color: Color = Black,
     style: TextStyle = MaterialTheme.typography.bodyMedium,
     textAlign: TextAlign = TextAlign.Center,
     fontWeight: FontWeight = FontWeight.Bold
 ){
     Text(
         text = productName,
-        color = color,
         style = style,
         textAlign = textAlign,
         fontWeight = fontWeight
@@ -213,13 +208,11 @@ fun ProductNameText(
 @Composable
 fun ProductCategoryText(
     category: ShopCategory,
-    color: Color = Black,
     style: TextStyle = MaterialTheme.typography.bodySmall,
     textAlign: TextAlign = TextAlign.Center
 ){
     Text(
         text = category.toString(),
-        color = color,
         style = style,
         textAlign = textAlign
     )
@@ -227,12 +220,10 @@ fun ProductCategoryText(
 
 @Composable
 fun ProductPriceText(price: Double,
-                     color: Color = Black,
                      style: TextStyle = MaterialTheme.typography.bodyMedium,
                      textAlign: TextAlign = TextAlign.Center){
     Text(
         text = "€%.2f".format(price),
-        color = color,
         style = style,
         textAlign = textAlign,
         modifier = Modifier.padding(vertical = 6.dp)

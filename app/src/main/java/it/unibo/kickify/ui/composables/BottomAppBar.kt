@@ -12,13 +12,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import it.unibo.kickify.ui.theme.GhostWhite
 
 @Composable
 fun BottomBar(){
-    BottomAppBar(
-        containerColor = GhostWhite
-    ) {
+    BottomAppBar() {
         Spacer(Modifier.weight(0.7f, true))
         IconButton(onClick = { /* go to Home */ }) {
             Icon(Icons.Outlined.Home, contentDescription = "Home")
