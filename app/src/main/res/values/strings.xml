@@ -58,4 +58,5 @@
     <string name="notificationscreen_productsInCart">Shoes still in your cart</string>
     <string name="notificationscreen_orderPlaced">Order placed</string>
     <string name="notificationscreen_productReviewRequested">Product review requested</string>
+    <string name="wishlist_title">Wishlist</string>
 </resources>
