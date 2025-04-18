@@ -1,9 +1,5 @@
 package it.unibo.kickify.ui.composables
 
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
@@ -11,27 +7,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
+import it.unibo.kickify.ui.theme.BluePrimary
+import it.unibo.kickify.ui.theme.GhostWhite
 
 @Composable
-fun SwitchButton(checked: Boolean = false) {
-    var _checked by remember { mutableStateOf(checked) }
+fun SwitchButton(
+    isChecked: Boolean,
+    onChangeCheckedAction: () -> Unit
+) {
+    var checked by remember { mutableStateOf(isChecked) }
 
     Switch(
-        checked = _checked,
+        checked = checked,
         onCheckedChange = {
-            _checked = it
+            checked = it
+            onChangeCheckedAction()
         },
-        thumbContent = if (checked) {
-            {
-                Icon(
-                    imageVector = Icons.Filled.Check,
-                    contentDescription = null,
-                    modifier = Modifier.size(SwitchDefaults.IconSize),
-                )
-            }
-        } else {
-            null
-        }
+        colors = SwitchDefaults.colors(
+            checkedThumbColor = GhostWhite,
+            uncheckedThumbColor = GhostWhite,
+            checkedTrackColor = BluePrimary,
+            uncheckedTrackColor = BluePrimary,
+            checkedBorderColor = BluePrimary,
+            uncheckedBorderColor = BluePrimary
+        )
     )
 }

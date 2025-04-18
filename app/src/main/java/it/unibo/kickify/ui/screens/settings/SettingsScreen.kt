@@ -1,92 +1,97 @@
 package it.unibo.kickify.ui.screens.settings
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountBalanceWallet
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.NotificationsActive
+import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import it.unibo.kickify.R
-import it.unibo.kickify.data.models.Theme
-import it.unibo.kickify.ui.composables.SwitchButton
-import it.unibo.kickify.ui.theme.KickifyTheme
+import it.unibo.kickify.ui.composables.AppBar
+import it.unibo.kickify.ui.composables.SettingsItemWithLeadingIcon
+import it.unibo.kickify.ui.composables.SettingsItemWithTrailingSwitchButton
+import it.unibo.kickify.ui.composables.SettingsTitleLine
 
-@Preview
 @Composable
 fun SettingsScreen(
+    navController: NavController = NavController(LocalContext.current)
     //state: ThemeState,
     //onThemeSelected: (Theme) -> Unit*/
 ) {
-    KickifyTheme {
-        Column(
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier.selectableGroup())
-        {
-            Text(text = stringResource(R.string.settings_chooseTheme),
-                color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.padding(start = 16.dp)
+    Scaffold(
+        topBar = {
+            AppBar(
+                navController,
+                title = stringResource(R.string.settings_title)
             )
-            Theme.entries.forEach { theme ->
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .selectable(
-                            /*selected = (theme == state.theme),
-                            onClick = { onThemeSelected(theme) },*/
-                            selected = false,
-                            onClick = {},
-                            role = Role.RadioButton
-                        )
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = false, //(theme == state.theme),
-                        onClick = null
-                    )
-                    Text(
-                        text = getLocalizedThemeString(theme),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
-                }
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-            ){
-                Text(text = stringResource(R.string.settings_enableLoginWithFingerPrint),
-                    color = MaterialTheme.colorScheme.onPrimary)
-                Spacer(modifier = Modifier.width(26.dp))
-                SwitchButton(checked = false)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
         }
-    }
-}
+    ) { contentPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(contentPadding)
+                .padding(horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
 
-@Composable
-private fun getLocalizedThemeString(theme: Theme) : String {
-    return when(theme) {
-        Theme.Light -> stringResource(R.string.theme_light)
-        Theme.Dark -> stringResource(R.string.theme_dark)
-        else -> stringResource(R.string.theme_system)
+            SettingsTitleLine(stringResource(R.string.settings_accountTitle))
+            SettingsItemWithLeadingIcon(
+                icon = Icons.Outlined.NotificationsActive,
+                text = stringResource(R.string.settings_notifications),
+                onClick = {}
+            )
+            SettingsItemWithLeadingIcon(
+                icon = Icons.Outlined.ShoppingCart,
+                text = stringResource(R.string.settings_shippingAddress),
+                onClick = {}
+            )
+            SettingsItemWithLeadingIcon(
+                icon = Icons.Outlined.AccountBalanceWallet,
+                text = stringResource(R.string.settings_payment),
+                onClick = {}
+            )
+            SettingsItemWithLeadingIcon(
+                icon = Icons.Outlined.Delete,
+                text = stringResource(R.string.settings_deleteAccount),
+                onClick = {}
+            )
+
+            Spacer(Modifier.height(15.dp))
+            SettingsTitleLine(stringResource(R.string.settings_appSettingsTitle))
+            SettingsItemWithTrailingSwitchButton(
+                stringResource(R.string.settings_enableFaceIDtoLogin),
+                checked = false,
+                onSwitchChange = { }
+            )
+            SettingsItemWithTrailingSwitchButton(
+                stringResource(R.string.settings_enableFingerprintToLogin),
+                checked = false,
+                onSwitchChange = { }
+            )
+            SettingsItemWithTrailingSwitchButton(
+                stringResource(R.string.settings_enableLocationServices),
+                checked = true,
+                onSwitchChange = { }
+            )
+            SettingsItemWithTrailingSwitchButton(
+                stringResource(R.string.settings_darkTheme),
+                checked = true,
+                onSwitchChange = { }
+            )
+        }
     }
 }
