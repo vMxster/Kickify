@@ -1,4 +1,4 @@
-package it.unibo.kickify.ui.screens.wishlist
+package it.unibo.kickify.ui.screens.productList
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,24 +16,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
+import it.unibo.kickify.data.models.ShopCategory
 import it.unibo.kickify.ui.composables.AppBar
-import it.unibo.kickify.ui.composables.ProductCardWishlistPage
+import it.unibo.kickify.ui.composables.ProductCardShoesPage
 
 @Preview
 @Composable
-fun WishlistScreen(
+fun ProductListScreen(
     navController: NavController = NavController(LocalContext.current)
 ){
-    val itemNames = listOf("Nike Lunarglide", "Nike Zoom", "Nike Air Max", "Nike Zoom 2K")
-    val itemPrices = listOf(59.99, 37.99, 59.99, 37.99)
-
+    val itemNames = listOf("Nike Air Force", "Nike Air Max",
+        "Nike Jordan", "Nike Air Max", "Nike Air Force", "Nike Air Max")
+    val itemPrices = listOf(98.76, 99.89, 119.99, 189.99, 69.99, 189.99)
     Scaffold(
         topBar = {
             AppBar(
                 navController,
-                title = stringResource(R.string.wishlist_title)
+                title = stringResource(R.string.homescreen_popular)
             )
         },
+        bottomBar = { }
     ) { contentPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -42,17 +44,18 @@ fun WishlistScreen(
                 .fillMaxSize()
                 .padding(contentPadding)
                 .padding(horizontal = 16.dp)
-        ){
+        ) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                items(itemNames.size){ index ->
-                    ProductCardWishlistPage(
+                items(itemNames.size) { index ->
+                    ProductCardShoesPage(
                         productName = itemNames[index],
                         price = itemPrices[index],
-                        onClick = {}
+                        onClick = {},
+                        category = ShopCategory.Men
                     )
                 }
             }

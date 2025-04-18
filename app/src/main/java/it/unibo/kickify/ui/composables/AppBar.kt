@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.ShoppingBag
+import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,8 +31,8 @@ import it.unibo.kickify.ui.theme.BluePrimary
 fun AppBar(navController: NavController, title: String) {
     CenterAlignedTopAppBar(
         title = {
-            if(title == stringResource(R.string.app_name)){
-                if(isSystemInDarkTheme()){
+            if(title == stringResource(R.string.app_name)) {
+                if (isSystemInDarkTheme()) {
                     Image(
                         painterResource(R.drawable.kickify_dark_banner),
                         "logo",
@@ -76,6 +77,11 @@ fun AppBar(navController: NavController, title: String) {
                         text = stringResource(R.string.notificationscreen_clearAll),
                         color = BluePrimary
                     )
+                }
+            }
+            if(title == stringResource(R.string.homescreen_popular)){
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(Icons.Outlined.Tune, contentDescription = "Filter")
                 }
             }
             /*if (title != "Settings") {
