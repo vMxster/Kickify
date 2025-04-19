@@ -68,4 +68,8 @@
     <string name="notificationscreen_orderPlaced">Order placed</string>
     <string name="notificationscreen_productReviewRequested">Product review requested</string>
     <string name="wishlist_title">Wishlist</string>
+    <string name="prodDetails_gallery">Gallery</string>
+    <string name="prodDetails_size">Size</string>
+    <string name="prodDetails_price">Price</string>
+    <string name="prodDetails_addToCart">Add To Cart</string>
 </resources>
