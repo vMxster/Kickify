@@ -5,6 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.ShoppingBag
 import androidx.compose.material.icons.outlined.Tune
@@ -82,6 +83,11 @@ fun AppBar(navController: NavController, title: String) {
             if(title == stringResource(R.string.homescreen_popular)){
                 IconButton(onClick = { /*TODO*/ }) {
                     Icon(Icons.Outlined.Tune, contentDescription = "Filter")
+                }
+            }
+            if (title == stringResource(R.string.profileScreen_title)){
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(Icons.Outlined.Edit, contentDescription = "Edit profile")
                 }
             }
             /*if (title != "Settings") {
