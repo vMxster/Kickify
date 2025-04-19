@@ -18,7 +18,7 @@ import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.CartItemsList
-import it.unibo.kickify.ui.composables.CartResume
+import it.unibo.kickify.ui.composables.CartAndCheckoutResume
 
 @Preview
 @Composable
@@ -41,7 +41,7 @@ fun CartScreen(
         ) {
             CartItemsList()
             Spacer(Modifier.height(20.dp))
-            CartResume(subTotal = (69.99+129.99+87.99), shipping = 10.0)
+            CartAndCheckoutResume(subTotal = (69.99+129.99+87.99), shipping = 10.0)
         }
     }
 }

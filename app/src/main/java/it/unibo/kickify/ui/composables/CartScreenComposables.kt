@@ -21,7 +21,6 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -31,7 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,8 +42,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import it.unibo.kickify.R
-import it.unibo.kickify.ui.theme.Black
-import it.unibo.kickify.ui.theme.GhostWhite
 
 @Composable
 fun CartItemsList(){
@@ -165,7 +161,7 @@ fun QuantityManager(){
 }
 
 @Composable
-fun CartResume(subTotal: Double, shipping: Double){
+fun CartAndCheckoutResume(subTotal: Double, shipping: Double){
     Card(
         //onClick = onClick,
         modifier = Modifier.height(180.dp)
@@ -185,7 +181,7 @@ fun CartResume(subTotal: Double, shipping: Double){
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
                 Text(
-                    stringResource(R.string.cartscreen_subtotal))
+                    stringResource(R.string.subtotal))
                 Spacer(Modifier.width(20.dp))
                 Text("€%.2f".format(subTotal))
             }
@@ -197,7 +193,7 @@ fun CartResume(subTotal: Double, shipping: Double){
                     .padding(vertical = 6.dp)
             ){
                 Text(
-                    stringResource(R.string.cartscreen_shipping),
+                    stringResource(R.string.shipping),
                 )
                 Spacer(Modifier.width(20.dp))
                 "%.2f".format(shipping)
@@ -214,7 +210,7 @@ fun CartResume(subTotal: Double, shipping: Double){
                     .padding(vertical = 6.dp)
             ){
                 Text(
-                    stringResource(R.string.cartscreen_totalCost),
+                    stringResource(R.string.totalCost),
                 )
                 Spacer(Modifier.width(20.dp))
                 Text("€%.2f".format((subTotal+shipping))

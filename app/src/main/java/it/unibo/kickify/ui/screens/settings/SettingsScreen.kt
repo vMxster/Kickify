@@ -61,7 +61,7 @@ fun SettingsScreen(
             )
             SettingsItemWithLeadingIcon(
                 icon = Icons.Outlined.AccountBalanceWallet,
-                text = stringResource(R.string.settings_payment),
+                text = stringResource(R.string.payment),
                 onClick = {}
             )
             SettingsItemWithLeadingIcon(
