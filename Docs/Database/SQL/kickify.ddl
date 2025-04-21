@@ -1,8 +1,8 @@
 -- Database Section
 -- ________________ 
 
-CREATE DATABASE IF NOT EXISTS UrbanKicks;
-USE UrbanKicks;
+CREATE DATABASE IF NOT EXISTS Kickify;
+USE Kickify;
 
 -- Tables Section
 -- _____________ 
@@ -71,10 +71,10 @@ CREATE TABLE IF NOT EXISTS comprendere (
 
 CREATE TABLE IF NOT EXISTS INDIRIZZO (
      Email VARCHAR(100) NOT NULL,
-     Via VARCHAR(255) NOT NULL,
+     Via VARCHAR(100) NOT NULL,
      NumeroCivico INT NOT NULL,
      CAP INT NOT NULL,
-     Citta VARCHAR(100) NOT NULL,
+     Citta VARCHAR(45) NOT NULL,
      Provincia VARCHAR(50) NOT NULL,
      Nazione VARCHAR(50) NOT NULL,
      Predefinito TINYINT(1) NOT NULL,

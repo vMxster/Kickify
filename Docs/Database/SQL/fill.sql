@@ -1,5 +1,5 @@
 -- Inserimento Utente ADMIN
-INSERT INTO UTENTE (Email, Nome, Cognome, Password, Data_Registrazione, Preferenze_Newsletter, Ruolo) VALUES ("tomassimartin@hotmail.com", "UrbanKicks", "Admin", "$2y$10$l4Llx3ynDp0HbOYyADATEOBmFUNaELDU0LI4VYIncpajnTYJCfdFa", NOW(), 0, "Admin");
+INSERT INTO UTENTE (Email, Nome, Cognome, Password, Data_Registrazione, Preferenze_Newsletter, Ruolo) VALUES ("tomassimartin@hotmail.com", "Kickify", "Admin", "$2y$10$l4Llx3ynDp0HbOYyADATEOBmFUNaELDU0LI4VYIncpajnTYJCfdFa", NOW(), 0, "Admin");
 
 -- Inserimento Stato Notifica
 INSERT INTO STATO_NOTIFICA (Tipo, Descrizione) VALUES
