@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
@@ -101,7 +102,7 @@ fun SquareProductCardHomePage(
         modifier = Modifier
             .size(200.dp)
             .fillMaxSize()
-            .padding(horizontal = 8.dp)
+            .padding(horizontal = 12.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -124,8 +125,8 @@ fun RectangularProductCardHomePage(
     Card(
         onClick = onClick,
         modifier = Modifier
-            .size(300.dp, 130.dp)
             .fillMaxSize()
+            .padding(horizontal = 12.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()

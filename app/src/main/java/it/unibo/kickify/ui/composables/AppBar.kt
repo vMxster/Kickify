@@ -96,8 +96,11 @@ fun AppBar(navController: NavController, title: String) {
                 }
             }*/
         },
-        /*colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = BluePrimary
-        )*/
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.onBackground,
+            navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+            actionIconContentColor = MaterialTheme.colorScheme.onBackground
+        )
     )
 }

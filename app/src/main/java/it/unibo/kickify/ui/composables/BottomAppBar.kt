@@ -10,12 +10,16 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
 fun BottomBar(){
-    BottomAppBar() {
+    BottomAppBar(
+        containerColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground
+    ) {
         Spacer(Modifier.weight(0.7f, true))
         IconButton(onClick = { /* go to Home */ }) {
             Icon(Icons.Outlined.Home, contentDescription = "Home")
