@@ -52,7 +52,7 @@ fun ProductDetailsScreen(
                 .padding(horizontal = 16.dp)
                 .verticalScroll(state),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
             val productInfo = mapOf("name" to "Nike Air Zoom",
                 "descr" to "Nike Air Zoom is a responsive cushioning technology in footwear," +

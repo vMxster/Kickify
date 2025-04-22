@@ -167,8 +167,8 @@ fun SizesList(
                 },
                 enabled = size.value, // button is enabled if corresponding size is
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (selectedSize == size.key) BluePrimary else MaterialTheme.colorScheme.surfaceContainer,
-                    contentColor = if(selectedSize == size.key) Color.White else MediumGray
+                    containerColor = if (selectedSize == size.key) BluePrimary else MaterialTheme.colorScheme.background,
+                    contentColor = if(selectedSize == size.key) Color.White else MaterialTheme.colorScheme.onSurface
                 ),
                 contentPadding = ButtonDefaults.ExtraSmallContentPadding,
                 shape = CircleShape,
