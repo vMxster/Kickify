@@ -69,7 +69,7 @@ fun CartItem(
 ){
     Card(
         //onClick = onClick,
-        modifier = Modifier.height(90.dp)
+        modifier = Modifier.height(110.dp)
             .padding(horizontal = 12.dp)
             .fillMaxWidth(),
     ) {

@@ -1,5 +1,6 @@
 package it.unibo.kickify.ui.screens.onboard
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,15 @@ fun OnBoardScreen(
     val totalDots = 3
     var selectedIndex by remember { mutableIntStateOf(0) }
 
+    fun selectedIndexMgr(){
+        if (selectedIndex == (totalDots - 1)) {
+            // when on last page, go to login page
+
+        } else if (selectedIndex < (totalDots -1 )){
+            selectedIndex += 1
+        }
+    }
+
     Scaffold { contentPadding ->
         Column (
             modifier = Modifier.fillMaxSize()
@@ -62,8 +72,7 @@ fun OnBoardScreen(
                 when (selectedIndex) {
                     0 -> stringResource(R.string.onboard_title_1)
                     1 -> stringResource(R.string.onboard_title_2)
-                    2 -> stringResource(R.string.onboard_title_3)
-                    else -> " "
+                    else -> stringResource(R.string.onboard_title_3)
                 }, style = TextStyle(
                     fontSize = 33.sp,
                     fontWeight = FontWeight.Bold,
@@ -76,8 +85,7 @@ fun OnBoardScreen(
                 when (selectedIndex) { // messages
                     0 -> stringResource(R.string.onboard_text_1)
                     1 -> stringResource(R.string.onboard_text_2)
-                    2 -> stringResource(R.string.onboard_text_3)
-                    else -> " "
+                    else -> stringResource(R.string.onboard_text_3)
                 }, style = TextStyle(
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Normal,
@@ -95,14 +103,9 @@ fun OnBoardScreen(
                     modifier = Modifier.padding(16.dp)
                 )
 
-                //Spacer(modifier = Modifier.height(16.dp))
-
-                Button(onClick = {
-                    selectedIndex = (selectedIndex + 1) % totalDots
-                    if (selectedIndex == (totalDots - 1)) {
-                        // when on last page, go to login page
-                    }
-                }) {
+                Button(
+                    onClick = { selectedIndexMgr() }
+                ) {
                     Text(
                         when (selectedIndex) {
                             0 -> stringResource(R.string.getStarted_button)
