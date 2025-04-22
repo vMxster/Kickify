@@ -165,7 +165,7 @@ fun CartAndCheckoutResume(subTotal: Double, shipping: Double){
     Card(
         //onClick = onClick,
         modifier = Modifier.height(180.dp)
-            .padding(horizontal = 12.dp)
+            .padding(horizontal = 10.dp)
             .padding(bottom = 4.dp)
             .fillMaxWidth()
     ) {

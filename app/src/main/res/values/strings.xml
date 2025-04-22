@@ -78,4 +78,6 @@
     <string name="checkoutScreen_contactInformation">Contact Information</string>
     <string name="checkoutScreen_address">Address</string>
     <string name="checkoutScreen_paymentMethod">Payment Method</string>
+    <string name="checkoutScreen_email">Email</string>
+    <string name="checkoutScreen_phone">Phone</string>
 </resources>
