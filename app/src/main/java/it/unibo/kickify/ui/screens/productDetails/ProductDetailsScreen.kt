@@ -88,7 +88,7 @@ fun ProductDetailsScreen(
                 productName = productInfo.getValue("name").toString()
             )
 
-            SectionTitle(title = stringResource(R.string.prodDetails_size))
+            SectionTitle(title = stringResource(R.string.size))
             SizesList(
                 sizeSelected = 40,
                 sizesAvailability =  mapOf(

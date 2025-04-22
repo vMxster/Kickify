@@ -51,7 +51,7 @@
     <string name="homescreen_novelties">Novelties</string>
     <string name="homescreen_discounted">Discounted</string>
     <string name="homescreen_seeAll">See all</string>
-    <string name="cartscreen_size">Size</string>
+    <string name="size">Size</string>
     <string name="subtotal">Subtotal</string>
     <string name="shipping">Shipping</string>
     <string name="totalCost">Total Cost</string>
@@ -69,8 +69,7 @@
     <string name="notificationscreen_productReviewRequested">Product review requested</string>
     <string name="wishlist_title">Wishlist</string>
     <string name="prodDetails_gallery">Gallery</string>
-    <string name="prodDetails_size">Size</string>
-    <string name="prodDetails_price">Price</string>
+    <string name="price">Price</string>
     <string name="prodDetails_addToCart">Add To Cart</string>
     <string name="profileScreen_title">Profile</string>
     <string name="profileScreen_fullName">Full Name</string>
@@ -80,4 +79,8 @@
     <string name="checkoutScreen_paymentMethod">Payment Method</string>
     <string name="checkoutScreen_email">Email</string>
     <string name="checkoutScreen_phone">Phone</string>
+    <string name="filterBottomSheet_title">Filters</string>
+    <string name="filterBottomSheet_reset">Reset</string>
+    <string name="filterBottomSheet_gender">Gender</string>
+    <string name="filterBottomSheet_apply">Apply</string>
 </resources>
