@@ -23,7 +23,7 @@ import it.unibo.kickify.data.models.ShopCategory
 import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.HomeScreenCategory
-import it.unibo.kickify.ui.composables.HomeScreenSection
+import it.unibo.kickify.ui.composables.HomeScreenSectionSquareProductCards
 import it.unibo.kickify.ui.composables.HomeScreenSmallBrandLogos
 import it.unibo.kickify.ui.composables.SearchRoundedTextField
 
@@ -84,23 +84,24 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 for(brandName in brands){
-                    HomeScreenSmallBrandLogos(brandName)
+                    HomeScreenSmallBrandLogos(brandName, onClick = {})
                 }
             }
 
             // begin shoes section
             val homeSectionsModifier = Modifier.padding(vertical = 6.dp).padding(horizontal = 8.dp)
-            HomeScreenSection(modifier = homeSectionsModifier,
+            HomeScreenSectionSquareProductCards(modifier = homeSectionsModifier,
                 sectionTitle = "Popular Shoes",
-                prodList = listOf("p1", "p2"))
+                prodList = mapOf("p1" to false, "p2" to false)
+            )
 
-            HomeScreenSection(modifier = homeSectionsModifier,
+            HomeScreenSectionSquareProductCards(modifier = homeSectionsModifier,
                 sectionTitle = "Novelties",
-                prodList = listOf("p1", "p2"))
+                prodList = mapOf("p1" to true))
 
-            HomeScreenSection(modifier = homeSectionsModifier,
+            HomeScreenSectionSquareProductCards(modifier = homeSectionsModifier,
                 sectionTitle = "Discounted",
-                prodList = listOf("p1", "p2"))
+                prodList = mapOf("p1" to false, "p2" to false))
         }
 
     }
