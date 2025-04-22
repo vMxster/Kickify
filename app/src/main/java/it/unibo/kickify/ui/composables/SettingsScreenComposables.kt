@@ -41,7 +41,7 @@ fun SettingsItemWithLeadingIcon(
     Row(
         modifier = Modifier.fillMaxWidth()
             .padding(vertical = 6.dp)
-            .height(30.dp),
+            .height(40.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ){
@@ -52,7 +52,8 @@ fun SettingsItemWithLeadingIcon(
         Text(
             text = text,
             style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Start
+            textAlign = TextAlign.Start,
+            modifier = Modifier.fillMaxWidth(fraction = 0.8f)
         )
         Icon(
             Icons.Outlined.ChevronRight,

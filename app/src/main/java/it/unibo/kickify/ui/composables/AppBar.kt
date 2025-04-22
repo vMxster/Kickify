@@ -17,7 +17,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -25,11 +31,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
+import it.unibo.kickify.ui.screens.productList.FilterScreen
 import it.unibo.kickify.ui.theme.BluePrimary
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppBar(navController: NavController, title: String) {
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScope = rememberCoroutineScope()
+    var showSheet by remember { mutableStateOf(false) }
+
     CenterAlignedTopAppBar(
         title = {
             if(title == stringResource(R.string.app_name)) {
@@ -80,10 +93,29 @@ fun AppBar(navController: NavController, title: String) {
                     )
                 }
             }
-            if(title == stringResource(R.string.homescreen_popular)){
-                IconButton(onClick = { /*TODO*/ }) {
+            if(title.contains("Shoes")){ // Popular shoes, etc.
+                IconButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            showSheet = true
+                            sheetState.show()
+                        }
+                    }
+                ) {
                     Icon(Icons.Outlined.Tune, contentDescription = "Filter")
                 }
+            }
+            if(showSheet){
+                FilterScreen(
+                    onDismissRequest = {
+                        coroutineScope.launch {
+                            showSheet = false
+                            sheetState.hide()
+                        }
+                    },
+                    sheetState = sheetState,
+                    onResetFilter = {}
+                )
             }
             if (title == stringResource(R.string.profileScreen_title)){
                 IconButton(onClick = { /*TODO*/ }) {

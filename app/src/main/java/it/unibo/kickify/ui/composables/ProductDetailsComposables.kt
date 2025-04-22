@@ -194,7 +194,7 @@ fun ProductDetailsFooter(
         Column(
             modifier = Modifier.fillMaxWidth(fraction = 0.5f)
         ) {
-            Text(stringResource((R.string.prodDetails_price)))
+            Text(stringResource((R.string.price)))
             ProductPrice(price = price)
         }
 

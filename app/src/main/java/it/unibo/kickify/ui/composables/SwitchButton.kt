@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import it.unibo.kickify.ui.theme.BluePrimary
 import it.unibo.kickify.ui.theme.GhostWhite
 
@@ -27,9 +28,8 @@ fun SwitchButton(
             checkedThumbColor = GhostWhite,
             uncheckedThumbColor = GhostWhite,
             checkedTrackColor = BluePrimary,
-            uncheckedTrackColor = BluePrimary,
             checkedBorderColor = BluePrimary,
-            uncheckedBorderColor = BluePrimary
+            uncheckedBorderColor = Color.Unspecified
         )
     )
 }
