@@ -66,7 +66,10 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
+    implementation(libs.androidx.compose.material3.material3)
     implementation(libs.material3)
     implementation(libs.androidx.material3.adaptive.navigation.suite)
+
+    /* for biometric authentication */
+    implementation(libs.androidx.biometric.v120alpha05)
 }

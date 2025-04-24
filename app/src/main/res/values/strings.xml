@@ -83,4 +83,7 @@
     <string name="filterBottomSheet_reset">Reset</string>
     <string name="filterBottomSheet_gender">Gender</string>
     <string name="filterBottomSheet_apply">Apply</string>
+    <string name="notificationManager_channelVisibleName">Generic notifications</string>
+    <string name="notificationManager_channelVisibleDescription">All notifications about offers, your orders…</string>
+
 </resources>
