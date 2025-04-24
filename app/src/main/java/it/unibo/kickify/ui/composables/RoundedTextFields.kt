@@ -27,7 +27,10 @@ import androidx.compose.ui.unit.dp
 import it.unibo.kickify.R
 
 @Composable
-fun SearchRoundedTextField(modifier: Modifier, onSearchAction: () -> Unit){
+fun SearchRoundedTextField(
+    modifier: Modifier,
+    onSearchAction: () -> Unit
+) {
     RoundedTextFieldGeneralWithLeadingIcon(
         leadingIcon = Icons.Outlined.Search,
         singleline = true,

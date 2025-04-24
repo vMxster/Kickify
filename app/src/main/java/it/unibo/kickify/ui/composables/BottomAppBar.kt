@@ -13,19 +13,21 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
+import it.unibo.kickify.ui.KickifyRoute
 
 @Composable
-fun BottomBar(){
+fun BottomBar(navController: NavController){
     BottomAppBar(
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground
     ) {
         Spacer(Modifier.weight(0.7f, true))
-        IconButton(onClick = { /* go to Home */ }) {
+        IconButton(onClick = { navController.navigate(KickifyRoute.Home) }) {
             Icon(Icons.Outlined.Home, contentDescription = "Home")
         }
         Spacer(Modifier.weight(1f, true))
-        IconButton(onClick = { /* go to wishlist */ }) {
+        IconButton(onClick = { navController.navigate(KickifyRoute.Wishlist) }) {
             Icon(Icons.Outlined.FavoriteBorder, contentDescription = "")
         }
         Spacer(Modifier.weight(1f, true))
@@ -33,11 +35,11 @@ fun BottomBar(){
             Icon(Icons.Outlined.Search, contentDescription = "")
         }
         Spacer(Modifier.weight(1f, true))
-        IconButton(onClick = { /* go to notification page */ }) {
+        IconButton(onClick = { navController.navigate(KickifyRoute.Notifications) }) {
             Icon(Icons.Outlined.Notifications, contentDescription = "")
         }
         Spacer(Modifier.weight(1f, true))
-        IconButton(onClick = { /* go to profile page */ }) {
+        IconButton(onClick = { navController.navigate(KickifyRoute.Profile) }) {
             Icon(Icons.Outlined.Person, contentDescription = "")
         }
         Spacer(Modifier.weight(0.7f, true))

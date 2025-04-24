@@ -3,7 +3,6 @@ package it.unibo.kickify.ui.screens.notifications
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -14,19 +13,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.NotificationType
 import it.unibo.kickify.ui.composables.AppBar
-import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.NotificationItem
 import it.unibo.kickify.ui.composables.NotificationTitleLine
 import it.unibo.kickify.ui.theme.BluePrimary
-import it.unibo.kickify.ui.theme.KickifyTheme
 
-@Preview(backgroundColor = 0xFFFFFF)
 @Composable
 fun NotificationScreen(
     navController: NavController = NavController(LocalContext.current)

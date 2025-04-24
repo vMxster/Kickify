@@ -1,6 +1,5 @@
 package it.unibo.kickify.ui.screens.onboard
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,14 +25,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
+import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.ExpandingDotIndicator
 
-@Preview
 @Composable
 fun OnBoardScreen(
     navController: NavController = NavController(LocalContext.current)
@@ -41,10 +39,11 @@ fun OnBoardScreen(
     val totalDots = 3
     var selectedIndex by remember { mutableIntStateOf(0) }
 
-    fun selectedIndexMgr(){
+    fun selectedIndexMgr() {
         if (selectedIndex == (totalDots - 1)) {
-            // when on last page, go to login page
-
+            navController.navigate(KickifyRoute.Login) {
+                popUpTo(KickifyRoute.Onboard) { inclusive = true }
+            }
         } else if (selectedIndex < (totalDots -1 )){
             selectedIndex += 1
         }

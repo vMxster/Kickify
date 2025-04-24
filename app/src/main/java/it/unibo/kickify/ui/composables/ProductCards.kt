@@ -1,6 +1,7 @@
 package it.unibo.kickify.ui.composables
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -95,14 +96,14 @@ fun ProductCardWishlistPage(
 fun SquareProductCardHomePage(
     productName: String,
     price: Double,
-    onClick: () -> Unit
+    onClick: (Int) -> Unit
 ){
     Card(
-        onClick = onClick,
         modifier = Modifier
             .size(200.dp)
             .fillMaxSize()
             .padding(horizontal = 12.dp)
+            .clickable { onClick(1) } // Shoe ID to be passed
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -120,13 +121,13 @@ fun SquareProductCardHomePage(
 fun RectangularProductCardHomePage(
     productName: String,
     price: Double,
-    onClick: () -> Unit
+    onClick: (Int) -> Unit
 ){
     Card(
-        onClick = onClick,
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 12.dp)
+            .clickable { onClick(1) } // Shoe ID to be passed
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()

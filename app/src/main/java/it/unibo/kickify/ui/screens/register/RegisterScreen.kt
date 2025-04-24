@@ -22,17 +22,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
+import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.EmailRoundedTextField
 import it.unibo.kickify.ui.composables.PasswordRoundedTextField
 import it.unibo.kickify.ui.composables.UsernameRoundedTextField
 import it.unibo.kickify.ui.theme.MediumGray
 
-@Preview
 @Composable
 fun RegisterScreen(
     navController: NavController = NavController(LocalContext.current)
@@ -89,7 +88,11 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(15.dp))
             Button(
-                onClick = { /* standard login */ },
+                onClick = {
+                    navController.navigate(KickifyRoute.Login) {
+                        popUpTo(KickifyRoute.Register) { inclusive = true }
+                    }
+                },
                 modifier = registerScreenModifier,
             ) {
                 Text(
@@ -114,7 +117,11 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(15.dp))
 
             TextButton(
-                onClick = { /* go to login page */ },
+                onClick = {
+                    navController.navigate(KickifyRoute.Login) {
+                        popUpTo(KickifyRoute.Register) { inclusive = true }
+                    }
+                },
                 modifier = registerScreenModifier,
             ) {
                 Text(

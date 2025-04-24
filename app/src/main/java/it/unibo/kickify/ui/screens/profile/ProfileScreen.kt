@@ -25,7 +25,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -38,7 +37,6 @@ import it.unibo.kickify.ui.theme.BluePrimary
 import it.unibo.kickify.ui.theme.GhostWhite
 import it.unibo.kickify.ui.theme.LightGray
 
-@Preview
 @Composable
 fun ProfileScreen(
     navController: NavController = NavController(LocalContext.current)

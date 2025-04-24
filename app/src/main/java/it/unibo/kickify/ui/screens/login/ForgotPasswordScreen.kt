@@ -16,15 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
+import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.EmailRoundedTextField
 
-@Preview
 @Composable
 fun ForgotPasswordScreen(
     navController: NavController = NavController(LocalContext.current)
@@ -76,7 +75,11 @@ fun ForgotPasswordScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { /* standard login */ },
+                onClick = {
+                    navController.navigate(KickifyRoute.Login) {
+                        popUpTo(KickifyRoute.ForgotPassword) { inclusive = true }
+                    }
+                },
                 modifier = forgotScreenModifier,
             ) {
                 Text(

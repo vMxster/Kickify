@@ -27,11 +27,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.ShopCategory
+import it.unibo.kickify.ui.KickifyRoute
 
 @Composable
-fun HomeScreenSmallBrandLogos(brandName: Int, onClick: () -> Unit) {
+fun HomeScreenSmallBrandLogos(brandName: Int, onClick: (String) -> Unit) {
     Image(
         painter = painterResource(brandName),
         "",
@@ -39,7 +41,7 @@ fun HomeScreenSmallBrandLogos(brandName: Int, onClick: () -> Unit) {
         modifier = Modifier
             .size(46.dp)
             .clip(CircleShape)
-            .clickable { onClick() }
+            .clickable { onClick(brandName.toString()) } // To Add the Brand Name
             .background(MaterialTheme.colorScheme.surface)
             .padding(4.dp),
         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
@@ -48,9 +50,9 @@ fun HomeScreenSmallBrandLogos(brandName: Int, onClick: () -> Unit) {
 }
 
 @Composable
-fun HomeScreenCategory(categoryName: ShopCategory, onClick: () -> Unit) {
+fun HomeScreenCategory(categoryName: ShopCategory, onClick: (String) -> Unit) {
     Button(
-        onClick = { onClick() },
+        onClick = { onClick(categoryName.toString()) },
         modifier = Modifier.padding(horizontal = 4.dp),
         colors =  ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -63,11 +65,11 @@ fun HomeScreenCategory(categoryName: ShopCategory, onClick: () -> Unit) {
 
 @Composable
 fun HomeScreenSectionSquareProductCards(
+    navController: NavController,
     sectionTitle:String,
     /** associates the product with a boolean: true to make a rectangular product card, false to make a square product card*/
     prodList: Map<String, Boolean>,
     modifier: Modifier
-    /*onClick: () -> Unit*/
 ){
 
     Column (
@@ -84,7 +86,7 @@ fun HomeScreenSectionSquareProductCards(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-            TextButton(onClick = { /*onClick()*/ }) {
+            TextButton(onClick = { navController.navigate(KickifyRoute.ProductListWithCategory(sectionTitle)) }) {
                 Text(stringResource(R.string.homescreen_seeAll))
             }
         }
@@ -97,13 +99,23 @@ fun HomeScreenSectionSquareProductCards(
                 if(!prod.value){ // to make a square product card
                     SquareProductCardHomePage(
                         productName = prod.key,
-                        price = price
-                    ) { }
+                        price = price,
+                        onClick = { productId ->
+                            navController.navigate(
+                                KickifyRoute.ProductDetails(productId)
+                            )
+                        }
+                    )
                 } else { // to make a rectangular product card
                     RectangularProductCardHomePage(
                         productName = prod.key,
-                        price = price
-                    ) { }
+                        price = price,
+                        onClick = { productId ->
+                            navController.navigate(
+                                KickifyRoute.ProductDetails(productId)
+                            )
+                        }
+                    )
                 }
             }
         }

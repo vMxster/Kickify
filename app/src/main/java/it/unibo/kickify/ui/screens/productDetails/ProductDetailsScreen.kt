@@ -14,10 +14,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
+import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.ProductDetailsFooter
 import it.unibo.kickify.ui.composables.ProductImage
@@ -29,17 +29,16 @@ import it.unibo.kickify.ui.composables.RatingBar
 import it.unibo.kickify.ui.composables.SectionTitle
 import it.unibo.kickify.ui.composables.SizesList
 
-@Preview
 @Composable
 fun ProductDetailsScreen(
     navController: NavController = NavController(LocalContext.current),
-    displayTitle: String = "Men's Shoes"
+    productId: Int
 ) {
     Scaffold(
         topBar = {
             AppBar(
                 navController,
-                title = displayTitle
+                title = "Men's Shoes"
             )
         }
     ) { contentPadding ->

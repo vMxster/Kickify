@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
@@ -20,19 +19,20 @@ import it.unibo.kickify.data.models.ShopCategory
 import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.ProductCardShoesPage
 
-@Preview
 @Composable
 fun ProductListScreen(
-    navController: NavController = NavController(LocalContext.current)
+    navController: NavController = NavController(LocalContext.current),
+    category: String? = null
 ){
     val itemNames = listOf("Nike Air Force", "Nike Air Max",
         "Nike Jordan", "Nike Air Max", "Nike Air Force", "Nike Air Max")
     val itemPrices = listOf(98.76, 99.89, 119.99, 189.99, 69.99, 189.99)
+    val title = category ?: stringResource(R.string.homescreen_popular)
     Scaffold(
         topBar = {
             AppBar(
                 navController,
-                title = stringResource(R.string.homescreen_popular)
+                title = title
             )
         },
         bottomBar = { }

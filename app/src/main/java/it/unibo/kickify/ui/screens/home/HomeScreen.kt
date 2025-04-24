@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.ShopCategory
+import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.HomeScreenCategory
@@ -44,7 +45,7 @@ fun HomeScreen(
             )
         },
         bottomBar = {
-            BottomBar()
+            BottomBar(navController)
         }
     ) { contentPadding ->
         val brandIconsScrollState = rememberScrollState()
@@ -60,7 +61,9 @@ fun HomeScreen(
         ){
             SearchRoundedTextField(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                onSearchAction = {  }
+                onSearchAction = {
+                    navController.navigate(KickifyRoute.ProductList)
+                }
             )
 
             Row(
@@ -71,7 +74,14 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ){
                 ShopCategory.entries.forEach {
-                    HomeScreenCategory(it) { }
+                    HomeScreenCategory(
+                        it,
+                        onClick = { category ->
+                            navController.navigate(
+                                KickifyRoute.ProductListWithCategory(category)
+                            )
+                        }
+                    )
                 }
             }
 
@@ -84,24 +94,38 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 for(brandName in brands){
-                    HomeScreenSmallBrandLogos(brandName, onClick = {})
+                    HomeScreenSmallBrandLogos(
+                        brandName,
+                        onClick = { category ->
+                            navController.navigate(
+                                KickifyRoute.ProductListWithCategory(category)
+                            )
+                        })
                 }
             }
 
             // begin shoes section
             val homeSectionsModifier = Modifier.padding(vertical = 6.dp).padding(horizontal = 8.dp)
-            HomeScreenSectionSquareProductCards(modifier = homeSectionsModifier,
+            HomeScreenSectionSquareProductCards(
+                navController,
+                modifier = homeSectionsModifier,
                 sectionTitle = "Popular Shoes",
                 prodList = mapOf("p1" to false, "p2" to false)
             )
 
-            HomeScreenSectionSquareProductCards(modifier = homeSectionsModifier,
+            HomeScreenSectionSquareProductCards(
+                navController,
+                modifier = homeSectionsModifier,
                 sectionTitle = "Novelties",
-                prodList = mapOf("p1" to true))
+                prodList = mapOf("p1" to true)
+            )
 
-            HomeScreenSectionSquareProductCards(modifier = homeSectionsModifier,
+            HomeScreenSectionSquareProductCards(
+                navController,
+                modifier = homeSectionsModifier,
                 sectionTitle = "Discounted",
-                prodList = mapOf("p1" to false, "p2" to false))
+                prodList = mapOf("p1" to false, "p2" to false)
+            )
         }
 
     }

@@ -6,13 +6,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.ShoppingBag
-import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -25,12 +27,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
+import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.screens.productList.FilterScreen
 import it.unibo.kickify.ui.theme.BluePrimary
 import kotlinx.coroutines.launch
@@ -74,19 +78,19 @@ fun AppBar(navController: NavController, title: String) {
                     Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Go Back")
                 }
             } else {
-                IconButton(onClick = {  }) {
+                IconButton(onClick = { /*TODO*/ }) {
                     Icon(Icons.Outlined.Menu, "Menu")
                 }
             }
         },
         actions = {
             if (title == stringResource(R.string.app_name)) {
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { navController.navigate(KickifyRoute.Cart) }) {
                     Icon(Icons.Outlined.ShoppingBag, contentDescription = "Cart")
                 }
             }
             if(title == stringResource(R.string.notificationscreen_title)){
-                TextButton(onClick = { /**/ }) {
+                TextButton(onClick = { /*TODO*/ }) {
                     Text(
                         text = stringResource(R.string.notificationscreen_clearAll),
                         color = BluePrimary
@@ -94,15 +98,17 @@ fun AppBar(navController: NavController, title: String) {
                 }
             }
             if(title.contains("Shoes")){ // Popular shoes, etc.
-                IconButton(
-                    onClick = {
-                        coroutineScope.launch {
-                            showSheet = true
-                            sheetState.show()
-                        }
-                    }
+                var checked by remember { mutableStateOf(false) }
+                IconToggleButton(
+                    checked = checked,
+                    onCheckedChange = { checked = it }
                 ) {
-                    Icon(Icons.Outlined.Tune, contentDescription = "Filter")
+                    Icon(
+                        imageVector = if(checked) Icons.Outlined.Favorite
+                        else Icons.Outlined.FavoriteBorder,
+                        contentDescription = "",
+                        tint = Color.Red,
+                    )
                 }
             }
             if(showSheet){
