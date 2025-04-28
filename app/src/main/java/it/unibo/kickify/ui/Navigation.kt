@@ -10,6 +10,7 @@ import it.unibo.kickify.ui.screens.checkout.CheckOutScreen
 import it.unibo.kickify.ui.screens.home.HomeScreen
 import it.unibo.kickify.ui.screens.login.ForgotPasswordScreen
 import it.unibo.kickify.ui.screens.login.LoginScreen
+import it.unibo.kickify.ui.screens.login.OTPScreen
 import it.unibo.kickify.ui.screens.notifications.NotificationScreen
 import it.unibo.kickify.ui.screens.onboard.OnBoardScreen
 import it.unibo.kickify.ui.screens.productDetails.ProductDetailsScreen
@@ -26,6 +27,7 @@ sealed interface KickifyRoute {
     @Serializable data object Checkout : KickifyRoute
     @Serializable data object Login : KickifyRoute
     @Serializable data object ForgotPassword : KickifyRoute
+    @Serializable data object OTPScreen : KickifyRoute
     @Serializable data object Notifications : KickifyRoute
     @Serializable data object Onboard : KickifyRoute
     @Serializable data class ProductDetails(val productId: Int) : KickifyRoute
@@ -61,6 +63,10 @@ fun KickifyNavGraph(navController: NavHostController) {
 
         composable<KickifyRoute.ForgotPassword> {
             ForgotPasswordScreen(navController)
+        }
+
+        composable<KickifyRoute.OTPScreen> {
+            OTPScreen(navController)
         }
 
         composable<KickifyRoute.Notifications> {

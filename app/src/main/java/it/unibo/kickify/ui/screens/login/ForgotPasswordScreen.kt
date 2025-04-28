@@ -76,8 +76,8 @@ fun ForgotPasswordScreen(
 
             Button(
                 onClick = {
-                    navController.navigate(KickifyRoute.Login) {
-                        popUpTo(KickifyRoute.ForgotPassword) { inclusive = true }
+                    navController.navigate(KickifyRoute.OTPScreen) {
+                        //popUpTo(KickifyRoute.ForgotPassword) { inclusive = true }
                     }
                 },
                 modifier = forgotScreenModifier,

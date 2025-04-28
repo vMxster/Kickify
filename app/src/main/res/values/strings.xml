@@ -25,6 +25,8 @@
     <string name="forgotpsw_title">Reset Your Password In A Snap!</string>
     <string name="forgotpsw_text">Enter your email - we\'ll send a secure link to get you back on track.</string>
     <string name="forgotpsw_templateEmail">email@example.com</string>
+    <string name="otpScreen_text">Type in the OTP Code we sent you.</string>
+    <string name="otpScreen_otp">OTP</string>
     <string name="continue_button">Continue</string>
     <string name="settings_title">Settings</string>
     <string name="settings_accountTitle">Account</string>
