@@ -92,5 +92,5 @@
     <string name="filterBottomSheet_apply">Apply</string>
     <string name="notificationManager_channelVisibleName">Generic notifications</string>
     <string name="notificationManager_channelVisibleDescription">All notifications about offers, your orders…</string>
-
+    <string name="notificationManager_NOpermissionMessage">Notifications disabled.</string>
 </resources>
