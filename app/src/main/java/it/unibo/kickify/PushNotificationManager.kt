@@ -1,6 +1,5 @@
 package it.unibo.kickify
 
-import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -12,7 +11,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 
 class PushNotificationManager(
-    private val activity: Activity,
     private val context: Context
 ) {
     private val channelID = "kickifyNotifications1"
@@ -24,18 +22,6 @@ class PushNotificationManager(
         checkNotificationPermission()
         createNotificationChannel()
     }
-
-    /* CRASHES APP
-    private fun requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13+
-            if (ContextCompat.checkSelfPermission(this.activity, android.Manifest.permission.POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED) {
-
-                ActivityCompat.requestPermissions(this.activity,
-                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1001)
-            }
-        }
-    }*/
 
     fun checkNotificationPermission(): Boolean {
         if (Build.VERSION.SDK_INT >= 33) { // in API >= 33 required to give permission

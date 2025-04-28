@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.rememberNavController
 import it.unibo.kickify.ui.KickifyNavGraph
+import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.theme.KickifyTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,6 +23,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         try {
             Log.d("MainActivity", "onCreate: inizializzazione")
+
             setContent {
                 val ctx = LocalContext.current
                 val pushNotificationMgr = PushNotificationManager(
@@ -54,7 +56,16 @@ class MainActivity : ComponentActivity() {
                     }
 
                     val navController = rememberNavController()
-                    KickifyNavGraph(navController)
+                    val value = intent.getBooleanExtra("AUTH_SUCCESS", false)
+                    LaunchedEffect(value) {
+                        if (value) {
+                            navController.navigate(KickifyRoute.Home) {
+                                popUpTo(KickifyRoute.Home) { inclusive = true }
+                            }
+                        }
+                    }
+
+                   KickifyNavGraph(navController)
                 }
             }
         } catch (e: Exception) {

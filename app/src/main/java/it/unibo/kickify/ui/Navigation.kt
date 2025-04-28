@@ -8,6 +8,7 @@ import androidx.navigation.toRoute
 import it.unibo.kickify.ui.screens.cart.CartScreen
 import it.unibo.kickify.ui.screens.checkout.CheckOutScreen
 import it.unibo.kickify.ui.screens.home.HomeScreen
+import it.unibo.kickify.ui.screens.login.BiometricAuthScreen
 import it.unibo.kickify.ui.screens.login.ForgotPasswordScreen
 import it.unibo.kickify.ui.screens.login.LoginScreen
 import it.unibo.kickify.ui.screens.login.OTPScreen
@@ -26,6 +27,7 @@ sealed interface KickifyRoute {
     @Serializable data object Cart : KickifyRoute
     @Serializable data object Checkout : KickifyRoute
     @Serializable data object Login : KickifyRoute
+    @Serializable data object AuthenticationScreen: KickifyRoute
     @Serializable data object ForgotPassword : KickifyRoute
     @Serializable data object OTPScreen : KickifyRoute
     @Serializable data object Notifications : KickifyRoute
@@ -59,6 +61,10 @@ fun KickifyNavGraph(navController: NavHostController) {
 
         composable<KickifyRoute.Login> {
             LoginScreen(navController)
+        }
+
+        composable<KickifyRoute.AuthenticationScreen> {
+            BiometricAuthScreen(navController)
         }
 
         composable<KickifyRoute.ForgotPassword> {
