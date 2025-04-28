@@ -12,12 +12,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
-import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.ProductDetailsFooter
 import it.unibo.kickify.ui.composables.ProductImage
@@ -34,13 +32,20 @@ fun ProductDetailsScreen(
     navController: NavController,
     productId: Int
 ) {
+    val productInfo = mapOf("name" to "Nike Air Zoom",
+        "descr" to "Nike Air Zoom is a responsive cushioning technology in footwear," +
+                "enhancing athletic performance and comfort across sneakers, while blending sport " +
+                "functionality with casual style.")
+    val price = 97.99
+
     Scaffold(
         topBar = {
             AppBar(
                 navController,
                 title = "Details"
             )
-        }
+        },
+        bottomBar = { ProductDetailsFooter(price) }
     ) { contentPadding ->
         val state = rememberScrollState()
 
@@ -53,12 +58,6 @@ fun ProductDetailsScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            val productInfo = mapOf("name" to "Nike Air Zoom",
-                "descr" to "Nike Air Zoom is a responsive cushioning technology in footwear," +
-                        "enhancing athletic performance and comfort across sneakers, while blending sport " +
-                        "functionality with casual style.")
-            val price = 97.99
-
             ProductImage(
                 productInfo.getValue("name").toString(),
                 modifier = Modifier.fillMaxWidth()
@@ -96,7 +95,6 @@ fun ProductDetailsScreen(
                 ),
                 onSizeSelected = { }
             )
-            ProductDetailsFooter(price)
         }
     }
 }
