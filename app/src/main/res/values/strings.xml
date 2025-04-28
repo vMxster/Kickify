@@ -78,6 +78,7 @@
     <string name="prodDetails_gallery">Gallery</string>
     <string name="price">Price</string>
     <string name="prodDetails_addToCart">Add To Cart</string>
+    <string name="color">Color</string>
     <string name="profileScreen_title">Profile</string>
     <string name="profileScreen_fullName">Full Name</string>
     <string name="checkoutScreen_title">Checkout</string>

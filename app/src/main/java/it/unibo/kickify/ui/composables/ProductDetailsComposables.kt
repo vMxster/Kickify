@@ -1,6 +1,7 @@
 package it.unibo.kickify.ui.composables
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -136,6 +137,50 @@ fun ProductPhotoGallery(
             Spacer(Modifier.width(18.dp))
         }
     }
+}
+
+@Composable
+fun ColorsList(
+    colorSelected: Color?,
+    colorAvailability: Map<Color, Boolean>,
+    onColorSelected: (Color) -> Unit
+){
+    val scrollState = rememberScrollState()
+    var selectedColor by remember { mutableStateOf(colorSelected) }
+
+    Spacer(Modifier.height(10.dp))
+    Row(modifier = Modifier.fillMaxWidth()
+        .horizontalScroll(scrollState),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        for (color in colorAvailability.entries){
+            if(color.value) { // if color is available
+                Button(
+                    onClick = {
+                        selectedColor = color.key
+                        onColorSelected(color.key)
+                    },
+                    enabled = color.value,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = color.key
+                    ),
+                    shape = CircleShape,
+                    modifier = Modifier.size(44.dp)
+                        .border(
+                            width = 4.dp,
+                            color = if (selectedColor == color.key) BluePrimary else Color.Transparent,
+                            shape = CircleShape
+                        )
+                ) {
+                }
+
+                Spacer(Modifier.width(18.dp))
+            }
+        }
+    }
+
+    Spacer(Modifier.height(10.dp))
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

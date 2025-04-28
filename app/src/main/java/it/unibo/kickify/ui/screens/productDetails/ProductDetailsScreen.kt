@@ -12,11 +12,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.composables.AppBar
+import it.unibo.kickify.ui.composables.ColorsList
 import it.unibo.kickify.ui.composables.ProductDetailsFooter
 import it.unibo.kickify.ui.composables.ProductImage
 import it.unibo.kickify.ui.composables.ProductLongDescription
@@ -94,6 +96,17 @@ fun ProductDetailsScreen(
                     42 to false, 43 to true, 44 to true, 45 to true
                 ),
                 onSizeSelected = { }
+            )
+
+            SectionTitle(title = stringResource(R.string.color))
+            ColorsList(
+                colorSelected = Color.White,
+                colorAvailability = mapOf(
+                    Color.White to true, Color.Black to false,
+                    Color.Red to true, Color.Blue to true,
+                    Color.Yellow to false
+                ),
+                onColorSelected = { }
             )
         }
     }
