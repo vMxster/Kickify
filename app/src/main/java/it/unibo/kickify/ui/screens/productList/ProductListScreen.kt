@@ -22,17 +22,18 @@ import it.unibo.kickify.ui.composables.ProductCardShoesPage
 @Composable
 fun ProductListScreen(
     navController: NavController,
-    category: String? = null
+    title: String? = null
 ){
     val itemNames = listOf("Nike Air Force", "Nike Air Max",
         "Nike Jordan", "Nike Air Max", "Nike Air Force", "Nike Air Max")
     val itemPrices = listOf(98.76, 99.89, 119.99, 189.99, 69.99, 189.99)
-    val title = category ?: stringResource(R.string.homescreen_popular)
+    val titleString = title ?: stringResource(R.string.homescreen_popular)
+
     Scaffold(
         topBar = {
             AppBar(
                 navController,
-                title = title
+                title = titleString
             )
         },
         bottomBar = { }

@@ -38,7 +38,7 @@ fun ProductDetailsScreen(
         topBar = {
             AppBar(
                 navController,
-                title = "Men's Shoes"
+                title = "Details"
             )
         }
     ) { contentPadding ->

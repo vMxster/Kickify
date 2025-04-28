@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.ShoppingBag
 import androidx.compose.material.icons.outlined.Tune
@@ -13,6 +15,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -25,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -63,7 +67,7 @@ fun AppBar(navController: NavController, title: String = "") {
                     )
                 }
 
-            } else {
+            } else if (title != "Details"){
                 Text(text = title,
                     style = MaterialTheme.typography.titleMedium
                 )
@@ -94,19 +98,15 @@ fun AppBar(navController: NavController, title: String = "") {
                     )
                 }
             }
-            if(title.contains("Shoes")){ // Popular shoes, etc.
-                /*var checked by remember { mutableStateOf(false) }
-                IconToggleButton(
-                    checked = checked,
-                    onCheckedChange = { checked = it }
-                ) {
-                    Icon(
-                        imageVector = if(checked) Icons.Outlined.Favorite
-                        else Icons.Outlined.FavoriteBorder,
-                        contentDescription = "",
-                        tint = Color.Red,
-                    )
-                }*/
+
+            // show filter button only on pages that show a list of shoes
+            if(title == stringResource(R.string.homescreen_popular)
+                || title == stringResource(R.string.homescreen_novelties)
+                || title == stringResource(R.string.homescreen_discounted)
+                || title.contains(stringResource(R.string.shopCategory_men))
+                || title.contains(stringResource(R.string.shopCategory_women))
+                || title.contains(stringResource(R.string.shopCategory_kids))
+            ){
                 IconButton(
                     onClick = {
                         coroutineScope.launch {
@@ -130,15 +130,32 @@ fun AppBar(navController: NavController, title: String = "") {
                     onResetFilter = {}
                 )
             }
+
             if (title == stringResource(R.string.profileScreen_title)){
                 IconButton(onClick = { /*TODO*/ }) {
                     Icon(Icons.Outlined.Edit, contentDescription = "Edit profile")
                 }
             }
-            /*if (title != "Settings") {
-                IconButton(onClick = { navController.navigate(Settings) }) {
-                    Icon(Icons.Outlined.Settings, "Settings")
+
+            if(title == "Details"){
+                var checked by remember { mutableStateOf(false) }
+                IconToggleButton(
+                    checked = checked,
+                    onCheckedChange = { checked = it }
+                ) {
+                    Icon(
+                        imageVector = if(checked) Icons.Outlined.Favorite
+                        else Icons.Outlined.FavoriteBorder,
+                        contentDescription = "",
+                        tint = Color.Red
+                    )
                 }
+            }
+
+            /*if (title != "Settings") {
+                   IconButton(onClick = { navController.navigate(Settings) }) {
+                       Icon(Icons.Outlined.Settings, "Settings")
+                   }
             }*/
         },
         colors = TopAppBarDefaults.topAppBarColors(

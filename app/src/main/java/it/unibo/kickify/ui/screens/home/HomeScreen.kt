@@ -13,9 +13,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
@@ -28,7 +26,6 @@ import it.unibo.kickify.ui.composables.HomeScreenSectionSquareProductCards
 import it.unibo.kickify.ui.composables.HomeScreenSmallBrandLogos
 import it.unibo.kickify.ui.composables.SearchRoundedTextField
 
-@Preview
 @Composable
 fun HomeScreen(
     navController: NavController
@@ -93,14 +90,16 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                for(brandName in brands){
+                for(brandResID in brands){
+                    val brandName = stringResource(brandResID)
                     HomeScreenSmallBrandLogos(
-                        brandName,
-                        onClick = { category ->
+                        brandResID,
+                        onClick = {
                             navController.navigate(
-                                KickifyRoute.ProductListWithCategory(category)
+                                KickifyRoute.ProductListWithCategory(brandName)
                             )
-                        })
+                        }
+                    )
                 }
             }
 
