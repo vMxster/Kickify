@@ -1,5 +1,6 @@
 package it.unibo.kickify.ui.screens.register
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
+import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.EmailRoundedTextField
 import it.unibo.kickify.ui.composables.PasswordRoundedTextField
 import it.unibo.kickify.ui.composables.UsernameRoundedTextField
@@ -34,9 +36,17 @@ import it.unibo.kickify.ui.theme.MediumGray
 
 @Composable
 fun RegisterScreen(
-    navController: NavController = NavController(LocalContext.current)
+    navController: NavController
 ) {
-    Scaffold { contentPadding ->
+    val ctx = LocalContext.current
+    Scaffold (
+        topBar = {
+            AppBar(
+                navController,
+                title = ""
+            )
+        }
+    )  { contentPadding ->
         val registerScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)
 
@@ -89,9 +99,13 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(15.dp))
             Button(
                 onClick = {
-                    navController.navigate(KickifyRoute.Login) {
-                        popUpTo(KickifyRoute.Register) { inclusive = true }
-                    }
+                    /* if(registration successful) {
+                        navController.navigate(KickifyRoute.Home){
+                            popUpTo(KickifyRoute.Home) { inclusive = true }
+                        }
+                    } else { */
+                    Toast.makeText(ctx, "Registration error", Toast.LENGTH_LONG).show()
+                    // }
                 },
                 modifier = registerScreenModifier,
             ) {
@@ -119,7 +133,7 @@ fun RegisterScreen(
             TextButton(
                 onClick = {
                     navController.navigate(KickifyRoute.Login) {
-                        popUpTo(KickifyRoute.Register) { inclusive = true }
+                        popUpTo(KickifyRoute.Login) { inclusive = true }
                     }
                 },
                 modifier = registerScreenModifier,

@@ -24,7 +24,7 @@ import it.unibo.kickify.ui.theme.BluePrimary
 
 @Composable
 fun NotificationScreen(
-    navController: NavController = NavController(LocalContext.current)
+    navController: NavController
 ){
     Scaffold(
         topBar = {

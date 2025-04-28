@@ -21,7 +21,7 @@ import it.unibo.kickify.ui.composables.ProductCardShoesPage
 
 @Composable
 fun ProductListScreen(
-    navController: NavController = NavController(LocalContext.current),
+    navController: NavController,
     category: String? = null
 ){
     val itemNames = listOf("Nike Air Force", "Nike Air Max",

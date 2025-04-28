@@ -26,7 +26,7 @@ import it.unibo.kickify.ui.composables.EmailRoundedTextField
 
 @Composable
 fun ForgotPasswordScreen(
-    navController: NavController = NavController(LocalContext.current)
+    navController: NavController
 ) {
     Scaffold(
         topBar = {

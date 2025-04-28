@@ -31,7 +31,7 @@ import it.unibo.kickify.ui.composables.SearchRoundedTextField
 @Preview
 @Composable
 fun HomeScreen(
-    navController: NavController = NavController(LocalContext.current)
+    navController: NavController
 ){
     val brands = listOf(R.drawable.nike,
         R.drawable.puma, R.drawable.under_armour,

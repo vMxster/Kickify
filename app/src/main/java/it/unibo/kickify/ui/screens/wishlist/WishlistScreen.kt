@@ -20,7 +20,7 @@ import it.unibo.kickify.ui.composables.ProductCardWishlistPage
 
 @Composable
 fun WishlistScreen(
-    navController: NavController = NavController(LocalContext.current)
+    navController: NavController
 ){
     val itemNames = listOf("Nike Lunarglide", "Nike Zoom", "Nike Air Max", "Nike Zoom 2K")
     val itemPrices = listOf(59.99, 37.99, 59.99, 37.99)

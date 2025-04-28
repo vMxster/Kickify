@@ -27,13 +27,21 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
+import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.EmailRoundedTextField
 import it.unibo.kickify.ui.composables.PasswordRoundedTextField
 import it.unibo.kickify.ui.theme.MediumGray
 
 @Composable
-fun LoginScreen(navController: NavController = NavController(LocalContext.current)) {
-    Scaffold { contentPadding ->
+fun LoginScreen(navController: NavController) {
+    Scaffold (
+        topBar = {
+            AppBar(
+                navController,
+                title = ""
+            )
+        }
+    )  { contentPadding ->
         val loginScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)
 
@@ -81,7 +89,7 @@ fun LoginScreen(navController: NavController = NavController(LocalContext.curren
             TextButton(
                 onClick = {
                     navController.navigate(KickifyRoute.ForgotPassword) {
-                        popUpTo(KickifyRoute.Login) { inclusive = true }
+                       // popUpTo(KickifyRoute.Login) { inclusive = true }
                     }
                 },
                 modifier = Modifier.align(Alignment.End)

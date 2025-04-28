@@ -31,7 +31,7 @@ import it.unibo.kickify.ui.composables.SizesList
 
 @Composable
 fun ProductDetailsScreen(
-    navController: NavController = NavController(LocalContext.current),
+    navController: NavController,
     productId: Int
 ) {
     Scaffold(

@@ -19,7 +19,7 @@ import it.unibo.kickify.ui.composables.InformationCard
 
 @Composable
 fun CheckOutScreen(
-    navController: NavController = NavController(LocalContext.current)
+    navController: NavController
 ){
     Scaffold(
         topBar = {

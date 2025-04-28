@@ -30,11 +30,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
+import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.ExpandingDotIndicator
 
 @Composable
 fun OnBoardScreen(
-    navController: NavController = NavController(LocalContext.current)
+    navController: NavController
 ) {
     val totalDots = 3
     var selectedIndex by remember { mutableIntStateOf(0) }
@@ -49,7 +50,14 @@ fun OnBoardScreen(
         }
     }
 
-    Scaffold { contentPadding ->
+    Scaffold (
+        topBar = {
+            AppBar(
+                navController,
+                title = ""
+            )
+        }
+    ) { contentPadding ->
         Column (
             modifier = Modifier.fillMaxSize()
                 .padding(contentPadding)

@@ -27,7 +27,7 @@ import it.unibo.kickify.ui.composables.SettingsTitleLine
 
 @Composable
 fun SettingsScreen(
-    navController: NavController = NavController(LocalContext.current)
+    navController: NavController
     //state: ThemeState,
     //onThemeSelected: (Theme) -> Unit*/
 ) {

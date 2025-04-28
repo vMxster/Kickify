@@ -39,7 +39,7 @@ import it.unibo.kickify.ui.theme.LightGray
 
 @Composable
 fun ProfileScreen(
-    navController: NavController = NavController(LocalContext.current)
+    navController: NavController
 ){
     Scaffold(
         topBar = {

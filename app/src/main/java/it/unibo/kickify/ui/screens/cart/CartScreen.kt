@@ -21,7 +21,7 @@ import it.unibo.kickify.ui.composables.CartAndCheckoutResume
 
 @Composable
 fun CartScreen(
-    navController: NavController = NavController(LocalContext.current)
+    navController: NavController
 ){
     Scaffold(
         topBar = {
