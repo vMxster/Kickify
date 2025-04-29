@@ -72,5 +72,6 @@ dependencies {
     implementation(libs.androidx.material3.adaptive.navigation.suite)
 
     /* for biometric authentication */
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.biometric.v120alpha05)
 }

@@ -1,5 +1,6 @@
 package it.unibo.kickify.ui.screens.login
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import it.unibo.kickify.AuthActivity
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.AppBar
@@ -34,6 +36,8 @@ import it.unibo.kickify.ui.theme.MediumGray
 
 @Composable
 fun LoginScreen(navController: NavController) {
+    val ctx = LocalContext.current
+
     Scaffold (
         topBar = {
             AppBar(
@@ -105,9 +109,10 @@ fun LoginScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    navController.navigate(KickifyRoute.Home) {
+                    ctx.startActivity(Intent(ctx, AuthActivity::class.java))
+                    /*navController.navigate(KickifyRoute.Home) {
                         popUpTo(KickifyRoute.Login) { inclusive = true }
-                    }
+                    }*/
                 },
                 modifier = Modifier
                     .fillMaxWidth()

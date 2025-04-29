@@ -26,10 +26,7 @@ class MainActivity : ComponentActivity() {
 
             setContent {
                 val ctx = LocalContext.current
-                val pushNotificationMgr = PushNotificationManager(
-                    activity = this,
-                    context = ctx
-                )
+                val pushNotificationMgr = PushNotificationManager(ctx)
                 if(pushNotificationMgr.checkNotificationPermission()){
                     pushNotificationMgr.sendNotificationNoAction(
                         notificationTitle = "Title",

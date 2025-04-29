@@ -25,9 +25,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AuthActivity"
+        <!-- <activity android:name=".AuthActivityOLD"
             android:exported="false"
             android:theme="@style/Theme.UrbanKicks">
+        </activity>-->
+        <activity android:name=".AuthActivity"
+            android:exported="false"
+            android:theme="@style/AppCompatTheme.UrbanKicks">
         </activity>
     </application>
 

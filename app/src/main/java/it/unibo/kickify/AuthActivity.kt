@@ -1,44 +1,116 @@
 package it.unibo.kickify
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
-import androidx.biometric.BiometricPrompt
-import androidx.fragment.app.FragmentActivity
-import androidx.core.content.ContextCompat
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import it.unibo.kickify.authentication.AuthManager
+import it.unibo.kickify.authentication.BiometricResult
+import it.unibo.kickify.ui.theme.KickifyTheme
 
-class AuthActivity : FragmentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        authenticate()
+class AuthActivity : AppCompatActivity() {
+    private val promptMgr by lazy {
+        AuthManager(this)
     }
 
-    private fun authenticate() {
-        val executor = ContextCompat.getMainExecutor(this)
-        val biometricPrompt = BiometricPrompt(
-            this, // FragmentActivity
-            executor,
-            object : BiometricPrompt.AuthenticationCallback() {
-                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                    navigateBackToMain(result = true, msg = "AUTH SUCCESS")
-                }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                    navigateBackToMain(result = false, msg = "AUTH ERROR code $errorCode: $errString")
-                }
+        setContent {
+            KickifyTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    val biometricResult by promptMgr.promptResults.collectAsState(
+                        initial = null
+                    )
+                    val enrollLauncher = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.StartActivityForResult(),
+                        onResult = {
+                            println("Activity result: $it")
+                        }
+                    )
+                    LaunchedEffect(biometricResult) {
+                        if (biometricResult is BiometricResult.AuthenticationNotSet) {
+                            if (Build.VERSION.SDK_INT >= 30) {
+                                val enrollIntent = Intent(Settings.ACTION_BIOMETRIC_ENROLL).apply {
+                                    putExtra(
+                                        Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
+                                        BIOMETRIC_STRONG or DEVICE_CREDENTIAL
+                                    )
+                                }
+                                enrollLauncher.launch(enrollIntent)
+                            }
+                        }
+                    }
 
-                override fun onAuthenticationFailed() {
-                    navigateBackToMain(result = false, "AUTH FAILED: incorrect fingerprint")
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Button(onClick = {
+                            promptMgr.showBiometricPrompt(
+                                title = "Title",
+                                subtitle = "Subtitle",
+                                description = "Description"
+                            )
+                        }) {
+                            Text(text = "Authenticate")
+                        }
+                        biometricResult?.let { result ->
+                            Text(
+                                text = when (result) {
+                                    is BiometricResult.AuthenticationError -> {
+                                        result.error
+                                    }
+
+                                    BiometricResult.AuthenticationFailed -> {
+                                        "Authentication failed"
+                                    }
+
+                                    BiometricResult.AuthenticationNotSet -> {
+                                        "Authentication not set"
+                                    }
+
+                                    BiometricResult.AuthenticationSuccess -> {
+                                        "Authentication success"
+                                    }
+
+                                    BiometricResult.FeatureUnavailable -> {
+                                        "Feature unavailable"
+                                    }
+
+                                    BiometricResult.HardwareUnavailable -> {
+                                        "Hardware unavailable"
+                                    }
+                                }
+                            )
+                        }
+                    }
                 }
             }
-        )
-
-        val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Autenticazione biometrica")
-            .setSubtitle("Usa la tua impronta digitale per continuare")
-            .setNegativeButtonText("Annulla")
-            .build()
-
-        biometricPrompt.authenticate(promptInfo)
+        }
     }
 
     private fun navigateBackToMain(result: Boolean, msg: String) {
