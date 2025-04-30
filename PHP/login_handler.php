@@ -29,8 +29,8 @@ try {
     } else if (isset($_POST["password-login"])) {
         $user = $dbh->loginUser($_POST['email-login'], $_POST["password-login"]);
         if ($user) {
-            $_SESSION['user_email'] = $_POST['email-login'];
-            $_SESSION['role'] = $user["Ruolo"];
+            $_POST['user_email'] = $_POST['email-login'];
+            $_POST['role'] = $user["Ruolo"];
             $response = [
                 "success" => true, 
                 "message" => "Login successful",

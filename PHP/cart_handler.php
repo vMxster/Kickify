@@ -10,10 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 $response = ["success" => false, "message" => ""];
 
 try {
-    $email = $_SESSION['user_email'] ?? null;
-    if (!$email) {
-        throw new Exception('User not logged in');
-    }
+    $email = $_POST['user_email'] ?? null;
 
     if (isset($_POST['action'])) {
         switch ($_POST['action']) {

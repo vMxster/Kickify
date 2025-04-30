@@ -33,9 +33,9 @@ try {
         
         // Generate 6-digit OTP
         $otp = sprintf("%06d", mt_rand(0, 999999));
-        $_SESSION['recovery_otp'] = $otp;
-        $_SESSION['recovery_email'] = $email;
-        $_SESSION['recovery_expires'] = time() + 900; // 15 minutes
+        $_POST['recovery_otp'] = $otp;
+        $_POST['recovery_email'] = $email;
+        $_POST['recovery_expires'] = time() + 900; // 15 minutes
 
         // Create PHPMailer instance
         $mail = new PHPMailer(true);
@@ -66,17 +66,17 @@ try {
         $email = filter_var($_POST["email-recovery"], FILTER_SANITIZE_EMAIL);
         $otp = $_POST["otp"];
         
-        if (!isset($_SESSION['recovery_otp']) || 
-            !isset($_SESSION['recovery_email']) || 
-            $_SESSION['recovery_email'] !== $email) {
+        if (!isset($_POST['recovery_otp']) || 
+            !isset($_POST['recovery_email']) || 
+            $_POST['recovery_email'] !== $email) {
             throw new Exception("Invalid recovery session");
         }
         
-        if ($_SESSION['recovery_expires'] <= time()) {
+        if ($_POST['recovery_expires'] <= time()) {
             throw new Exception("OTP has expired");
         }
         
-        if ($_SESSION['recovery_otp'] !== $otp) {
+        if ($_POST['recovery_otp'] !== $otp) {
             throw new Exception("Invalid OTP");
         }
         
@@ -85,7 +85,7 @@ try {
         $email = filter_var($_POST["email"], FILTER_SANITIZE_EMAIL);
         $password = $_POST["password"];
         
-        if (!isset($_SESSION['recovery_email']) || $_SESSION['recovery_email'] !== $email) {
+        if (!isset($_POST['recovery_email']) || $_POST['recovery_email'] !== $email) {
             throw new Exception("Invalid recovery session");
         }
         
@@ -93,11 +93,6 @@ try {
         if (!$dbh->changePassword($email, $password)) {
             throw new Exception("Failed to update password");
         }
-        
-        // Clear recovery session
-        unset($_SESSION['recovery_otp']);
-        unset($_SESSION['recovery_email']);
-        unset($_SESSION['recovery_expires']);
         
         $response = ["success" => true, "message" => "Password updated successfully"];
     } else {

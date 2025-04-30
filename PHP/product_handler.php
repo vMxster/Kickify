@@ -63,14 +63,8 @@ try {
             if (!isset($_POST["product_id"], $_POST["size"], $_POST["color"])) {
                 throw new Exception("Missing required fields");
             }
-         /*   if (!isset($_POST["email"]) || empty($_POST["email"])) {
-                throw new Exception("User must be logged in");
-            }*/
-            if(!isset($_SESSION['user_email'])){
-                throw new Exception("You need to be logged in");
-            }
-            $email = $_SESSION['user_email'];
-          //  $email = filter_var($_POST["email"], FILTER_SANITIZE_EMAIL);
+
+            $email = $_POST['user_email'];
             $productId = $_POST["product_id"];
             $size = floatval($_POST["size"]);
             $color = $_POST["color"];
@@ -104,15 +98,8 @@ try {
             break;
 
         case "add_to_wishlist":
-          /*  if (!isset($_POST["product_id"], $_POST["size"], $_POST["color"], $_POST["email"])) {
-                throw new Exception("Missing required fields");
-            }*/
-            if(!isset($_POST["product_id"], $_SESSION['user_email']))
-                throw new Exception("You need to be logged in");
-            $email = filter_var($_SESSION['user_email'], FILTER_SANITIZE_EMAIL);
+            $email = $_POST['user_email'];
             $productId = $_POST["product_id"];
-         /*   $size = floatval($_POST["size"]);
-            $color = $_POST["color"];*/
             
             $success = $dbh->addToWishlist($email, $productId);
             if (!$success) {
@@ -126,14 +113,7 @@ try {
                     throw new Exception("Missing required fields");
                 }
             
-                if (!isset($_SESSION["user_email"])) {
-                    
-                    $response = ["success" => false, "message" => "User not logged in"];
-                    echo json_encode($response);
-                    exit();
-                }
-            
-                $email = filter_var($_SESSION["user_email"], FILTER_SANITIZE_EMAIL);
+                $email = $_POST["user_email"];
                 $productId = $_POST["product_id"];
             
                 $success = $dbh->removeFromWishlist($email, $productId);
@@ -146,15 +126,11 @@ try {
                 break;
 
         case "add_review":
-            if(!isset($_SESSION["user_email"])){
-                throw new Exception("You need to be logged in");
-            }
-
             if (!isset($_POST["product_id"], $_POST["rating"], $_POST["comment"])) {
                 throw new Exception("Missing required fields");
             }
 
-            $email = filter_var($_SESSION['user_email'], FILTER_SANITIZE_EMAIL);
+            $email = $_POST['user_email'];
             $productId = $_POST["product_id"];
             $rating = intval($_POST["rating"]);
             $comment = filter_var($_POST["comment"], FILTER_SANITIZE_STRING);
@@ -185,12 +161,12 @@ try {
                 'success'   => true,
                 'newReview' => $newReviewData
             ]);
-         //   echo json_encode($response);
+            
             exit();
             break;
 
         case "notify_availability":
-            if (!isset($_POST["product_id"], $_POST["size"], $_POST["color"], $_SESSION['user_email'])) {
+            if (!isset($_POST["product_id"], $_POST["size"], $_POST["color"])) {
                 throw new Exception("Missing required fields");
             }
 

@@ -1,10 +1,6 @@
 <?php
 require_once("bootstrap.php");
 
-if (!isset($_SESSION["user_email"])) {
-    die(json_encode(['success' => false, 'message' => 'Unauthorized']));
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $response = ['success' => false, 'message' => ''];
     
@@ -12,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_POST['notificationIds']) && isset($_POST['action'])) {
             $notificationIds = json_decode($_POST['notificationIds']);
             $action = $_POST['action'];
-            $email = $_SESSION["user_email"];
+            $email = $_POST["user_email"];
 
             if (!is_array($notificationIds)) {
                 $notificationIds = [$notificationIds];

@@ -2,11 +2,6 @@
 require_once("bootstrap.php");
 header('Content-Type: application/json');
 
-if (!isset($_SESSION["user_email"])) {
-    echo json_encode(["success" => false, "message" => "User not logged in"]);
-    exit;
-}
-
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(["success" => false, "message" => "Invalid request method"]);
     exit;
@@ -26,7 +21,7 @@ try {
 
             $discount = $dbh->checkPromoCode($promoCode);
             if ($discount) {
-                $_SESSION['discount'] = $discount;
+                $_POST['discount'] = $discount;
                 echo json_encode([
                     'valid' => true,
                     'value' => $discount['Valore'],
@@ -39,19 +34,14 @@ try {
 
         case "payment":
             $orderId = $dbh->placeOrder(
-                $_SESSION["user_email"],
+                $_POST["user_email"],
                 $data['total'],
                 $data['paymentMethod'],
                 $data['shippingType'],
-                isset($_SESSION['gift_wrap']) ? true : false,
+                isset($_POST['gift_wrap']) ? true : false,
                 $data['firstName'],
                 $data['lastName']
             );
-            
-            // Clear gift wrap session
-            if(isset($_SESSION['gift_wrap'])) {
-                unset($_SESSION['gift_wrap']);
-            }
             
             echo json_encode([
                 "success" => true,
