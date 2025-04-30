@@ -13,10 +13,10 @@ INSERT INTO STATO_PRODOTTO (Tipo, Descrizione) VALUES
     	('Coming', 'Il prodotto è previsto in arrivo prossimamente');
 
 -- Aggiornamento dati nella tabella MESSAGGIO
-INSERT INTO `messaggio` (`Email`, `Oggetto`, `Corpo`, `Timestamp_Invio`) VALUES ('tomassimartin@hotmail.com', 	'Risposta', 'Ciao, ho pensato a questo', NOW());
+INSERT INTO MESSAGGIO (Email, Oggetto, Corpo, Timestamp_Invio) VALUES ('tomassimartin@hotmail.com', 	'Risposta', 'Ciao, ho pensato a questo', NOW());
 
 -- Aggiornamento dati nella tabella NOTIFICA
-INSERT INTO `notifica` (`ID_Notifica`, `TipoNotifica`, `Messaggio`, `Timestamp_Invio`, `Tipo`, `Email`) VALUES 	('1', 'Flash Sale', 'Your favorite product Ultraboost [1] is now 6% off for a short time!!', NOW(), 	'Unread', 'tomassimartin@hotmail.com');
+INSERT INTO NOTIFICA (ID_Notifica, TipoNotifica, Messaggio, Timestamp_Invio, Tipo, Email) VALUES 	('1', 'Flash Sale', 'Your favorite product Ultraboost [1] is now 6% off for a short time!!', NOW(), 	'Unread', 'tomassimartin@hotmail.com');
 
 -- Inserimento dati nella tabella PRODOTTO
 INSERT INTO PRODOTTO (Nome, Descrizione, Marca, Tipo, Genere, Prezzo, Data_Aggiunta, Sta_Tipo) VALUES
