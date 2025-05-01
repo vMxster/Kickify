@@ -160,7 +160,7 @@ fun AddressOnMapBox(
 }
 
 @Composable
-private fun paymentMethodIcon(paymentMethod: String) : ImageVector {
+fun paymentMethodIcon(paymentMethod: String) : ImageVector {
     val method = PaymentMethod.getFromString(paymentMethod)
     return if (method != null) {
         when (method) {

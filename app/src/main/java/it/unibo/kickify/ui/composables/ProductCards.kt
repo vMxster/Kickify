@@ -182,13 +182,12 @@ fun ProductImage(
     productName: String,
     size: Dp = 120.dp,
     modifier: Modifier = Modifier
-        .size(size)
 ){
     Image(
         painterResource(R.drawable.nike_lunarglide),
         "$productName image",
         contentScale = ContentScale.FillWidth,
-        modifier = modifier
+        modifier = modifier.size(size)
     )
 }
 

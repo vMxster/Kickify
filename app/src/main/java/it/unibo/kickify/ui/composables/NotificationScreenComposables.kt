@@ -63,7 +63,7 @@ fun NotificationItem(
                         NotificationType.OrderShipped -> stringResource(R.string.notificationscreen_orderShipped)
                         NotificationType.FlashSale -> stringResource(R.string.notificationscreen_flashSale)
                         NotificationType.ItemsinCart -> stringResource(R.string.notificationscreen_productsInCart)
-                        NotificationType.OrderPlaced -> stringResource(R.string.notificationscreen_orderPlaced)
+                        NotificationType.OrderPlaced -> stringResource(R.string.orderPlaced)
                         NotificationType.RequestedProductReview -> stringResource(R.string.notificationscreen_productReviewRequested)
                     },
                     style = MaterialTheme.typography.titleMedium
