@@ -59,6 +59,7 @@
     <string name="homescreen_discounted">Discounted</string>
     <string name="homescreen_seeAll">See all</string>
     <string name="size">Size</string>
+    <string name="qty">Qty</string>
     <string name="subtotal">Subtotal</string>
     <string name="shipping">Shipping</string>
     <string name="totalCost">Total Cost</string>
@@ -72,7 +73,6 @@
     <string name="notificationscreen_orderShipped">Order shipped</string>
     <string name="notificationscreen_flashSale">Flash sale alert</string>
     <string name="notificationscreen_productsInCart">Shoes still in your cart</string>
-    <string name="notificationscreen_orderPlaced">Order placed</string>
     <string name="notificationscreen_productReviewRequested">Product review requested</string>
     <string name="wishlist_title">Wishlist</string>
     <string name="prodDetails_gallery">Gallery</string>
@@ -94,4 +94,22 @@
     <string name="notificationManager_channelVisibleName">Generic notifications</string>
     <string name="notificationManager_channelVisibleDescription">All notifications about offers, your orders…</string>
     <string name="notificationManager_NOpermissionMessage">Notifications disabled.</string>
+    <string name="myordersScreen_title">My Orders</string>
+    <string name="myordersScreen_ongoingOrders">Ongoing Orders</string>
+    <string name="order">Order</string>
+    <string name="myordersScreen_trackOrder">Track order</string>
+    <string name="myordersScreen_total">Total</string>
+    <string name="myordersScreen_paidWith">Paid with</string>
+    <string name="myordersScreen_completedOrders">Completed Orders</string>
+    <string name="orderPlaced">Order placed</string>
+    <string name="inProgress">In progress</string>
+    <string name="shipped">Shipped</string>
+    <string name="delivered">Delivered</string>
+    <string name="orderStatus">Order status</string>
+    <string name="expected">Expected</string>
+    <string name="parceLocation">Parcel Location</string>
+    <string name="trackOrder">Track Order</string>
+    <string name="orderDetails">Order Details</string>
+    <string name="expectedDeliveryDate">Expected Delivery Date</string>
+    <string name="trackingID">Tracking ID</string>
 </resources>

@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
@@ -22,13 +23,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
+import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.EmailRoundedTextField
 import it.unibo.kickify.ui.composables.PasswordRoundedTextField
@@ -94,6 +95,11 @@ fun ProfileScreen(
             )
             PasswordRoundedTextField(modifier = profileScreenModifier) { }
 
+            Button(
+                onClick = { navController.navigate(KickifyRoute.MyOrders)}
+            ) {
+                Text(stringResource(R.string.myordersScreen_title))
+            }
         }
     }
 }

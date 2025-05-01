@@ -63,8 +63,8 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    CameraApp()
-                   //KickifyNavGraph(navController)
+                    //CameraApp()
+                    KickifyNavGraph(navController)
                 }
             }
         } catch (e: Exception) {

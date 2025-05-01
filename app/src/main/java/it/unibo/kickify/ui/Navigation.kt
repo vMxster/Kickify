@@ -13,6 +13,8 @@ import it.unibo.kickify.ui.screens.login.LoginScreen
 import it.unibo.kickify.ui.screens.login.OTPScreen
 import it.unibo.kickify.ui.screens.notifications.NotificationScreen
 import it.unibo.kickify.ui.screens.onboard.OnBoardScreen
+import it.unibo.kickify.ui.screens.orders.MyOrdersScreen
+import it.unibo.kickify.ui.screens.orders.OrderDetailsScreen
 import it.unibo.kickify.ui.screens.productDetails.ProductDetailsScreen
 import it.unibo.kickify.ui.screens.productList.ProductListScreen
 import it.unibo.kickify.ui.screens.profile.ProfileScreen
@@ -37,6 +39,8 @@ sealed interface KickifyRoute {
     @Serializable data object Register : KickifyRoute
     @Serializable data object Settings : KickifyRoute
     @Serializable data object Wishlist : KickifyRoute
+    @Serializable data object MyOrders : KickifyRoute
+    @Serializable data class OrderDetails(val orderID: String) : KickifyRoute
 }
 
 @Composable
@@ -105,6 +109,15 @@ fun KickifyNavGraph(navController: NavHostController) {
 
         composable<KickifyRoute.Wishlist> {
             WishlistScreen(navController)
+        }
+
+        composable<KickifyRoute.MyOrders> {
+            MyOrdersScreen(navController)
+        }
+
+        composable<KickifyRoute.OrderDetails> { backStackEntry ->
+            val route = backStackEntry.toRoute<KickifyRoute.OrderDetails>()
+            OrderDetailsScreen(navController, route.orderID)
         }
     }
 }

@@ -109,10 +109,10 @@ fun LoginScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    ctx.startActivity(Intent(ctx, AuthActivity::class.java))
-                    /*navController.navigate(KickifyRoute.Home) {
+                    //ctx.startActivity(Intent(ctx, AuthActivity::class.java))
+                    navController.navigate(KickifyRoute.Home) {
                         popUpTo(KickifyRoute.Login) { inclusive = true }
-                    }*/
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
