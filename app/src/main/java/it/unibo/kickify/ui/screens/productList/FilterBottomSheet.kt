@@ -1,5 +1,6 @@
 package it.unibo.kickify.ui.screens.productList
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SliderDefaults
@@ -24,8 +26,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberRangeSliderState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,14 +41,18 @@ import androidx.compose.ui.unit.sp
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.ShopCategory
 import it.unibo.kickify.ui.theme.BluePrimary
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterScreen(
     onDismissRequest: () -> Unit,
     sheetState: SheetState,
+    onFilter: () -> Unit,
     onResetFilter: () -> Unit
 ){
+    val coroutineScope = rememberCoroutineScope()
+
     ModalBottomSheet(
         onDismissRequest = { onDismissRequest() },
         sheetState = sheetState
@@ -54,12 +62,24 @@ fun FilterScreen(
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(horizontal = 12.dp)
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
                 .padding(vertical = 8.dp)
         ){
             FilterTitleRow(onResetFilter = onResetFilter)
-
             Spacer(Modifier.height(8.dp))
+
+            FilterGroupTitle(stringResource(R.string.filterBottomSheet_orderBy))
+            FilterButtonGroup(
+                options = listOf(
+                    stringResource(R.string.filterBottomSheet_priceLowHigh),
+                    stringResource(R.string.filterBottomSheet_priceHighLow),
+                    stringResource(R.string.filterBottomSheet_alphabetical),
+                    stringResource(R.string.filterBottomSheet_reviewsLowHigh),
+                    stringResource(R.string.filterBottomSheet_reviewsHighLow)),
+                onSelectedChanged = { }
+            )
+
             FilterGroupTitle(stringResource(R.string.filterBottomSheet_gender))
             GenderGroup()
 
@@ -72,7 +92,12 @@ fun FilterScreen(
             PriceSlider(minValue = 40, maxValue = 500)
 
             Spacer(Modifier.height(8.dp))
-            ApplyFilterButton(onClick = {})
+            ApplyFilterButton(onClick = {
+                onFilter()
+                coroutineScope.launch {
+                    sheetState.hide()
+                }
+            })
         }
     }
 }
@@ -82,7 +107,8 @@ fun ApplyFilterButton(onClick: () -> Unit){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(horizontal = 12.dp)
             .padding(vertical = 8.dp)
     ){
@@ -157,11 +183,49 @@ fun FilterTitleRow(onResetFilter: () -> Unit){
 }
 
 @Composable
+fun FilterButtonGroup(
+    options: List<String>,
+    onSelectedChanged: (Int) -> Unit
+) {
+    var selectedIndex by remember { mutableIntStateOf(0) }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.Start
+    ){
+        options.forEach { option ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 2.dp)
+                    .clickable {
+                        selectedIndex = options.indexOf(option)
+                        onSelectedChanged(selectedIndex)
+                    }
+            ) {
+                RadioButton(
+                    selected = (selectedIndex == options.indexOf(option)),
+                    onClick = {
+                        selectedIndex = options.indexOf(option)
+                        onSelectedChanged(selectedIndex)
+                    }
+                )
+                Text(
+                    text = option,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun FilterGroupTitle(title: String){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(vertical = 8.dp)
             .padding(horizontal = 8.dp)
     ) {

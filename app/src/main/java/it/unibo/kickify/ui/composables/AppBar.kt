@@ -127,6 +127,7 @@ fun AppBar(navController: NavController, title: String = "") {
                         }
                     },
                     sheetState = sheetState,
+                    onFilter = {},
                     onResetFilter = {}
                 )
             }
@@ -151,12 +152,6 @@ fun AppBar(navController: NavController, title: String = "") {
                     )
                 }
             }
-
-            /*if (title != "Settings") {
-                   IconButton(onClick = { navController.navigate(Settings) }) {
-                       Icon(Icons.Outlined.Settings, "Settings")
-                   }
-            }*/
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,

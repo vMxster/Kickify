@@ -91,6 +91,12 @@
     <string name="filterBottomSheet_reset">Reset</string>
     <string name="filterBottomSheet_gender">Gender</string>
     <string name="filterBottomSheet_apply">Apply</string>
+    <string name="filterBottomSheet_orderBy">Order By</string>
+    <string name="filterBottomSheet_priceLowHigh">Price Low To High</string>
+    <string name="filterBottomSheet_priceHighLow">Price High To Low</string>
+    <string name="filterBottomSheet_alphabetical">Alphabetical</string>
+    <string name="filterBottomSheet_reviewsLowHigh">Reviews Low To High</string>
+    <string name="filterBottomSheet_reviewsHighLow">Reviews High to Low</string>
     <string name="notificationManager_channelVisibleName">Generic notifications</string>
     <string name="notificationManager_channelVisibleDescription">All notifications about offers, your orders…</string>
     <string name="notificationManager_NOpermissionMessage">Notifications disabled.</string>
