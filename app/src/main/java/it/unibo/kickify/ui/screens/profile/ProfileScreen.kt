@@ -1,5 +1,7 @@
 package it.unibo.kickify.ui.screens.profile
 
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.CameraAlt
@@ -23,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -61,8 +65,9 @@ fun ProfileScreen(
         ) {
             val profileScreenModifier = Modifier.fillMaxWidth()
                 .padding(horizontal = 24.dp)
-            
-            ProfileImageWithChangeButton(false)
+
+            val photo = TakenPhotosViewModel().getBitmapAtIndex(0)
+            ProfileImageWithChangeButton(navController, photo)
 
             Text(
                 modifier = Modifier.fillMaxWidth()
@@ -105,32 +110,30 @@ fun ProfileScreen(
 }
 
 @Composable
-fun ProfileImageWithChangeButton(hasUserImage: Boolean){
+fun ProfileImageWithChangeButton(navController: NavController, userBitmap: Bitmap?){
     Box(
         contentAlignment = Alignment.BottomCenter,
         modifier = Modifier.size(150.dp)
     ){
-        if(!hasUserImage) {
-            IconButton(
-                onClick = { },
-                modifier = Modifier
-                    //.fillMaxSize()
-                    .size(150.dp)
-                    .clip(CircleShape)
+        if(userBitmap == null) {
+            Icon(
+                imageVector = Icons.Outlined.AccountCircle,
+                contentDescription = "",
+                modifier = Modifier.size(140.dp) .clip(CircleShape)
                     .align(Alignment.TopCenter)
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.AccountCircle,
-                    contentDescription = "",
-                    modifier = Modifier.size(140.dp)
-                )
-            }
+            )
         } else {
             // user image
+            Image(
+                bitmap = userBitmap.asImageBitmap(),
+                contentDescription = "",
+                modifier = Modifier
+                    .clip(RoundedCornerShape(10.dp))
+            )
         }
 
         IconButton(
-            onClick = { },
+            onClick = { navController.navigate(KickifyRoute.TakeProfilePhoto) },
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)

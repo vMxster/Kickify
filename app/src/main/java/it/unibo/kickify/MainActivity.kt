@@ -15,7 +15,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.rememberNavController
 import it.unibo.kickify.ui.KickifyNavGraph
 import it.unibo.kickify.ui.KickifyRoute
-import it.unibo.kickify.ui.screens.profile.CameraApp
 import it.unibo.kickify.ui.theme.KickifyTheme
 
 class MainActivity : ComponentActivity() {
@@ -63,8 +62,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    //CameraApp()
-                    KickifyNavGraph(navController)
+                    KickifyNavGraph(navController, this)
                 }
             }
         } catch (e: Exception) {

@@ -1,5 +1,6 @@
 package it.unibo.kickify.ui
 
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -18,6 +19,7 @@ import it.unibo.kickify.ui.screens.orders.OrderDetailsScreen
 import it.unibo.kickify.ui.screens.productDetails.ProductDetailsScreen
 import it.unibo.kickify.ui.screens.productList.ProductListScreen
 import it.unibo.kickify.ui.screens.profile.ProfileScreen
+import it.unibo.kickify.ui.screens.profile.TakePhotoScreen
 import it.unibo.kickify.ui.screens.register.RegisterScreen
 import it.unibo.kickify.ui.screens.settings.SettingsScreen
 import it.unibo.kickify.ui.screens.wishlist.WishlistScreen
@@ -41,10 +43,11 @@ sealed interface KickifyRoute {
     @Serializable data object Wishlist : KickifyRoute
     @Serializable data object MyOrders : KickifyRoute
     @Serializable data class OrderDetails(val orderID: String) : KickifyRoute
+    @Serializable data object TakeProfilePhoto : KickifyRoute
 }
 
 @Composable
-fun KickifyNavGraph(navController: NavHostController) {
+fun KickifyNavGraph(navController: NavHostController, activity: ComponentActivity) {
     NavHost(
         navController = navController,
         startDestination = KickifyRoute.Onboard
@@ -118,6 +121,10 @@ fun KickifyNavGraph(navController: NavHostController) {
         composable<KickifyRoute.OrderDetails> { backStackEntry ->
             val route = backStackEntry.toRoute<KickifyRoute.OrderDetails>()
             OrderDetailsScreen(navController, route.orderID)
+        }
+
+        composable<KickifyRoute.TakeProfilePhoto> {
+            TakePhotoScreen(navController, activity)
         }
     }
 }
