@@ -6,17 +6,54 @@ import it.unibo.kickify.data.repositories.SettingsRepository
 import it.unibo.kickify.ui.screens.profile.TakenPhotosViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import org.koin.core.module.dsl.viewModel
-import org.koin.core.scope.get
 import org.koin.dsl.module
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.room.Room
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
+import it.unibo.kickify.data.database.KickifyDatabase
+import it.unibo.kickify.data.repositories.LocalRepository
+import it.unibo.kickify.data.repositories.RepositoryHandler
+import it.unibo.kickify.data.repositories.RemoteRepository
+import kotlinx.serialization.json.Json
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.singleOf
 
-val Context.dataStore by preferencesDataStore("settings")
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 val appModule = module {
     single { get<Context>().dataStore }
 
-    single { SettingsRepository(get()) }
+    single {
+        Room.databaseBuilder(
+                androidContext(),
+                KickifyDatabase::class.java,
+                "kickify"
+            ).fallbackToDestructiveMigration(false).build()
+    }
+
+    single { get<KickifyDatabase>().tripsDAO() }
+
+    single {
+        HttpClient(OkHttp) {
+            install(ContentNegotiation) {
+                json(Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys = true
+                })
+            }
+        }
+    }
+
+    single { LocalRepository(dao = get(), contentResolver = androidContext().contentResolver) }
+    single { SettingsRepository(dataStore = get()) }
+    single { RemoteRepository(httpClient = get()) }
+    single { RepositoryHandler(get(), get(), get()) }
 
     viewModel { SettingsViewModel(get()) }
-
     viewModel { TakenPhotosViewModel() }
 }

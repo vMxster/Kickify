@@ -17,6 +17,7 @@ class SettingsRepository(
         private val USER_NAME = stringPreferencesKey("username")
         private val THEME_KEY = stringPreferencesKey("theme")
         private val LOGIN_WITH_FINGERPRINT : Preferences.Key<Boolean> = booleanPreferencesKey("login_fingerprint")
+        private val LAST_ACCESS_KEY = stringPreferencesKey("last_access")
     }
 
     // get userid
@@ -54,5 +55,15 @@ class SettingsRepository(
     // set login with fingerprint
     suspend fun setLoginWithFingerPrint(loginWithFingerPrint: Boolean) = dataStore.edit {
         it[LOGIN_WITH_FINGERPRINT] = loginWithFingerPrint
+    }
+
+    // get last access
+    val lastAccess: Flow<Long> = dataStore.data.map { preferences ->
+        preferences[LAST_ACCESS_KEY]?.toLongOrNull() ?: 0L
+    }
+
+    // set last access
+    suspend fun setLastAccess(timestamp: Long) = dataStore.edit { preferences ->
+        preferences[LAST_ACCESS_KEY] = timestamp.toString()
     }
 }

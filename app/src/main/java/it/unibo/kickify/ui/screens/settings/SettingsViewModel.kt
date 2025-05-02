@@ -3,6 +3,7 @@ package it.unibo.kickify.ui.screens.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.unibo.kickify.data.models.Theme
+import it.unibo.kickify.data.repositories.RepositoryHandler
 import it.unibo.kickify.data.repositories.SettingsRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -13,9 +14,10 @@ data class ThemeState(val theme: Theme)
 data class UserIDState(val userID: String)
 data class UserNameState(val username: String)
 data class LoginWithFingerPrintState(val enabled: Boolean)
+data class LastAccessState(val timestamp: Long)
 
 class SettingsViewModel(
-    private val repository: SettingsRepository
+    private val repository: RepositoryHandler
 ) : ViewModel() {
 
     // get theme from repository
@@ -64,5 +66,17 @@ class SettingsViewModel(
     // set loggedinWithFingerprint from repository
     fun changeLoggedinWithFingerPrint(enabled: Boolean) = viewModelScope.launch {
         repository.setLoginWithFingerPrint(enabled)
+    }
+
+    // get last access from repository
+    val getLastAccess = repository.lastAccess.map { LastAccessState(it) }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = LastAccessState(0L)
+    )
+
+    // set last access from repository
+    fun setLastAccess(timestamp: Long) = viewModelScope.launch {
+        repository.setLastAccess(timestamp)
     }
 }
