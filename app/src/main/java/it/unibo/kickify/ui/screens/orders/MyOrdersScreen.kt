@@ -16,6 +16,7 @@ import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.PaymentMethod
 import it.unibo.kickify.ui.composables.AppBar
+import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.OrderCardContainer
 import it.unibo.kickify.ui.composables.OrderItem
 import it.unibo.kickify.ui.composables.OrdersTitleLine
@@ -31,7 +32,9 @@ fun MyOrdersScreen(
                 title = stringResource(R.string.myordersScreen_title)
             )
         },
-        bottomBar = { }
+        bottomBar = {
+            BottomBar(navController)
+        }
     ) { contentPadding ->
         val scrollState = rememberScrollState()
 

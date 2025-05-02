@@ -23,7 +23,11 @@ fun BottomBar(navController: NavController){
         contentColor = MaterialTheme.colorScheme.onBackground
     ) {
         Spacer(Modifier.weight(0.7f, true))
-        IconButton(onClick = { navController.navigate(KickifyRoute.Home) }) {
+        IconButton(onClick = {
+            navController.navigate(KickifyRoute.Home) {
+                popUpTo(KickifyRoute.Home) { inclusive = true }
+            }
+        } ) {
             Icon(Icons.Outlined.Home, contentDescription = "Home")
         }
         Spacer(Modifier.weight(1f, true))

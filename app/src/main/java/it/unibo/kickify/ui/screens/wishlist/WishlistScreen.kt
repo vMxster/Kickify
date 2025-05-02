@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.composables.AppBar
+import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ProductCardWishlistPage
 
 @Composable
@@ -32,6 +33,9 @@ fun WishlistScreen(
                 title = stringResource(R.string.wishlist_title)
             )
         },
+        bottomBar = {
+            BottomBar(navController)
+        }
     ) { contentPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

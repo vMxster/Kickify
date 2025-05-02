@@ -16,6 +16,7 @@ import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.ShopCategory
 import it.unibo.kickify.ui.composables.AppBar
+import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ProductCardShoesPage
 
 @Composable
@@ -35,7 +36,9 @@ fun ProductListScreen(
                 title = titleString
             )
         },
-        bottomBar = { }
+        bottomBar = {
+            BottomBar(navController)
+        }
     ) { contentPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

@@ -9,6 +9,7 @@ import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.ShoppingBag
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -135,6 +136,9 @@ fun AppBar(navController: NavController, title: String = "") {
             if (title == stringResource(R.string.profileScreen_title)){
                 IconButton(onClick = { /*TODO*/ }) {
                     Icon(Icons.Outlined.Edit, contentDescription = "Edit profile")
+                }
+                IconButton(onClick = { navController.navigate(KickifyRoute.Settings) }) {
+                    Icon(Icons.Outlined.Settings, contentDescription = "Edit profile")
                 }
             }
 

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.composables.AppBar
+import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.SettingsItemWithLeadingIcon
 import it.unibo.kickify.ui.composables.SettingsItemWithTrailingSwitchButton
 import it.unibo.kickify.ui.composables.SettingsTitleLine
@@ -37,6 +38,9 @@ fun SettingsScreen(
                 navController,
                 title = stringResource(R.string.settings_title)
             )
+        },
+        bottomBar = {
+            BottomBar(navController)
         }
     ) { contentPadding ->
         Column(

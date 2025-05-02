@@ -35,6 +35,7 @@ import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.AppBar
+import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.EmailRoundedTextField
 import it.unibo.kickify.ui.composables.PasswordRoundedTextField
 import it.unibo.kickify.ui.composables.UsernameRoundedTextField
@@ -53,7 +54,9 @@ fun ProfileScreen(
                 title = stringResource(R.string.profileScreen_title)
             )
         },
-        bottomBar = { }
+        bottomBar = {
+            BottomBar(navController)
+        }
     ) { contentPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

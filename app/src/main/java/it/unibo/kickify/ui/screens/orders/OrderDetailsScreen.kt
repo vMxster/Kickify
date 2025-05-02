@@ -18,6 +18,7 @@ import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.composables.AddressOnMapBox
 import it.unibo.kickify.ui.composables.AppBar
+import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.OrderIDCenterTitle
 import it.unibo.kickify.ui.composables.OrderItem
 import it.unibo.kickify.ui.composables.OrdersTitleLine
@@ -35,7 +36,9 @@ fun OrderDetailsScreen(
                 title = stringResource(R.string.trackOrder)
             )
         },
-        bottomBar = { }
+        bottomBar = {
+            BottomBar(navController)
+        }
     ) { contentPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

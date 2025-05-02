@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.composables.AppBar
+import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.CartItemsList
 import it.unibo.kickify.ui.composables.CartAndCheckoutResume
 
@@ -30,6 +31,9 @@ fun CartScreen(
                 title = stringResource(R.string.cartscreen_title)
             )
         },
+        bottomBar = {
+            BottomBar(navController)
+        }
     ) { contentPadding ->
         Column(
             modifier = Modifier.fillMaxSize()
