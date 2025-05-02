@@ -40,6 +40,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import it.unibo.kickify.R
 
@@ -229,9 +230,9 @@ fun CartAndCheckoutResume(subTotal: Double, shipping: Double){
 }
 
 @Composable
-fun ShoesColorIndicator(productColor: Color){
+fun ShoesColorIndicator(productColor: Color, indicatorSize: Dp = 20.dp){
     Box(Modifier
-        .size(20.dp)
+        .size(indicatorSize)
         .clip(CircleShape)
         .background(productColor)
     )

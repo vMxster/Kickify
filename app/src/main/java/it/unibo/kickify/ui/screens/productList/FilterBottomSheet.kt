@@ -1,6 +1,7 @@
 package it.unibo.kickify.ui.screens.productList
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -40,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.ShopCategory
+import it.unibo.kickify.ui.composables.ShoesColorIndicator
 import it.unibo.kickify.ui.theme.BluePrimary
 import kotlinx.coroutines.launch
 
@@ -79,11 +82,19 @@ fun FilterScreen(
                     stringResource(R.string.filterBottomSheet_reviewsHighLow)),
                 onSelectedChanged = { }
             )
+            Spacer(Modifier.height(8.dp))
 
             FilterGroupTitle(stringResource(R.string.filterBottomSheet_gender))
             GenderGroup()
-
             Spacer(Modifier.height(8.dp))
+
+            FilterGroupTitle(stringResource(R.string.color))
+            ColorGroup(
+                listOf(Color.White, Color.Red, Color.Gray, Color.Blue,
+                    Color.Yellow, Color.Black, Color.Green, Color.DarkGray)
+            )
+            Spacer(Modifier.height(8.dp))
+
             FilterGroupTitle(stringResource(R.string.size))
             SizeGroup(sizeList)
 
@@ -226,7 +237,7 @@ fun FilterGroupTitle(title: String){
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 11.dp)
             .padding(horizontal = 8.dp)
     ) {
         Text(
@@ -252,13 +263,33 @@ fun GenderGroup(){
 }
 
 @Composable
-fun SizeGroup(
-    sizeList: List<Int>
+fun ColorGroup(
+    colorList: List<Color>
 ){
+    val scrollState = rememberScrollState()
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
+            .horizontalScroll(scrollState)
+    ) {
+        for (color in colorList) {
+            ShoesColorIndicator(color, indicatorSize = 32.dp)
+            Spacer(Modifier.width(14.dp))
+        }
+    }
+}
+
+@Composable
+fun SizeGroup(
+    sizeList: List<Int>
+){
+    val scrollState = rememberScrollState()
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxWidth()
+            .horizontalScroll(scrollState)
     ) {
         for (size in sizeList){
             SingleSizeButton(size.toString())
