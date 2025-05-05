@@ -108,22 +108,21 @@ try {
             $response = ["success" => true, "message" => "Product added to wishlist"];
             break;
 
-            case "remove_from_wishlist":
-                if (!isset($_POST["product_id"])) {
-                    throw new Exception("Missing required fields");
-                }
-            
-                $email = $_POST["user_email"];
-                $productId = $_POST["product_id"];
-            
-                $success = $dbh->removeFromWishlist($email, $productId);
-                if (!$success) {
-                    throw new Exception("Failed to remove item from wishlist");
-                }
-            
-                $response = ["success" => true, "message" => "Product removed from wishlist"];
-               // echo json_encode($response);
-                break;
+        case "remove_from_wishlist":
+            if (!isset($_POST["product_id"])) {
+                throw new Exception("Missing required fields");
+            }
+        
+            $email = $_POST["user_email"];
+            $productId = $_POST["product_id"];
+        
+            $success = $dbh->removeFromWishlist($email, $productId);
+            if (!$success) {
+                throw new Exception("Failed to remove item from wishlist");
+            }
+        
+            $response = ["success" => true, "message" => "Product removed from wishlist"];
+            break;
 
         case "add_review":
             if (!isset($_POST["product_id"], $_POST["rating"], $_POST["comment"])) {
@@ -179,6 +178,25 @@ try {
             $dbh->addToWishlist($email, $productId, $color, $size);
             
             $response = ["success" => true, "message" => "You will be notified when the product is available"];
+            break;
+
+        case "getProducts":
+            $filters = isset($_POST["filters"]) ? $_POST["filters"] : [];
+            $products = $dbh->getProducts($filters);
+            $response = [
+                "success" => true,
+                "products" => $products
+            ];
+            break;
+            
+        case "getProductData":
+            $productId = $_POST["productId"];
+            $userEmail = isset($_POST["userEmail"]) ? $_POST["userEmail"] : null;
+            $productData = $dbh->getProductData($productId, $userEmail);
+            $response = [
+                "success" => true,
+                "productData" => $productData
+            ];
             break;
 
         default:
