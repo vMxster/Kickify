@@ -20,7 +20,6 @@ import it.unibo.kickify.data.repositories.RepositoryHandler
 import it.unibo.kickify.data.repositories.RemoteRepository
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.module.dsl.singleOf
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -29,10 +28,10 @@ val appModule = module {
 
     single {
         Room.databaseBuilder(
-                androidContext(),
-                KickifyDatabase::class.java,
-                "kickify"
-            ).fallbackToDestructiveMigration(false).build()
+            androidContext(),
+            KickifyDatabase::class.java,
+            "kickify"
+        ).fallbackToDestructiveMigration(false).build()
     }
 
     single { get<KickifyDatabase>().tripsDAO() }

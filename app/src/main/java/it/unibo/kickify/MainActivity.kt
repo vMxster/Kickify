@@ -9,13 +9,19 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import it.unibo.kickify.data.models.Theme
 import it.unibo.kickify.ui.KickifyNavGraph
 import it.unibo.kickify.ui.KickifyRoute
+import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.theme.KickifyTheme
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +40,16 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
-                KickifyTheme {
+                val settingsViewModel: SettingsViewModel = koinViewModel<SettingsViewModel>()
+                val themeState by settingsViewModel.getThemeState.collectAsStateWithLifecycle()
+
+                KickifyTheme(
+                    darkTheme = when(themeState.theme){
+                        Theme.Light -> false
+                        Theme.Dark -> true
+                        Theme.System -> isSystemInDarkTheme()
+                    }
+                ) {
                     val noNotificationPermissionMessage = stringResource(R.string.notificationManager_NOpermissionMessage)
                     val launcher = rememberLauncherForActivityResult(
                         contract = ActivityResultContracts.RequestPermission(),
@@ -62,7 +77,11 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    KickifyNavGraph(navController, this)
+                    KickifyNavGraph(
+                        navController = navController,
+                        activity = this,
+                        settingsViewModel = settingsViewModel
+                    )
                 }
             }
         } catch (e: Exception) {

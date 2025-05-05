@@ -1,6 +1,6 @@
 package it.unibo.kickify.data.remote
 
-import com.example.traveldiary.utils.Coordinates
+import it.unibo.kickify.utils.Coordinates
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
