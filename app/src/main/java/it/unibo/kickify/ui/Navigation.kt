@@ -22,6 +22,7 @@ import it.unibo.kickify.ui.screens.profile.ProfileScreen
 import it.unibo.kickify.ui.screens.profile.TakePhotoScreen
 import it.unibo.kickify.ui.screens.register.RegisterScreen
 import it.unibo.kickify.ui.screens.settings.SettingsScreen
+import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.screens.wishlist.WishlistScreen
 import kotlinx.serialization.Serializable
 
@@ -47,7 +48,11 @@ sealed interface KickifyRoute {
 }
 
 @Composable
-fun KickifyNavGraph(navController: NavHostController, activity: ComponentActivity) {
+fun KickifyNavGraph(
+    navController: NavHostController,
+    activity: ComponentActivity,
+    settingsViewModel: SettingsViewModel
+) {
     NavHost(
         navController = navController,
         startDestination = KickifyRoute.Onboard
@@ -107,7 +112,7 @@ fun KickifyNavGraph(navController: NavHostController, activity: ComponentActivit
         }
 
         composable<KickifyRoute.Settings> {
-            SettingsScreen(navController)
+            SettingsScreen(navController, settingsViewModel)
         }
 
         composable<KickifyRoute.Wishlist> {

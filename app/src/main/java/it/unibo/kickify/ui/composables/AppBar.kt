@@ -1,7 +1,6 @@
 package it.unibo.kickify.ui.composables
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -30,6 +29,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -52,21 +52,13 @@ fun AppBar(navController: NavController, title: String = "") {
     CenterAlignedTopAppBar(
         title = {
             if(title == stringResource(R.string.app_name)) {
-                if (isSystemInDarkTheme()) {
-                    Image(
-                        painterResource(R.drawable.kickify_dark_banner),
-                        "logo",
-                        contentScale = ContentScale.FillWidth,
-                        modifier = Modifier.height(40.dp)
-                    )
-                } else {
-                    Image(
-                        painterResource(R.drawable.kickify_light_banner),
-                        "logo",
-                        contentScale = ContentScale.FillWidth,
-                        modifier = Modifier.height(40.dp)
-                    )
-                }
+                Image(
+                    painterResource(R.drawable.kickify_light_banner),
+                    "logo",
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier.height(40.dp),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
+                )
 
             } else if (title != "Details"){
                 Text(text = title,
