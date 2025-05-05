@@ -35,10 +35,9 @@
     <string name="payment">Payment</string>
     <string name="settings_deleteAccount">Delete Account</string>
     <string name="settings_appSettingsTitle">App Settings</string>
-    <string name="settings_enableFaceIDtoLogin">Enable Face ID To Log In</string>
-    <string name="settings_enableFingerprintToLogin">Enable Fingerprint To Log In</string>
+    <string name="settings_enableBiometricLogin">Enable Biometric Log In</string>
     <string name="settings_enableLocationServices">Enable Location Services</string>
-    <string name="settings_darkTheme">Dark theme</string>
+    <string name="settings_appTheme">App Theme</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_system">System</string>

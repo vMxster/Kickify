@@ -1,5 +1,6 @@
 package it.unibo.kickify.ui.theme
 
+import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -9,6 +10,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.Shapes
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
 private val DarkColorPalette = darkColorScheme(
     primary = BluePrimary,
@@ -45,6 +49,15 @@ fun KickifyTheme(
         colorScheme = colors,
         typography = KickifyTypography,
         shapes = KickifyShapes,
-        content = content
+        content = {
+            val view = LocalView.current
+            if (!view.isInEditMode) {
+                SideEffect {
+                    WindowCompat.getInsetsController((view.context as Activity).window, view)
+                        .isAppearanceLightStatusBars = !darkTheme
+                }
+            }
+            content()
+        }
     )
 }
