@@ -13,11 +13,14 @@ import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.composables.AppBar
@@ -25,13 +28,16 @@ import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.SettingsItemWithLeadingIcon
 import it.unibo.kickify.ui.composables.SettingsItemWithTrailingSwitchButton
 import it.unibo.kickify.ui.composables.SettingsTitleLine
+import it.unibo.kickify.ui.composables.ThemeChooserRow
 
 @Composable
 fun SettingsScreen(
-    navController: NavController
-    //state: ThemeState,
-    //onThemeSelected: (Theme) -> Unit*/
+    navController: NavController,
+    settingsViewModel: SettingsViewModel
 ) {
+    val settings by settingsViewModel.settings.collectAsState()
+    val themeState by settingsViewModel.getThemeState.collectAsStateWithLifecycle()
+
     Scaffold(
         topBar = {
             AppBar(
@@ -76,25 +82,22 @@ fun SettingsScreen(
 
             Spacer(Modifier.height(15.dp))
             SettingsTitleLine(stringResource(R.string.settings_appSettingsTitle))
-            SettingsItemWithTrailingSwitchButton(
-                stringResource(R.string.settings_enableFaceIDtoLogin),
-                checked = false,
-                onSwitchChange = { }
-            )
-            SettingsItemWithTrailingSwitchButton(
-                stringResource(R.string.settings_enableFingerprintToLogin),
-                checked = false,
-                onSwitchChange = { }
-            )
+            if(settingsViewModel.isStrongAuthenticationAvailable(LocalContext.current)){
+                SettingsItemWithTrailingSwitchButton(
+                    stringResource(R.string.settings_enableBiometricLogin),
+                    checked = false,
+                    onSwitchChange = { }
+                )
+            }
             SettingsItemWithTrailingSwitchButton(
                 stringResource(R.string.settings_enableLocationServices),
-                checked = true,
+                checked = settings.enabledLocationServices,
                 onSwitchChange = { }
             )
-            SettingsItemWithTrailingSwitchButton(
-                stringResource(R.string.settings_darkTheme),
-                checked = true,
-                onSwitchChange = { }
+            ThemeChooserRow(selectedTheme = themeState.theme,
+                onThemeSelected = {
+                    settingsViewModel.changeTheme(it)
+                }
             )
         }
     }

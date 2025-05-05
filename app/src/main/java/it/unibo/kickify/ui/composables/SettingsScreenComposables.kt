@@ -11,13 +11,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import it.unibo.kickify.R
+import it.unibo.kickify.data.models.Theme
 
 @Composable
 fun SettingsTitleLine(title: String){
@@ -85,5 +96,46 @@ fun SettingsItemWithTrailingSwitchButton(
             isChecked = checked,
             onChangeCheckedAction = onSwitchChange,
         )
+    }
+}
+
+@Composable
+fun ThemeChooserRow(
+    selectedTheme: Theme,
+    onThemeSelected: (Theme) -> Unit
+) {
+    var selectedTh by rememberSaveable { mutableStateOf(selectedTheme) }
+    var selectedIndex by rememberSaveable { mutableIntStateOf(Theme.entries.indexOf(selectedTh)) }
+
+    Row(
+        modifier = Modifier.fillMaxWidth()
+            .padding(vertical = 6.dp)
+            .height(30.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = stringResource(R.string.settings_appTheme),
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+    SingleChoiceSegmentedButtonRow {
+        Theme.entries.forEachIndexed { index, th ->
+            SegmentedButton(
+                shape = SegmentedButtonDefaults.itemShape(
+                    index = index,
+                    count = Theme.entries.size
+                ),
+                onClick = {
+                    selectedIndex = index
+                    selectedTh = Theme.entries[index]
+                    onThemeSelected(selectedTh)
+                },
+                selected = index == selectedIndex,
+                label = {
+                    Text(th.toString())
+                }
+            )
+        }
     }
 }
