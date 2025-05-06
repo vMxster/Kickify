@@ -83,7 +83,8 @@
     <string name="checkoutScreen_title">Checkout</string>
     <string name="checkoutScreen_contactInformation">Contact Information</string>
     <string name="checkoutScreen_address">Address</string>
-    <string name="checkoutScreen_paymentMethod">Payment Method</string>
+    <string name="paymentMethod">Payment Method</string>
+    <string name="cardExpires">Expires</string>
     <string name="checkoutScreen_email">Email</string>
     <string name="checkoutScreen_phone">Phone</string>
     <string name="filterBottomSheet_title">Filters</string>
@@ -117,4 +118,5 @@
     <string name="orderDetails">Order Details</string>
     <string name="expectedDeliveryDate">Expected Delivery Date</string>
     <string name="trackingID">Tracking ID</string>
+    <string name="capturePhotoError">An error occurred while capturing photo.</string>
 </resources>

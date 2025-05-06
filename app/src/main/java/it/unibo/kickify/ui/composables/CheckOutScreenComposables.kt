@@ -79,7 +79,7 @@ fun InformationCard(
             AddressOnMapBox(address = shippingAddress)
 
             Spacer(Modifier.height(10.dp))
-            InformationSectionTitle(stringResource(R.string.checkoutScreen_paymentMethod))
+            InformationSectionTitle(stringResource(R.string.paymentMethod))
 
             Spacer(Modifier.height(6.dp))
             CheckOutInformationRow(

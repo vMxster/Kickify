@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import it.unibo.kickify.camerax.CameraXutils
 import it.unibo.kickify.ui.screens.cart.CartScreen
 import it.unibo.kickify.ui.screens.checkout.CheckOutScreen
 import it.unibo.kickify.ui.screens.home.HomeScreen
@@ -25,6 +26,7 @@ import it.unibo.kickify.ui.screens.settings.SettingsScreen
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.screens.wishlist.WishlistScreen
 import kotlinx.serialization.Serializable
+import org.koin.compose.koinInject
 
 sealed interface KickifyRoute {
     @Serializable data object Home : KickifyRoute
@@ -53,6 +55,8 @@ fun KickifyNavGraph(
     activity: ComponentActivity,
     settingsViewModel: SettingsViewModel
 ) {
+    val cameraXutils =  koinInject<CameraXutils>()
+
     NavHost(
         navController = navController,
         startDestination = KickifyRoute.Onboard
@@ -104,7 +108,7 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.Profile> {
-            ProfileScreen(navController)
+            ProfileScreen(navController, cameraXutils)
         }
 
         composable<KickifyRoute.Register> {

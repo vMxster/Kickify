@@ -1,6 +1,5 @@
 package it.unibo.kickify.ui.screens.profile
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,12 +26,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
+import it.unibo.kickify.camerax.CameraXutils
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.BottomBar
@@ -45,7 +46,8 @@ import it.unibo.kickify.ui.theme.LightGray
 
 @Composable
 fun ProfileScreen(
-    navController: NavController
+    navController: NavController,
+    cameraXutils: CameraXutils
 ){
     Scaffold(
         topBar = {
@@ -69,8 +71,7 @@ fun ProfileScreen(
             val profileScreenModifier = Modifier.fillMaxWidth()
                 .padding(horizontal = 24.dp)
 
-            val photo = TakenPhotosViewModel().getBitmapAtIndex(0)
-            ProfileImageWithChangeButton(navController, photo)
+            ProfileImageWithChangeButton(navController, cameraXutils)
 
             Text(
                 modifier = Modifier.fillMaxWidth()
@@ -113,25 +114,26 @@ fun ProfileScreen(
 }
 
 @Composable
-fun ProfileImageWithChangeButton(navController: NavController, userBitmap: Bitmap?){
+fun ProfileImageWithChangeButton(navController: NavController, cameraXutils: CameraXutils){
     Box(
         contentAlignment = Alignment.BottomCenter,
         modifier = Modifier.size(150.dp)
     ){
-        if(userBitmap == null) {
-            Icon(
-                imageVector = Icons.Outlined.AccountCircle,
-                contentDescription = "",
-                modifier = Modifier.size(140.dp) .clip(CircleShape)
-                    .align(Alignment.TopCenter)
-            )
-        } else {
-            // user image
+        val userBitmap = cameraXutils.getBitmapFromFile(LocalContext.current)
+        // if found user image saved in app cache
+        if(userBitmap != null) {
             Image(
                 bitmap = userBitmap.asImageBitmap(),
                 contentDescription = "",
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
+            )
+        } else { // otherwise use user profile icon
+            Icon(
+                imageVector = Icons.Outlined.AccountCircle,
+                contentDescription = "",
+                modifier = Modifier.size(140.dp) .clip(CircleShape)
+                    .align(Alignment.TopCenter)
             )
         }
 

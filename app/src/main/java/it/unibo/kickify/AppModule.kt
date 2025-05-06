@@ -3,7 +3,6 @@ package it.unibo.kickify
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 import it.unibo.kickify.data.repositories.SettingsRepository
-import it.unibo.kickify.ui.screens.profile.TakenPhotosViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -14,6 +13,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
+import it.unibo.kickify.camerax.CameraXutils
 import it.unibo.kickify.data.database.KickifyDatabase
 import it.unibo.kickify.data.repositories.LocalRepository
 import it.unibo.kickify.data.repositories.RepositoryHandler
@@ -48,11 +48,14 @@ val appModule = module {
         }
     }
 
+    single {
+        CameraXutils(androidContext())
+    }
+
     single { LocalRepository(dao = get(), contentResolver = androidContext().contentResolver) }
     single { SettingsRepository(dataStore = get()) }
     single { RemoteRepository(httpClient = get()) }
     single { RepositoryHandler(get(), get(), get()) }
 
     viewModel { SettingsViewModel(get()) }
-    viewModel { TakenPhotosViewModel() }
 }
