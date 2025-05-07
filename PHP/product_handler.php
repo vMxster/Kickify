@@ -19,11 +19,11 @@ try {
 
     switch ($action) {
         case "get_disabled_sizes":
-            if (!isset($_POST["product_id"], $_POST["color"])) {
+            if (!isset($_POST["productId"], $_POST["color"])) {
                 throw new Exception("Missing required fields");
             }
     
-            $productId = $_POST["product_id"];
+            $productId = $_POST["productId"];
             $color = $_POST["color"];
     
 
@@ -40,11 +40,11 @@ try {
     
         case "get_disabled_colors":
 
-            if (!isset($_POST["product_id"], $_POST["size"])) {
+            if (!isset($_POST["productId"], $_POST["size"])) {
                 throw new Exception("Missing required fields");
             }
     
-            $productId = $_POST["product_id"];
+            $productId = $_POST["productId"];
             $size = floatval($_POST["size"]);
 
             $availableColors = $dbh->getColorsBySize($productId, $size);
@@ -60,12 +60,12 @@ try {
 
         case "add_to_cart":
             // Validate required fields
-            if (!isset($_POST["product_id"], $_POST["size"], $_POST["color"])) {
+            if (!isset($_POST["productId"], $_POST["size"], $_POST["color"], $_POST["email"])) {
                 throw new Exception("Missing required fields");
             }
 
-            $email = $_POST['user_email'];
-            $productId = $_POST["product_id"];
+            $email = $_POST['email'];
+            $productId = $_POST["productId"];
             $size = floatval($_POST["size"]);
             $color = $_POST["color"];
             $quantity = isset($_POST["quantity"]) ? intval($_POST["quantity"]) : 1;
@@ -78,7 +78,7 @@ try {
             break;
 
         case "remove_from_cart":
-            if (!isset($_POST["product_id"], $_POST["size"], $_POST["color"])) {
+            if (!isset($_POST["productId"], $_POST["size"], $_POST["color"])) {
                 throw new Exception("Missing required fields");
             }
             if (!isset($_POST["email"]) || empty($_POST["email"])) {
@@ -86,7 +86,7 @@ try {
             }
 
             $email = filter_var($_POST["email"], FILTER_SANITIZE_EMAIL);
-            $productId = $_POST["product_id"];
+            $productId = $_POST["productId"];
             $size = floatval($_POST["size"]);
             $color = $_POST["color"];
 
@@ -97,26 +97,26 @@ try {
             $response = ["success" => true, "message" => "Product removed from cart"];
             break;
 
-        case "add_to_wishlist":
-            $email = $_POST['user_email'];
-            $productId = $_POST["product_id"];
+        case "addToWishlist":
+            if (!isset($_POST["productId"], $_POST["email"])) {
+                throw new Exception("Missing required fields");
+            }
             
-            $success = $dbh->addToWishlist($email, $productId);
+            $success = $dbh->addToWishlist(
+                $_POST["email"], $_POST["productId"]);
             if (!$success) {
                 throw new Exception("Failed to add item to wishlist");
             }
             $response = ["success" => true, "message" => "Product added to wishlist"];
             break;
 
-        case "remove_from_wishlist":
-            if (!isset($_POST["product_id"])) {
+        case "removeFromWishlist":
+            if (!isset($_POST["productId"], $_POST["email"])) {
                 throw new Exception("Missing required fields");
             }
         
-            $email = $_POST["user_email"];
-            $productId = $_POST["product_id"];
-        
-            $success = $dbh->removeFromWishlist($email, $productId);
+            $success = $dbh->removeFromWishlist(
+                $_POST["email"], $_POST["productId"]);
             if (!$success) {
                 throw new Exception("Failed to remove item from wishlist");
             }
@@ -125,12 +125,12 @@ try {
             break;
 
         case "add_review":
-            if (!isset($_POST["product_id"], $_POST["rating"], $_POST["comment"])) {
+            if (!isset($_POST["productId"], $_POST["rating"], $_POST["comment"], $_POST["email"])) {
                 throw new Exception("Missing required fields");
             }
 
-            $email = $_POST['user_email'];
-            $productId = $_POST["product_id"];
+            $email = $_POST['email'];
+            $productId = $_POST["productId"];
             $rating = intval($_POST["rating"]);
             $comment = filter_var($_POST["comment"], FILTER_SANITIZE_STRING);
 
@@ -165,12 +165,12 @@ try {
             break;
 
         case "notify_availability":
-            if (!isset($_POST["product_id"], $_POST["size"], $_POST["color"])) {
+            if (!isset($_POST["productId"], $_POST["size"], $_POST["color"], $_POST["email"])) {
                 throw new Exception("Missing required fields");
             }
 
             $email = filter_var($_POST["email"], FILTER_SANITIZE_EMAIL);
-            $productId = $_POST["product_id"];
+            $productId = $_POST["productId"];
             $size = floatval($_POST["size"]);
             $color = $_POST["color"];
 
@@ -181,8 +181,7 @@ try {
             break;
 
         case "getProducts":
-            $filters = isset($_POST["filters"]) ? $_POST["filters"] : [];
-            $products = $dbh->getProducts($filters);
+            $products = $dbh->getProducts();
             $response = [
                 "success" => true,
                 "products" => $products
@@ -190,12 +189,42 @@ try {
             break;
             
         case "getProductData":
-            $productId = $_POST["productId"];
-            $userEmail = isset($_POST["userEmail"]) ? $_POST["userEmail"] : null;
-            $productData = $dbh->getProductData($productId, $userEmail);
+            if (!isset($_POST["productId"]) || !isset($_POST["email"]) 
+                || !isset($_POST["last_access"])) {
+                throw new Exception("Missing required fields");
+            }
+
+            $productData = $dbh->getProductData(
+                $_POST["productId"], $_POST["email"]);
             $response = [
                 "success" => true,
                 "productData" => $productData
+            ];
+            break;
+        
+        case "getProductHistory":
+            if (!isset($_POST["productId"]) || !isset($_POST["last_access"])) {
+                throw new Exception("Missing required fields");
+            }
+    
+            $history = $dbh->getProductHistory($_POST["productId"], $_POST["last_access"]);
+    
+            $response = [
+                "success" => true,
+                "history" => $history
+            ];
+            break;
+
+        case "getProductReviews":
+            if (!isset($_POST["productId"]) || !isset($_POST["last_access"])) {
+                throw new Exception("Missing required fields");
+            }
+    
+            $reviews = $dbh->getProductReviews($_POST["productId"], $_POST["last_access"]);
+    
+            $response = [
+                "success" => true,
+                "reviews" => $reviews
             ];
             break;
 

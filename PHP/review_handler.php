@@ -28,15 +28,6 @@ try {
                 }
                 break;
                 
-            case "getProductReviews":
-                $productId = $_POST["productId"];
-                $reviews = $dbh->getProductReviews($productId);
-                $response = [
-                    "success" => true,
-                    "reviews" => $reviews
-                ];
-                break;
-                
             case "deleteReview":
                 $email = $_POST["email"];
                 $productId = $_POST["productId"];

@@ -38,8 +38,9 @@ class DatabaseHelper {
     
     // Get all products
     public function getProducts() {
-        $query = "SELECT p.* 
-                  FROM PRODOTTO p 
+        $query = "SELECT p.*, i.* 
+                  FROM PRODOTTO p, IMMAGINE i 
+                  WHERE p.ID_Prodotto = i.ID_Prodotto 
                   ORDER BY p.Data_Aggiunta DESC";
         $stmt = $this->db->prepare($query);
         $stmt->execute();
@@ -192,22 +193,17 @@ class DatabaseHelper {
         }
     }
 
-    public function getProductData($productId, $userEmail = null) {
+    public function getProductData($productId, $userEmail = null, $lastAccess) {
         $query = "SELECT 
             p.*,
             v.Colore,
             v.Taglia,
             v.Quantita,
-            r.Punteggio,
-            r.Descrizione as RecensioneDescrizione,
-            r.Data_Recensione,
-            r.Email as ReviewerEmail,
             CASE WHEN w.Email IS NOT NULL THEN 1 ELSE 0 END as InWishlist,
             CASE WHEN cart.ID_Prodotto IS NOT NULL THEN 1 ELSE 0 END as InCart,
             cart.Quantita as CartQuantity
         FROM PRODOTTO p
         LEFT JOIN VARIANTE v ON p.ID_Prodotto = v.ID_Prodotto
-        LEFT JOIN RECENSIONE r ON p.ID_Prodotto = r.ID_Prodotto
         LEFT JOIN (
             SELECT a.ID_Prodotto, w.Email 
             FROM WISHLIST w 
@@ -220,15 +216,11 @@ class DatabaseHelper {
             JOIN comprendere comp ON c.ID_Carrello = comp.ID_Carrello 
             WHERE c.Email = ?
         ) cart ON p.ID_Prodotto = cart.ID_Prodotto
-        WHERE p.ID_Prodotto = ?";
+        WHERE p.ID_Prodotto = ? AND p.Data_Aggiunta > ?";
     
         try {
             $stmt = $this->db->prepare($query);
-            if($stmt === false) {
-                throw new Exception("Error preparing statement: " . $this->db->error);
-            }
-    
-            $stmt->bind_param("ssi", $userEmail, $userEmail, $productId);
+            $stmt->bind_param("ssis", $userEmail, $userEmail, $productId, $lastAccess);
             $stmt->execute();
             $result = $stmt->get_result();
     
@@ -294,6 +286,19 @@ class DatabaseHelper {
             error_log("Error in getProductData: " . $e->getMessage());
             throw $e;
         }
+    }
+
+    // Get product history
+    public function getProductHistory($productId, $lastAccess) {
+        $query = "SELECT ps.* 
+                  FROM PRODOTTO_STORICO ps 
+                  WHERE ps.ID_Prodotto = ? 
+                  AND ps.Data_Modifica > ?";
+        
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("is", $productId, $lastAccess);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
     // Admin: Update product stock
@@ -1384,14 +1389,15 @@ class DatabaseHelper {
     }
 
     // Get product reviews
-    public function getProductReviews($productId) {
+    public function getProductReviews($productId, $lastAccess) {
         $query = "SELECT r.*, u.Nome, u.Cognome 
                 FROM RECENSIONE r 
                 JOIN UTENTE u ON r.Email = u.Email 
                 WHERE r.ID_Prodotto = ? 
+                AND r.Data_Recensione > ? 
                 ORDER BY r.Data_Recensione DESC";
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param("s", $productId);
+        $stmt->bind_param("ss", $productId, $lastAccess);
         $stmt->execute();
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
@@ -1827,6 +1833,12 @@ class DatabaseHelper {
     
         return array_values($orders);
     }
+
+    /*********************
+     * USER INFO FUNCTIONS *
+     *********************/
+
+    // TBD
 }
 
 ?>

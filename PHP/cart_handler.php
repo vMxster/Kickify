@@ -19,15 +19,18 @@ try {
                     throw new Exception('Missing required parameters');
                 }
                 $sizes = $dbh->getSizesByColor($_POST['productId'], $_POST['color']);
-                echo json_encode($sizes);
-                exit();
+                $response = [
+                    'success' => true,
+                    'sizes' => $sizes
+                ];
+                break;
 
             case 'moveToWishlist':
                 if (!isset($_POST['productId']) || !isset($_POST['color']) || !isset($_POST['size'])) {
                     throw new Exception('Missing required parameters');
                 }
                 
-                $cart = $dbh->getCartByEmail($_SESSION["user_email"]);
+                $cart = $dbh->getCartByEmail($email);
                 if ($dbh->addToWishlist($email, $_POST['productId'])) {
                     $dbh->removeFromCart($email, $_POST['productId'], $_POST['color'], $_POST['size']);
                     $cartInfo = calculateCartInfo($dbh, $cart['ID_Carrello']);
@@ -38,140 +41,143 @@ try {
                         'itemCount' => $cartInfo['itemCount'],
                         'cartTotal' => $cartInfo['total']
                     ];
-                    echo json_encode($response);
-                    exit();
                 }
-        }
-    } else if (isset($_POST['removeItem'])) {
-        $cart = $dbh->getCartByEmail($_SESSION["user_email"]);
-        if ($dbh->removeFromCart($email, $_POST['removeItem'], $_POST['color'], $_POST['size'])) {
-            $cartInfo = calculateCartInfo($dbh, $cart['ID_Carrello']);
-            $dbh->modifyCartTotalValue($cart['ID_Carrello'], $cartInfo['total']);
-            $response = [
-                'success' => true,
-                'message' => 'Item removed',
-                'itemCount' => $cartInfo['itemCount'],
-                'cartTotal' => $cartInfo['total']
-            ];
-        }
-    } else if (isset($_POST['getQuantity'])) {
-        $availableQty = $dbh->getProductMaxQuantity(
-            $_POST['productId'],
-            $_POST['color'],
-            $_POST['size']
-        );
-        $response = [
-            'success' => true,
-            'quantity' => $availableQty
-        ];
-    } else if (isset($_POST['adjustQuantity'])) {
-        $cart = $dbh->getCartByEmail($_SESSION["user_email"]);
-        if ($dbh->adjustCartQuantity(
-            $cart['ID_Carrello'],
-            $_POST['productId'],
-            $_POST['color'],
-            $_POST['size'],
-            $_POST['quantity']
-        )) {
-            $cartInfo = calculateCartInfo($dbh, $cart['ID_Carrello']);
-            $dbh->modifyCartTotalValue($cart['ID_Carrello'], $cartInfo['total']);
-            $response = [
-                'success' => true,
-                'itemCount' => $cartInfo['itemCount'],
-                'cartTotal' => $cartInfo['total']
-            ];
-        }
-    } else if (isset($_POST['updateBoth'])) {
-        $cart = $dbh->getCartByEmail($_SESSION["user_email"]);
-        if ($dbh->updateSizeAndColor(
-            $cart['ID_Carrello'],
-            $_POST['productId'],
-            $_POST['oldColor'],
-            $_POST['oldSize'],
-            $_POST['newColor'],
-            $_POST['newSize']
-        )) {
-            $dbh->adjustCartQuantity(
-                $cart['ID_Carrello'],
-                $_POST['productId'],
-                $_POST['newColor'],
-                $_POST['newSize'],
-                1
-            );
-            $cartInfo = calculateCartInfo($dbh, $cart['ID_Carrello']);
-            $dbh->modifyCartTotalValue($cart['ID_Carrello'], $cartInfo['total']);
-            $response = [
-                'success' => true,
-                'message' => 'Cart updated successfully',
-                'itemCount' => $cartInfo['itemCount'],
-                'cartTotal' => $cartInfo['total']
-            ];
-        } else {
-            $response = [
-                'success' => false,
-                'message' => 'Selected variant is not available'
-            ];
-        }
-    } else if (isset($_POST['updateColor'])) {
-        $cart = $dbh->getCartByEmail($_SESSION["user_email"]);
-        if ($dbh->updateCartItemColor(
-            $cart['ID_Carrello'], 
-            $_POST['productId'],
-            $_POST['oldColor'],
-            $_POST['newColor'],
-            $_POST['size']
-        )) {
-            $dbh->adjustCartQuantity(
-                $cart['ID_Carrello'],
-                $_POST['productId'],
-                $_POST['newColor'],
-                $_POST['size'],
-                $_POST['quantity']
-            );
-            $cartInfo = calculateCartInfo($dbh, $cart['ID_Carrello']);
-            $response = [
-                'success' => true,
-                'message' => 'Color updated successfully',
-                'itemCount' => $cartInfo['itemCount'],
-                'cartTotal' => $cartInfo['total']
-            ];
-        } else {
-            $response = [
-                'success' => false,
-                'message' => 'Failed to update color'
-            ];
-        }
-    } else if (isset($_POST['updateSize'])) {
-        $cart = $dbh->getCartByEmail($_SESSION["user_email"]);
-        if ($dbh->updateSizeOnly(
-            $cart['ID_Carrello'],
-            $_POST['productId'],
-            $_POST['color'],
-            $_POST['oldSize'],
-            $_POST['newSize']
-        )) {
-            $dbh->adjustCartQuantity(
-                $cart['ID_Carrello'],
-                $_POST['productId'],
-                $_POST['color'],
-                $_POST['newSize'],
-                $_POST['quantity']
-            );
-            $cartInfo = calculateCartInfo($dbh, $cart['ID_Carrello']);
-            $response = [
-                'success' => true,
-                'message' => 'Size updated successfully',
-                'itemCount' => $cartInfo['itemCount'],
-                'cartTotal' => $cartInfo['total']
-            ];
-        } else {
-            $response = [
-                'success' => false,
-                'message' => 'Selected size is not available'
-            ];
+                break;
+            
+            case 'removeItem':
+                if (!isset($_POST['productId']) || !isset($_POST['color']) || !isset($_POST['size'])) {
+                    throw new Exception('Missing required parameters');
+                }
+
+                $cart = $dbh->getCartByEmail($email);
+                if ($dbh->removeFromCart($email, $_POST['productId'], $_POST['color'], $_POST['size'])) {
+                    $cartInfo = calculateCartInfo($dbh, $cart['ID_Carrello']);
+                    $dbh->modifyCartTotalValue($cart['ID_Carrello'], $cartInfo['total']);
+                    $response = [
+                        'success' => true,
+                        'message' => 'Item removed',
+                        'itemCount' => $cartInfo['itemCount'],
+                        'cartTotal' => $cartInfo['total']
+                    ];
+                }
+                break;
+
+            case 'getQuantity':
+                if (!isset($_POST['productId']) || !isset($_POST['color']) || !isset($_POST['size'])) {
+                    throw new Exception('Missing required parameters');
+                }
+
+                $availableQty = $dbh->getProductMaxQuantity(
+                    $_POST['productId'],
+                    $_POST['color'],
+                    $_POST['size']
+                );
+                $response = [
+                    'success' => true,
+                    'quantity' => $availableQty
+                ];
+                break;
+
+            case 'adjustQuantity':
+                if (!isset($_POST['productId']) || !isset($_POST['color']) 
+                    || !isset($_POST['size']) || !isset($_POST['quantity'])) {
+                    throw new Exception('Missing required parameters');
+                }
+
+                $cart = $dbh->getCartByEmail($email);
+                if ($dbh->adjustCartQuantity(
+                    $cart['ID_Carrello'],
+                    $_POST['productId'],
+                    $_POST['color'],
+                    $_POST['size'],
+                    $_POST['quantity']
+                )) {
+                    $cartInfo = calculateCartInfo($dbh, $cart['ID_Carrello']);
+                    $dbh->modifyCartTotalValue($cart['ID_Carrello'], $cartInfo['total']);
+                    $response = [
+                        'success' => true,
+                        'itemCount' => $cartInfo['itemCount'],
+                        'cartTotal' => $cartInfo['total']
+                    ];
+                }
+                break;
+
+            case 'updateColor':
+                if (!isset($_POST['productId']) || !isset($_POST['oldColor']) || !isset($_POST['newColor']) 
+                    || !isset($_POST['size']) || !isset($_POST['quantity'])) {
+                    throw new Exception('Missing required parameters');
+                }
+
+                $cart = $dbh->getCartByEmail($email);
+                if ($dbh->updateCartItemColor(
+                    $cart['ID_Carrello'], 
+                    $_POST['productId'],
+                    $_POST['oldColor'],
+                    $_POST['newColor'],
+                    $_POST['size']
+                )) {
+                    $dbh->adjustCartQuantity(
+                        $cart['ID_Carrello'],
+                        $_POST['productId'],
+                        $_POST['newColor'],
+                        $_POST['size'],
+                        $_POST['quantity']
+                    );
+                    $cartInfo = calculateCartInfo($dbh, $cart['ID_Carrello']);
+                    $response = [
+                        'success' => true,
+                        'message' => 'Color updated successfully',
+                        'itemCount' => $cartInfo['itemCount'],
+                        'cartTotal' => $cartInfo['total']
+                    ];
+                } else {
+                    $response = [
+                        'success' => false,
+                        'message' => 'Failed to update color'
+                    ];
+                }
+                break;
+
+            case 'updateSize':
+                if (!isset($_POST['productId']) || !isset($_POST['color']) || !isset($_POST['oldSize']) 
+                    || !isset($_POST['newSize']) || !isset($_POST['quantity'])) {
+                    throw new Exception('Missing required parameters');
+                }
+                
+                $cart = $dbh->getCartByEmail($email);
+                if ($dbh->updateSizeOnly(
+                    $cart['ID_Carrello'],
+                    $_POST['productId'],
+                    $_POST['color'],
+                    $_POST['oldSize'],
+                    $_POST['newSize']
+                )) {
+                    $dbh->adjustCartQuantity(
+                        $cart['ID_Carrello'],
+                        $_POST['productId'],
+                        $_POST['color'],
+                        $_POST['newSize'],
+                        $_POST['quantity']
+                    );
+                    $cartInfo = calculateCartInfo($dbh, $cart['ID_Carrello']);
+                    $response = [
+                        'success' => true,
+                        'message' => 'Size updated successfully',
+                        'itemCount' => $cartInfo['itemCount'],
+                        'cartTotal' => $cartInfo['total']
+                    ];
+                } else {
+                    $response = [
+                        'success' => false,
+                        'message' => 'Selected size is not available'
+                    ];
+                }
+                break;
+            
+            default:
+                throw new Exception('Invalid action');
         }
     }
-
 } catch (Exception $e) {
     $response = [
         'success' => false,
