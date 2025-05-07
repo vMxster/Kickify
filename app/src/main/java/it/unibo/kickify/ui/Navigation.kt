@@ -108,7 +108,7 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.Profile> {
-            ProfileScreen(navController, cameraXutils)
+            ProfileScreen(navController, cameraXutils, settingsViewModel)
         }
 
         composable<KickifyRoute.Register> {
@@ -133,7 +133,7 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.TakeProfilePhoto> {
-            TakePhotoScreen(navController, activity, cameraXutils)
+            TakePhotoScreen(navController, activity, cameraXutils, settingsViewModel)
         }
     }
 }

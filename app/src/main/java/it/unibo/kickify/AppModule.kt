@@ -55,7 +55,7 @@ val appModule = module {
     single { LocalRepository(dao = get(), contentResolver = androidContext().contentResolver) }
     single { SettingsRepository(dataStore = get()) }
     single { RemoteRepository(httpClient = get()) }
-    single { RepositoryHandler(get(), get(), get()) }
+    single { RepositoryHandler(get(), get()) }
 
     viewModel { SettingsViewModel(get()) }
 }

@@ -41,10 +41,10 @@ class MainActivity : ComponentActivity() {
                 }
 
                 val settingsViewModel: SettingsViewModel = koinViewModel<SettingsViewModel>()
-                val themeState by settingsViewModel.getThemeState.collectAsStateWithLifecycle()
+                val themeState by settingsViewModel.theme.collectAsStateWithLifecycle(initialValue = Theme.System)
 
                 KickifyTheme(
-                    darkTheme = when(themeState.theme){
+                    darkTheme = when(themeState){
                         Theme.Light -> false
                         Theme.Dark -> true
                         Theme.System -> isSystemInDarkTheme()
