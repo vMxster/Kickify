@@ -7,16 +7,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
 import it.unibo.kickify.camerax.CameraXutils
 import it.unibo.kickify.camerax.TakePhotoCameraScreen
 
 @Composable
-fun TakePhotoScreen(navController: NavController, mainActivity: ComponentActivity){
-    val ctx = LocalContext.current
-    val cameraXutils = CameraXutils(ctx)
+fun TakePhotoScreen(
+    navController: NavController, mainActivity: ComponentActivity,
+    cameraXutils: CameraXutils
+){
 
     if (!cameraXutils.hasRequiredPermissions()) {
         ActivityCompat.requestPermissions(
