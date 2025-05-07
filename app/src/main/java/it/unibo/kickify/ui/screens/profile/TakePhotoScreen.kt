@@ -11,13 +11,15 @@ import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
 import it.unibo.kickify.camerax.CameraXutils
 import it.unibo.kickify.camerax.TakePhotoCameraScreen
+import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 
 @Composable
 fun TakePhotoScreen(
-    navController: NavController, mainActivity: ComponentActivity,
-    cameraXutils: CameraXutils
+    navController: NavController,
+    mainActivity: ComponentActivity,
+    cameraXutils: CameraXutils,
+    settingsViewModel: SettingsViewModel
 ){
-
     if (!cameraXutils.hasRequiredPermissions()) {
         ActivityCompat.requestPermissions(
             mainActivity, cameraXutils.permissions, 0
@@ -30,7 +32,7 @@ fun TakePhotoScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            TakePhotoCameraScreen(navController, cameraXutils)
+            TakePhotoCameraScreen(navController, cameraXutils, settingsViewModel)
         }
     }
 }

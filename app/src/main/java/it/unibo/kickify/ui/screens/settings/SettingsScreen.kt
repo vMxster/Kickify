@@ -12,7 +12,6 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -23,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
-import it.unibo.kickify.data.models.Theme
 import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.SettingsItemWithLeadingIcon
@@ -36,9 +34,9 @@ fun SettingsScreen(
     navController: NavController,
     settingsViewModel: SettingsViewModel
 ) {
-    val themeState by settingsViewModel.theme.collectAsStateWithLifecycle(initialValue = Theme.System)
-    val locationEnabledState by settingsViewModel.enabledLocation.collectAsStateWithLifecycle(initialValue = false)
-    val biometricLoginState by settingsViewModel.biometricLogin.collectAsStateWithLifecycle(initialValue = false)
+    val themeState by settingsViewModel.theme.collectAsStateWithLifecycle()
+    val locationEnabledState by settingsViewModel.enabledLocation.collectAsStateWithLifecycle()
+    val biometricLoginState by settingsViewModel.biometricLogin.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {

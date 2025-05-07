@@ -119,4 +119,7 @@
     <string name="expectedDeliveryDate">Expected Delivery Date</string>
     <string name="trackingID">Tracking ID</string>
     <string name="capturePhotoError">An error occurred while capturing photo.</string>
+    <string name="close">Close</string>
+    <string name="profileScreen_choosePhotoFromGallery">Choose Profile Photo From Gallery</string>
+    <string name="profileScreen_takePhoto">Take a photo</string>
 </resources>
