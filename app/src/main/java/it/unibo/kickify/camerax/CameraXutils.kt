@@ -9,19 +9,15 @@ import android.graphics.Canvas
 import android.graphics.LightingColorFilter
 import android.graphics.Matrix
 import android.graphics.Paint
+import android.net.Uri
 import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCapture.OnImageCapturedCallback
-import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.camera.core.resolutionselector.ResolutionSelector
-import androidx.camera.extensions.ExtensionsManager
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.LifecycleCameraController
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
 import java.io.File
@@ -53,15 +49,27 @@ class CameraXutils(private val ctx: Context) {
     fun saveBitmapToFile(
         context: Context, bitmap: Bitmap,
         fileName: String = defaultUserProfileImageFilename
-    ) {
+    ):Uri {
         val file = File(context.filesDir, fileName)
         val outputStream = FileOutputStream(file)
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
         outputStream.flush()
         outputStream.close()
+        return Uri.fromFile(file)
     }
 
-    fun getBitmapFromFile(
+    fun getBitmapFromUri(context: Context, uri: Uri): Bitmap? {
+        try{
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                return BitmapFactory.decodeStream(inputStream)
+            }
+        }catch (e: Exception){
+            Log.e("KICKIFY", "getbitmapFromURI exception: ${e.message}")
+        }
+        return null
+    }
+
+    private fun getBitmapFromFile(
         context: Context,
         fileName: String = defaultUserProfileImageFilename
     ): Bitmap? {

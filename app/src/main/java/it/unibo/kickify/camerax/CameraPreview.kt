@@ -49,13 +49,18 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
+import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.launch
 import androidx.camera.core.Preview as CameraPreview
 
 @Composable
-fun TakePhotoCameraScreen(navController: NavController, cameraXutils: CameraXutils) {
+fun TakePhotoCameraScreen(
+    navController: NavController,
+    cameraXutils: CameraXutils,
+    settingsViewModel: SettingsViewModel
+) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
@@ -67,7 +72,7 @@ fun TakePhotoCameraScreen(navController: NavController, cameraXutils: CameraXuti
     val imageCapture = remember { cameraXutils.imageCapture }
 
     CameraContainer(context, navController, cameraXutils, previewView,
-        imageCapture, lifecycleOwner, preview)
+        imageCapture, lifecycleOwner, preview, settingsViewModel)
 }
 
 @Composable
@@ -79,6 +84,7 @@ private fun CameraContainer(
     imageCapture: ImageCapture,
     lifecycleOwner: LifecycleOwner,
     preview: Preview,
+    settingsViewModel: SettingsViewModel
 ) {
     var captureProgress by remember { mutableIntStateOf(0) }
     var previewBitmap by remember { mutableStateOf<Bitmap?>(null) }
@@ -211,9 +217,10 @@ private fun CameraContainer(
                             IconButton(
                                 onClick = {
                                     coroutineScope.launch {
-                                        cameraXutils.saveBitmapToFile(
+                                        val imgUri = cameraXutils.saveBitmapToFile(
                                             context = context, bitmap = bitmap
                                         )
+                                        settingsViewModel.setUserImg(imgUri.toString())
                                         navController.popBackStack() // go back to profile page
                                     }
                                 }
