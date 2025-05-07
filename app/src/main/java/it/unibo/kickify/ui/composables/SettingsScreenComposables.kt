@@ -16,6 +16,7 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -79,7 +80,7 @@ fun SettingsItemWithLeadingIcon(
 fun SettingsItemWithTrailingSwitchButton(
     text: String,
     checked: Boolean,
-    onSwitchChange: () -> Unit
+    onSwitchChange: (Boolean) -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth()
@@ -94,7 +95,7 @@ fun SettingsItemWithTrailingSwitchButton(
         )
         SwitchButton(
             isChecked = checked,
-            onChangeCheckedAction = onSwitchChange,
+            onChangeCheckedAction = { onSwitchChange(!checked) },
         )
     }
 }
@@ -106,6 +107,11 @@ fun ThemeChooserRow(
 ) {
     var selectedTh by rememberSaveable { mutableStateOf(selectedTheme) }
     var selectedIndex by rememberSaveable { mutableIntStateOf(Theme.entries.indexOf(selectedTh)) }
+
+    LaunchedEffect(selectedTheme) {
+        selectedTh = selectedTheme
+        selectedIndex = Theme.entries.indexOf(selectedTheme)
+    }
 
     Row(
         modifier = Modifier.fillMaxWidth()

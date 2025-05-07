@@ -3,6 +3,7 @@ package it.unibo.kickify.ui.composables
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -14,15 +15,19 @@ import it.unibo.kickify.ui.theme.GhostWhite
 @Composable
 fun SwitchButton(
     isChecked: Boolean,
-    onChangeCheckedAction: () -> Unit
+    onChangeCheckedAction: (Boolean) -> Unit
 ) {
-    var checked by remember { mutableStateOf(isChecked) }
+    var switchState by remember { mutableStateOf(isChecked) }
+
+    LaunchedEffect(isChecked) {
+        switchState = isChecked
+    }
 
     Switch(
-        checked = checked,
-        onCheckedChange = {
-            checked = it
-            onChangeCheckedAction()
+        checked = switchState,
+        onCheckedChange = { newValue ->
+            switchState = newValue
+            onChangeCheckedAction(newValue)
         },
         colors = SwitchDefaults.colors(
             checkedThumbColor = GhostWhite,
