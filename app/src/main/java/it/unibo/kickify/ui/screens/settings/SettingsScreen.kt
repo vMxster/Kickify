@@ -12,8 +12,8 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
+import it.unibo.kickify.data.models.Theme
 import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.SettingsItemWithLeadingIcon
@@ -35,8 +36,9 @@ fun SettingsScreen(
     navController: NavController,
     settingsViewModel: SettingsViewModel
 ) {
-    val settings by settingsViewModel.settings.collectAsState()
-    val themeState by settingsViewModel.getThemeState.collectAsStateWithLifecycle()
+    val themeState by settingsViewModel.theme.collectAsStateWithLifecycle(initialValue = Theme.System)
+    val locationEnabledState by settingsViewModel.enabledLocation.collectAsStateWithLifecycle(initialValue = false)
+    val biometricLoginState by settingsViewModel.biometricLogin.collectAsStateWithLifecycle(initialValue = false)
 
     Scaffold(
         topBar = {
@@ -85,18 +87,23 @@ fun SettingsScreen(
             if(settingsViewModel.isStrongAuthenticationAvailable(LocalContext.current)){
                 SettingsItemWithTrailingSwitchButton(
                     stringResource(R.string.settings_enableBiometricLogin),
-                    checked = false,
-                    onSwitchChange = { }
+                    checked = biometricLoginState,
+                    onSwitchChange = {
+                        settingsViewModel.setBiometricLogin(it)
+                    }
                 )
             }
             SettingsItemWithTrailingSwitchButton(
                 stringResource(R.string.settings_enableLocationServices),
-                checked = settings.enabledLocationServices,
-                onSwitchChange = { }
+                checked = locationEnabledState,
+                onSwitchChange = {
+                    settingsViewModel.setEnabledLocation(it)
+                }
             )
-            ThemeChooserRow(selectedTheme = themeState.theme,
+            ThemeChooserRow(
+                selectedTheme = themeState,
                 onThemeSelected = {
-                    settingsViewModel.changeTheme(it)
+                    settingsViewModel.setTheme(it)
                 }
             )
         }
