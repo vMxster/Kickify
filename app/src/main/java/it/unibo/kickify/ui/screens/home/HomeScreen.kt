@@ -30,9 +30,9 @@ import it.unibo.kickify.ui.composables.SearchRoundedTextField
 fun HomeScreen(
     navController: NavController,
 ){
-    val brands = listOf(R.drawable.nike,
-        R.drawable.puma, R.drawable.under_armour,
-        R.drawable.adidas, R.drawable.converse)
+    val brands = mapOf("Nike" to R.drawable.nike,
+        "Puma" to R.drawable.puma, "Under Armour" to R.drawable.under_armour,
+        "Adidas" to R.drawable.adidas, "Converse" to R.drawable.converse)
 
     Scaffold(
         topBar = {
@@ -90,13 +90,13 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                for(brandResID in brands){
-                    val brandName = stringResource(brandResID)
+                for((name, id) in brands.entries){
                     HomeScreenSmallBrandLogos(
-                        brandResID,
+                        name = name,
+                        brandResLogoID = id,
                         onClick = {
                             navController.navigate(
-                                KickifyRoute.ProductListWithCategory(brandName)
+                                KickifyRoute.ProductListWithCategory(name)
                             )
                         }
                     )

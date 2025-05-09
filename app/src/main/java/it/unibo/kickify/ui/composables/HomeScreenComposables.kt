@@ -33,7 +33,7 @@ import it.unibo.kickify.data.models.ShopCategory
 import it.unibo.kickify.ui.KickifyRoute
 
 @Composable
-fun HomeScreenSmallBrandLogos(brandResLogoID: Int, onClick: (String) -> Unit) {
+fun HomeScreenSmallBrandLogos(name: String, brandResLogoID: Int, onClick: (String) -> Unit) {
     Image(
         painter = painterResource(brandResLogoID),
         "",
@@ -41,7 +41,7 @@ fun HomeScreenSmallBrandLogos(brandResLogoID: Int, onClick: (String) -> Unit) {
         modifier = Modifier
             .size(46.dp)
             .clip(CircleShape)
-            .clickable { onClick(brandResLogoID.toString()) } // To Add the Brand Name
+            .clickable { onClick(name) } // To Add the Brand Name
             .background(MaterialTheme.colorScheme.surface)
             .padding(4.dp),
         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)

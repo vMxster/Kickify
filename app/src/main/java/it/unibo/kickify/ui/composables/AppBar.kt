@@ -9,7 +9,6 @@ import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.ShoppingBag
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -78,11 +77,6 @@ fun AppBar(navController: NavController, title: String = "") {
             }
         },
         actions = {
-            if (title == stringResource(R.string.app_name)) {
-                IconButton(onClick = { navController.navigate(KickifyRoute.Cart) }) {
-                    Icon(Icons.Outlined.ShoppingBag, contentDescription = "Cart")
-                }
-            }
             if(title == stringResource(R.string.notificationscreen_title)){
                 TextButton(onClick = { /*TODO*/ }) {
                     Text(
@@ -99,6 +93,8 @@ fun AppBar(navController: NavController, title: String = "") {
                 || title.contains(stringResource(R.string.shopCategory_men))
                 || title.contains(stringResource(R.string.shopCategory_women))
                 || title.contains(stringResource(R.string.shopCategory_kids))
+                || title.startsWith(stringResource(R.string.brand))
+                || title == stringResource(R.string.app_name)
             ){
                 IconButton(
                     onClick = {
@@ -130,7 +126,7 @@ fun AppBar(navController: NavController, title: String = "") {
                     Icon(Icons.Outlined.Edit, contentDescription = "Edit profile")
                 }
                 IconButton(onClick = { navController.navigate(KickifyRoute.Settings) }) {
-                    Icon(Icons.Outlined.Settings, contentDescription = "Edit profile")
+                    Icon(Icons.Outlined.Settings, contentDescription = "Edit app settings")
                 }
             }
 
