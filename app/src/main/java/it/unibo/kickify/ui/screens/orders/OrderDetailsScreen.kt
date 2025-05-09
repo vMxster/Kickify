@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,6 +31,8 @@ fun OrderDetailsScreen(
     navController: NavController,
     orderID: String
 ) {
+    val scrollState = rememberScrollState()
+
     Scaffold(
         topBar = {
             AppBar(
@@ -47,9 +51,18 @@ fun OrderDetailsScreen(
                 .fillMaxSize()
                 .padding(contentPadding)
                 .padding(horizontal = 16.dp)
+                .verticalScroll(scrollState)
         ) {
             OrderIDCenterTitle(orderID)
 
+            OrderItem(
+                productName = "Adidas Spezial",
+                productSize = "44",
+                qty = 1,
+                colorString = "blue",
+                finalPrice = 80.0f,
+                originalPrice = 109.99f,
+            )
             OrderItem(
                 productName = "Adidas Spezial",
                 productSize = "44",

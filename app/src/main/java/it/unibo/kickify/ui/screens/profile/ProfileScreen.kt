@@ -1,5 +1,6 @@
 package it.unibo.kickify.ui.screens.profile
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +34,8 @@ import it.unibo.kickify.camerax.CameraXutils
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.BottomBar
+import it.unibo.kickify.ui.composables.PaymentMethodRow
+import it.unibo.kickify.ui.composables.paymentMethodIcon
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 
 @Composable
@@ -119,8 +122,12 @@ fun ProfileScreen(
                 }
             }
 
+            val payMethods = listOf("Paypal", "Maestro")
+            val cardInfo = listOf(listOf("", "", "email@example.com"), listOf("1234", "01/29", ""))
             ProfileCardContainer(cardTitle = stringResource(R.string.paymentMethod)) {
-
+                for(i in payMethods.indices){
+                    PaymentMethodRow(payMethods[i], cardInfo[i][0], cardInfo[i][1], cardInfo[i][2])
+                }
             }
         }
     }

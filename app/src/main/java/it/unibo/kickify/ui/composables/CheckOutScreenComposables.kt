@@ -110,7 +110,10 @@ fun CheckOutInformationRow(
         horizontalArrangement = Arrangement.SpaceBetween
     ){
         if(leadingIcon != null){
-            Image(leadingIcon, contentDescription = "$secondaryText icon", modifier = Modifier.padding(start = 8.dp))
+            Image(leadingIcon,
+                contentDescription = "$secondaryText icon",
+                modifier = Modifier.padding(start = 8.dp)
+            )
         }
         Column(
             verticalArrangement = Arrangement.Center,
@@ -172,5 +175,37 @@ fun paymentMethodIcon(paymentMethod: String) : ImageVector {
         }
     } else {
         Icons.Outlined.Close
+    }
+}
+
+@Composable
+fun PaymentMethodRow(
+    paymentMethod: String,
+    endingCardNumber: String,
+    cardExpires: String,
+    emailAddress: String
+){
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ){
+        Image(
+            paymentMethodIcon(paymentMethod),
+            contentDescription = "$paymentMethod icon",
+            modifier = Modifier.padding(start = 9.dp)
+        )
+        Column(
+            modifier = Modifier.fillMaxWidth(fraction = 0.9f).padding(end = 8.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            if(PaymentMethod.getFromString(paymentMethod) == PAYPAL){
+                Text(paymentMethod)
+                Text(emailAddress)
+            } else {
+                Text("$paymentMethod **** $endingCardNumber")
+                Text("${stringResource(R.string.cardExpires)} $cardExpires")
+            }
+        }
     }
 }
