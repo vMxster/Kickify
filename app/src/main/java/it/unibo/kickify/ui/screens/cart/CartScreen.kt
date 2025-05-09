@@ -10,15 +10,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
+import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.BottomBar
-import it.unibo.kickify.ui.composables.CartItemsList
 import it.unibo.kickify.ui.composables.CartAndCheckoutResume
+import it.unibo.kickify.ui.composables.CartItemsList
 
 @Composable
 fun CartScreen(
@@ -43,7 +43,10 @@ fun CartScreen(
         ) {
             CartItemsList()
             Spacer(Modifier.height(20.dp))
-            CartAndCheckoutResume(subTotal = (69.99+129.99+87.99), shipping = 10.0)
+            CartAndCheckoutResume(
+                subTotal = (69.99+129.99+87.99),
+                shipping = 10.0,
+                onButtonClickAction = { navController.navigate(KickifyRoute.Checkout) })
         }
     }
 }

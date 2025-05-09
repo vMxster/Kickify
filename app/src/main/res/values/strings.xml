@@ -122,4 +122,5 @@
     <string name="close">Close</string>
     <string name="profileScreen_choosePhotoFromGallery">Choose Profile Photo From Gallery</string>
     <string name="profileScreen_takePhoto">Take a photo</string>
+    <string name="view">View</string>
 </resources>

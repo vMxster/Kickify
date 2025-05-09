@@ -1,21 +1,38 @@
 package it.unibo.kickify.ui.screens.checkout
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.toRoute
 import it.unibo.kickify.R
+import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.CartAndCheckoutResume
+import it.unibo.kickify.ui.composables.DialogWithImage
 import it.unibo.kickify.ui.composables.InformationCard
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 @Composable
 fun CheckOutScreen(
@@ -30,27 +47,84 @@ fun CheckOutScreen(
         },
         bottomBar = { }
     ) { contentPadding ->
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .padding(contentPadding)
-                .padding(horizontal = 10.dp)
-                .padding(vertical = 8.dp)
-                .fillMaxSize()
-        ) {
+        var showLoading: Boolean by rememberSaveable { mutableStateOf(false) }
+        var showDialog by rememberSaveable { mutableStateOf(false) }
 
-            InformationCard(
-                emailAddress = "mario.rossi@gmail.com",
-                phoneNr = "+39 1234567890",
-                shippingAddress = "Via Roma 123, Cesena, 47521 - IT",
-                payMethod = "paypal",
-                paymentDetails = "mario.rossi@gmail.com"
-            )
-            CartAndCheckoutResume(
-                subTotal = 287.97,
-                shipping = 10.00
-            )
+        LoadingAnimation(
+            isLoading = showLoading,
+            onLoadingComplete = {
+                showLoading = false
+                showDialog = true
+            }
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .padding(contentPadding)
+                    .padding(horizontal = 10.dp)
+                    .padding(vertical = 8.dp)
+                    .fillMaxSize()
+            ) {
+                InformationCard(
+                    emailAddress = "mario.rossi@gmail.com",
+                    phoneNr = "+39 1234567890",
+                    shippingAddress = "Via Roma 123, Cesena, 47521 - IT",
+                    payMethod = "paypal",
+                    paymentDetails = "mario.rossi@gmail.com"
+                )
+                CartAndCheckoutResume(
+                    subTotal = 287.97,
+                    shipping = 10.00,
+                    onButtonClickAction = {
+                        showLoading = true
+
+                    }
+                )
+            }
+            if(showDialog){
+                DialogWithImage(
+                    onDismissRequest = {
+                        navController.navigate(KickifyRoute.Home){
+                            popUpTo(KickifyRoute.Cart)
+                        }
+                    },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun LoadingAnimation(
+    isLoading: Boolean,
+    onLoadingComplete: () -> Unit,
+    screenContent: @Composable () -> Unit
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        screenContent()
+
+        if (isLoading) {
+            LaunchedEffect(Unit) {
+                withContext(Dispatchers.Default){
+                    delay(5000)
+                }
+                onLoadingComplete()
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f)) // Sfondo semi-trasparente
+                    .pointerInput(Unit) {
+                        detectTapGestures {} // block all click on screen
+                    }
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = Color.White
+                )
+            }
         }
     }
 }

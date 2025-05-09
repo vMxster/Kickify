@@ -162,9 +162,12 @@ fun QuantityManager(){
 }
 
 @Composable
-fun CartAndCheckoutResume(subTotal: Double, shipping: Double){
+fun CartAndCheckoutResume(
+    subTotal: Double,
+    shipping: Double,
+    onButtonClickAction: () -> Unit
+){
     Card(
-        //onClick = onClick,
         modifier = Modifier.height(180.dp)
             .padding(horizontal = 10.dp)
             .padding(bottom = 4.dp)
@@ -219,7 +222,7 @@ fun CartAndCheckoutResume(subTotal: Double, shipping: Double){
             }
             Row{
                 Button(
-                    onClick = {  },
+                    onClick = { onButtonClickAction() },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(stringResource(R.string.cartscreen_checkOutBtn))

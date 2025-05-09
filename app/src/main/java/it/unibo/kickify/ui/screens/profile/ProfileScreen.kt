@@ -1,12 +1,6 @@
 package it.unibo.kickify.ui.screens.profile
 
-import android.net.Uri
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,52 +9,31 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
-import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.core.net.toUri
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.camerax.CameraXutils
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.BottomBar
-import it.unibo.kickify.ui.composables.EmailRoundedTextField
-import it.unibo.kickify.ui.composables.PasswordRoundedTextField
-import it.unibo.kickify.ui.composables.UsernameRoundedTextField
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
-import it.unibo.kickify.ui.theme.BluePrimary
-import it.unibo.kickify.ui.theme.GhostWhite
-import it.unibo.kickify.ui.theme.LightGray
-import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(
@@ -79,165 +52,182 @@ fun ProfileScreen(
             BottomBar(navController)
         }
     ) { contentPadding ->
+        val scrollState = rememberScrollState()
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
-                .padding(horizontal = 16.dp)
+                .verticalScroll(scrollState)
         ) {
-            val profileScreenModifier = Modifier.fillMaxWidth()
-                .padding(horizontal = 24.dp)
 
-            ProfileImageWithChangeButton(navController, cameraXutils, settingsViewModel)
+            ProfileCardContainer(cardTitle = "User Profile") {
+                //val userImg
+                //if (userImg == null) {
+                    /*Image(
+                    bitmap = userBitmap.asImageBitmap(),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                    )*/
+                // } else { // otherwise use user profile icon
+                Icon(
+                    imageVector = Icons.Outlined.AccountCircle,
+                    contentDescription = "",
+                    modifier = Modifier.size(120.dp).clip(CircleShape)
+                        .align(Alignment.CenterHorizontally)
+                )
+                //}
 
-            Text(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(top = 4.dp),
-                text = "Mario Rossi",
-                textAlign = TextAlign.Center,
-                fontSize = 22.sp
+                Text("Mario Rossi", modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
+                    .padding(vertical = 4.dp).padding(start = 10.dp),
+                    style = MaterialTheme.typography.titleMedium)
+                TextInformationRow("email@example.com")
+                TextInformationRow("Phone:", "+39 321 1234567")
+                TextInformationRow("Language:", "English")
+            }
+
+            ProfileActionRow(
+                title = stringResource(R.string.myordersScreen_title),
+                onButtonClickAction = { navController.navigate(KickifyRoute.MyOrders) },
+                buttonText = stringResource(R.string.homescreen_seeAll),
             )
-            Spacer(Modifier.height(10.dp))
-            Text(
-                text = stringResource(R.string.profileScreen_fullName),
-                modifier = profileScreenModifier
-            )
-            UsernameRoundedTextField(modifier = profileScreenModifier)
-            Spacer(modifier = Modifier.height(15.dp))
 
-            Text(
-                text = stringResource(R.string.emailAddress),
-                modifier = profileScreenModifier
+            ProfileActionRow(
+                title = stringResource(R.string.wishlist_title),
+                onButtonClickAction = { navController.navigate(KickifyRoute.Wishlist) },
+                buttonText = stringResource(R.string.view)
             )
-            EmailRoundedTextField(
-                modifier = profileScreenModifier,
-                placeholderString = stringResource(R.string.emailAddress)
-            ) { }
-            Spacer(modifier = Modifier.height(15.dp))
 
-            Text(
-                stringResource(R.string.password),
-                modifier = profileScreenModifier
-            )
-            PasswordRoundedTextField(modifier = profileScreenModifier) { }
+            ProfileCardContainer(cardTitle = "Address") {
+                val addressList = listOf(
+                    listOf("Address 1", "Via Roma, 100", "Cesena", "Forlì-Cesena", "Emilia Romagna", "47521", "Italia"),
+                    listOf("Address 2", "Via della vittoria, 421", "Forlì", "Forlì-Cesena", "Emilia Romagna", "47121", "Italia")
+                )
+                for(addr in addressList){
+                    AddressContainer(
+                        addressDescription = addr[0],
+                        address = addr[1],
+                        city = addr[2],
+                        province = addr[3],
+                        region = addr[4],
+                        postCode = addr[5],
+                        country = addr[6]
+                    )
+                }
+            }
 
-            Button(
-                onClick = { navController.navigate(KickifyRoute.MyOrders)}
-            ) {
-                Text(stringResource(R.string.myordersScreen_title))
+            ProfileCardContainer(cardTitle = stringResource(R.string.paymentMethod)) {
+
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileImageWithChangeButton(
-    navController: NavController,
-    cameraXutils: CameraXutils,
-    settingsViewModel: SettingsViewModel
-) {
-    val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
-    var showBottomSheet by remember { mutableStateOf(false) }
-
-    val userImgState by settingsViewModel.userImg.collectAsStateWithLifecycle()
-    var imageUri by remember { mutableStateOf(userImgState.toUri()) }
-
-    Log.i("KICKIFY", "imgURI:$imageUri")
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        imageUri = uri ?: Uri.EMPTY
-        settingsViewModel.setUserImg(uri.toString())
-    }
-
-    Box(
-        contentAlignment = Alignment.BottomCenter,
-        modifier = Modifier.size(150.dp)
+fun ProfileActionRow(
+    title: String,
+    onButtonClickAction: () -> Unit,
+    buttonText: String
+){
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).padding(vertical = 8.dp)
     ) {
-        val userBitmap = cameraXutils.getBitmapFromUri(LocalContext.current, imageUri)
-       // val userBitmap = cameraXutils.getBitmapFromFile(LocalContext.current)
-
-        // if found user image saved in app cache
-        if(userBitmap != null) {
-            Image(
-                bitmap = userBitmap.asImageBitmap(),
-                contentDescription = "",
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-            )
-        } else { // otherwise use user profile icon
-            Icon(
-                imageVector = Icons.Outlined.AccountCircle,
-                contentDescription = "",
-                modifier = Modifier.size(140.dp) .clip(CircleShape)
-                    .align(Alignment.TopCenter)
-            )
-        }
-
-        IconButton(
-            onClick = { showBottomSheet = true },
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .align(Alignment.BottomCenter),
-            colors = IconButtonColors(
-                containerColor = BluePrimary,
-                contentColor = GhostWhite,
-                disabledContainerColor = LightGray,
-                disabledContentColor = GhostWhite,
-            )
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = 8.dp)
+                .padding(vertical = 6.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Outlined.CameraAlt,
-                contentDescription = "Camera Icon",
-                modifier = Modifier.size(30.dp)
-            )
-        }
-
-        if (showBottomSheet) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    showBottomSheet = false
-                },
-                sheetState = sheetState
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextButton(
-                            onClick = {
-                                scope.launch { launcher.launch("image/*") }
-                            }
-                        ) {
-                            Text(stringResource(R.string.profileScreen_choosePhotoFromGallery))
-                        }
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextButton(
-                            onClick = { navController.navigate(KickifyRoute.TakeProfilePhoto) }
-                        ) {
-                            Text(stringResource(R.string.profileScreen_takePhoto))
-                        }
-                    }
+            Column(modifier = Modifier.fillMaxWidth(fraction = 0.4f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.fillMaxWidth().padding(10.dp)
+                )
+            }
+            Column {
+                Button(
+                    onClick = { onButtonClickAction() },
+                    modifier = Modifier.padding(end = 8.dp)
+                ){
+                    Text(text = buttonText)
                 }
             }
         }
+    }
+}
+
+@Composable
+fun AddressContainer(
+    addressDescription: String,
+    address: String,
+    city: String,
+    province: String,
+    region: String,
+    postCode: String,
+    country: String
+){
+    val txtModifier = Modifier.fillMaxWidth().padding(start = 10.dp).padding(vertical = 2.dp)
+    Column(modifier = txtModifier.padding(vertical = 8.dp)) {
+        Text(text = addressDescription, modifier = txtModifier,
+            style = MaterialTheme.typography.titleMedium
+        )
+        Text(text = "$address, $city, $postCode", textAlign = TextAlign.Start, modifier = txtModifier)
+        Text(text = "$province, $region", textAlign = TextAlign.Start, modifier = txtModifier)
+        Text(text = country, textAlign = TextAlign.Start, modifier = txtModifier)
+    }
+}
+
+@Composable
+fun TextInformationRow(
+    leftValue: String,
+    rightValue: String? = null
+){
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        if(rightValue == null || rightValue == ""){ // show only leftValue
+            Column(modifier = Modifier.fillMaxWidth().padding(start = 10.dp)) {
+                Text(text = leftValue, textAlign = TextAlign.Start)
+            }
+        } else {
+            Column(modifier = Modifier.fillMaxWidth(fraction = 0.3f).padding(start = 10.dp)) {
+                Text(text = leftValue, textAlign = TextAlign.Start)
+            }
+            Column(modifier = Modifier.padding(start = 10.dp)) {
+                Text(text = rightValue, textAlign = TextAlign.Start)
+            }
+        }
+    }
+}
+
+@Composable
+fun ProfileCardContainer(
+    cardTitle: String,
+    columnCardContent: @Composable () -> Unit
+){
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).padding(vertical = 8.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = 8.dp)
+                .padding(vertical = 6.dp)
+        ) {
+            Text(
+                text = cardTitle,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.fillMaxWidth().padding(10.dp)
+            )
+        }
+        columnCardContent()
+        Spacer(Modifier.height(8.dp))
     }
 }

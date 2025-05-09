@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -26,10 +28,8 @@ import it.unibo.kickify.R
 @Composable
 fun DialogWithImage(
     onDismissRequest: () -> Unit,
-    painter: Painter
 ) {
-    Dialog(onDismissRequest = { }) {
-        // Draw a rectangle shape with rounded corners inside the dialog
+    Dialog(onDismissRequest = onDismissRequest) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -44,11 +44,11 @@ fun DialogWithImage(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Image(
-                    painter = painter,
+                    imageVector = Icons.Outlined.Check,
                     contentDescription = "",
                     contentScale = ContentScale.FillWidth,
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth().height(200.dp)
                 )
                 Text(
                     text = stringResource(R.string.cartscreen_paymentSuccessful),
