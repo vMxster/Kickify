@@ -42,8 +42,11 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppBar(navController: NavController, title: String = "") {
-
+fun AppBar(
+    navController: NavController,
+    title: String = "",
+    onNavigationClick: () -> Unit = {}
+) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
     var showSheet by remember { mutableStateOf(false) }
@@ -71,7 +74,7 @@ fun AppBar(navController: NavController, title: String = "") {
                     Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Go Back")
                 }
             } else if(title != ""){
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { onNavigationClick() }) {
                     Icon(Icons.Outlined.Menu, "Menu")
                 }
             }

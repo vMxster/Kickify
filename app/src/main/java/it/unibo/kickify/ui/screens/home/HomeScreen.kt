@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,11 +18,10 @@ import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.ShopCategory
 import it.unibo.kickify.ui.KickifyRoute
-import it.unibo.kickify.ui.composables.AppBar
-import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.HomeScreenCategory
 import it.unibo.kickify.ui.composables.HomeScreenSectionSquareProductCards
 import it.unibo.kickify.ui.composables.HomeScreenSmallBrandLogos
+import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.composables.SearchRoundedTextField
 
 @Composable
@@ -34,16 +32,11 @@ fun HomeScreen(
         "Puma" to R.drawable.puma, "Under Armour" to R.drawable.under_armour,
         "Adidas" to R.drawable.adidas, "Converse" to R.drawable.converse)
 
-    Scaffold(
-        topBar = {
-            AppBar(
-                navController,
-                title = stringResource(R.string.app_name)
-            )
-        },
-        bottomBar = {
-            BottomBar(navController)
-        }
+    ScreenTemplate(
+        screenTitle = stringResource(R.string.app_name),
+        navController = navController,
+        showTopAppBar = true,
+        showBottomAppBar = true
     ) { contentPadding ->
         val brandIconsScrollState = rememberScrollState()
         val state = rememberScrollState()
