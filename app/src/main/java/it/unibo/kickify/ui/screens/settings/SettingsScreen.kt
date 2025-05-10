@@ -11,7 +11,6 @@ import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.ShoppingCart
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -22,8 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
-import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.BottomBar
+import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.composables.SettingsItemWithLeadingIcon
 import it.unibo.kickify.ui.composables.SettingsItemWithTrailingSwitchButton
 import it.unibo.kickify.ui.composables.SettingsTitleLine
@@ -38,16 +37,11 @@ fun SettingsScreen(
     val locationEnabledState by settingsViewModel.enabledLocation.collectAsStateWithLifecycle()
     val biometricLoginState by settingsViewModel.biometricLogin.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            AppBar(
-                navController,
-                title = stringResource(R.string.settings_title)
-            )
-        },
-        bottomBar = {
-            BottomBar(navController)
-        }
+    ScreenTemplate(
+        screenTitle = stringResource(R.string.settings_title),
+        navController = navController,
+        showTopAppBar = true,
+        bottomAppBarContent = { BottomBar(navController) }
     ) { contentPadding ->
         Column(
             modifier = Modifier

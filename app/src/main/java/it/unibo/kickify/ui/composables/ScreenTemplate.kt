@@ -16,7 +16,7 @@ fun ScreenTemplate(
     screenTitle: String,
     navController: NavController,
     showTopAppBar: Boolean,
-    showBottomAppBar: Boolean,
+    bottomAppBarContent: @Composable () -> Unit = { },
     content: @Composable (PaddingValues) -> Unit
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -47,7 +47,7 @@ fun ScreenTemplate(
                 }
             },
             bottomBar = {
-                if(showBottomAppBar) { BottomBar(navController) }
+                bottomAppBarContent()
             }
         ) { contentPadding ->
             content(contentPadding)

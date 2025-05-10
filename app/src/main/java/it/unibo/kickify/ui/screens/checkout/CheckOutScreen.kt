@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,10 +23,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
-import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.CartAndCheckoutResume
 import it.unibo.kickify.ui.composables.DialogWithImage
 import it.unibo.kickify.ui.composables.InformationCard
+import it.unibo.kickify.ui.composables.ScreenTemplate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -36,14 +35,11 @@ import kotlinx.coroutines.withContext
 fun CheckOutScreen(
     navController: NavController
 ){
-    Scaffold(
-        topBar = {
-            AppBar(
-                navController,
-                title = stringResource(R.string.checkoutScreen_title)
-            )
-        },
-        bottomBar = { }
+    ScreenTemplate(
+        screenTitle = stringResource(R.string.checkoutScreen_title),
+        navController = navController,
+        showTopAppBar = true,
+        bottomAppBarContent = { }
     ) { contentPadding ->
         var showLoading: Boolean by rememberSaveable { mutableStateOf(false) }
         var showDialog by rememberSaveable { mutableStateOf(false) }

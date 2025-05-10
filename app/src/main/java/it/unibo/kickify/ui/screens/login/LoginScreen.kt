@@ -15,7 +15,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -31,23 +30,21 @@ import androidx.navigation.NavController
 import it.unibo.kickify.AuthActivity
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
-import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.EmailRoundedTextField
 import it.unibo.kickify.ui.composables.PasswordRoundedTextField
+import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.theme.MediumGray
 
 @Composable
 fun LoginScreen(navController: NavController) {
     val ctx = LocalContext.current
 
-    Scaffold (
-        topBar = {
-            AppBar(
-                navController,
-                title = ""
-            )
-        }
-    )  { contentPadding ->
+    ScreenTemplate(
+        screenTitle = "",
+        navController = navController,
+        showTopAppBar = true,
+        bottomAppBarContent = { }
+    ) { contentPadding ->
         val loginScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)
 

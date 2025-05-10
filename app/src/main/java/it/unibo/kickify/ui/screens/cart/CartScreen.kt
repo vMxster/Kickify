@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,25 +14,20 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
-import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.CartAndCheckoutResume
 import it.unibo.kickify.ui.composables.CartItemsList
+import it.unibo.kickify.ui.composables.ScreenTemplate
 
 @Composable
 fun CartScreen(
     navController: NavController
 ){
-    Scaffold(
-        topBar = {
-            AppBar(
-                navController,
-                title = stringResource(R.string.cartscreen_title)
-            )
-        },
-        bottomBar = {
-            BottomBar(navController)
-        }
+    ScreenTemplate(
+        screenTitle = stringResource(R.string.cartscreen_title),
+        navController = navController,
+        showTopAppBar = true,
+        bottomAppBarContent = { BottomBar(navController) }
     ) { contentPadding ->
         Column(
             modifier = Modifier.fillMaxSize()

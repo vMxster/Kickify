@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,9 +14,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.ShopCategory
-import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ProductCardShoesPage
+import it.unibo.kickify.ui.composables.ScreenTemplate
 
 @Composable
 fun ProductListScreen(
@@ -29,16 +28,11 @@ fun ProductListScreen(
     val itemPrices = listOf(98.76, 99.89, 119.99, 189.99, 69.99, 189.99)
     val titleString = title ?: stringResource(R.string.homescreen_popular)
 
-    Scaffold(
-        topBar = {
-            AppBar(
-                navController,
-                title = titleString
-            )
-        },
-        bottomBar = {
-            BottomBar(navController)
-        }
+    ScreenTemplate(
+        screenTitle = titleString,
+        navController = navController,
+        showTopAppBar = true,
+        bottomAppBarContent = { BottomBar(navController) }
     ) { contentPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
-import it.unibo.kickify.ui.composables.AppBar
+import it.unibo.kickify.ui.composables.ScreenTemplate
 
 @Composable
 fun OTPScreen(
@@ -45,17 +44,12 @@ fun OTPScreen(
         focusRequester.requestFocus()
     }
 
-    Scaffold(
-        topBar = {
-            AppBar(
-                navController,
-                title = ""
-            )
-        },
-        bottomBar = {
-        }
+    ScreenTemplate(
+        screenTitle = "",
+        navController = navController,
+        showTopAppBar = true,
+        bottomAppBarContent = { }
     ) { contentPadding ->
-
         val forgotScreenModifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)

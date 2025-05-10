@@ -1,6 +1,5 @@
 package it.unibo.kickify.ui.screens.profile
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,7 +18,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,10 +30,9 @@ import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.camerax.CameraXutils
 import it.unibo.kickify.ui.KickifyRoute
-import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.PaymentMethodRow
-import it.unibo.kickify.ui.composables.paymentMethodIcon
+import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 
 @Composable
@@ -44,16 +41,11 @@ fun ProfileScreen(
     cameraXutils: CameraXutils,
     settingsViewModel: SettingsViewModel
 ){
-    Scaffold(
-        topBar = {
-            AppBar(
-                navController,
-                title = stringResource(R.string.profileScreen_title)
-            )
-        },
-        bottomBar = {
-            BottomBar(navController)
-        }
+    ScreenTemplate(
+        screenTitle = stringResource(R.string.profileScreen_title),
+        navController = navController,
+        showTopAppBar = true,
+        bottomAppBarContent = { BottomBar(navController) }
     ) { contentPadding ->
         val scrollState = rememberScrollState()
 

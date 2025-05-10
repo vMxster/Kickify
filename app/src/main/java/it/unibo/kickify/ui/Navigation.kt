@@ -2,12 +2,10 @@ package it.unibo.kickify.ui
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import it.unibo.kickify.R
 import it.unibo.kickify.camerax.CameraXutils
 import it.unibo.kickify.ui.screens.cart.CartScreen
 import it.unibo.kickify.ui.screens.checkout.CheckOutScreen
@@ -106,7 +104,7 @@ fun KickifyNavGraph(
 
         composable<KickifyRoute.ProductListWithCategory> { backStackEntry ->
             val route = backStackEntry.toRoute<KickifyRoute.ProductListWithCategory>()
-            ProductListScreen(navController, stringResource(R.string.brand) + ": ${route.category}")
+            ProductListScreen(navController, route.category)
         }
 
         composable<KickifyRoute.Profile> {

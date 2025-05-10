@@ -18,6 +18,7 @@ import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.ShopCategory
 import it.unibo.kickify.ui.KickifyRoute
+import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.HomeScreenCategory
 import it.unibo.kickify.ui.composables.HomeScreenSectionSquareProductCards
 import it.unibo.kickify.ui.composables.HomeScreenSmallBrandLogos
@@ -36,7 +37,7 @@ fun HomeScreen(
         screenTitle = stringResource(R.string.app_name),
         navController = navController,
         showTopAppBar = true,
-        showBottomAppBar = true
+        bottomAppBarContent = { BottomBar(navController) }
     ) { contentPadding ->
         val brandIconsScrollState = rememberScrollState()
         val state = rememberScrollState()
@@ -84,12 +85,13 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 for((name, id) in brands.entries){
+                    val brand = stringResource(R.string.brand)
                     HomeScreenSmallBrandLogos(
                         name = name,
                         brandResLogoID = id,
                         onClick = {
                             navController.navigate(
-                                KickifyRoute.ProductListWithCategory(name)
+                                KickifyRoute.ProductListWithCategory("$brand: $name")
                             )
                         }
                     )
@@ -101,21 +103,21 @@ fun HomeScreen(
             HomeScreenSectionSquareProductCards(
                 navController,
                 modifier = homeSectionsModifier,
-                sectionTitle = "Popular Shoes",
+                sectionTitle = stringResource(R.string.homescreen_popular),
                 prodList = mapOf("p1" to false, "p2" to false)
             )
 
             HomeScreenSectionSquareProductCards(
                 navController,
                 modifier = homeSectionsModifier,
-                sectionTitle = "Novelties",
+                sectionTitle = stringResource(R.string.homescreen_novelties),
                 prodList = mapOf("p1" to true)
             )
 
             HomeScreenSectionSquareProductCards(
                 navController,
                 modifier = homeSectionsModifier,
-                sectionTitle = "Discounted",
+                sectionTitle = stringResource(R.string.homescreen_discounted),
                 prodList = mapOf("p1" to false, "p2" to false)
             )
         }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,7 +16,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
-import it.unibo.kickify.ui.composables.AppBar
 import it.unibo.kickify.ui.composables.ColorsList
 import it.unibo.kickify.ui.composables.ProductDetailsFooter
 import it.unibo.kickify.ui.composables.ProductImage
@@ -26,6 +24,7 @@ import it.unibo.kickify.ui.composables.ProductName
 import it.unibo.kickify.ui.composables.ProductPhotoGallery
 import it.unibo.kickify.ui.composables.ProductPrice
 import it.unibo.kickify.ui.composables.RatingBar
+import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.composables.SectionTitle
 import it.unibo.kickify.ui.composables.SizesList
 
@@ -40,14 +39,11 @@ fun ProductDetailsScreen(
                 "functionality with casual style.")
     val price = 97.99
 
-    Scaffold(
-        topBar = {
-            AppBar(
-                navController,
-                title = "Details"
-            )
-        },
-        bottomBar = { ProductDetailsFooter(price) }
+    ScreenTemplate(
+        screenTitle = stringResource(R.string.details),
+        navController = navController,
+        showTopAppBar = true,
+        bottomAppBarContent = { ProductDetailsFooter(price) }
     ) { contentPadding ->
         val state = rememberScrollState()
 
@@ -56,6 +52,7 @@ fun ProductDetailsScreen(
                 .fillMaxSize()
                 .padding(contentPadding)
                 .padding(horizontal = 16.dp)
+                .padding(vertical = 10.dp)
                 .verticalScroll(state),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween

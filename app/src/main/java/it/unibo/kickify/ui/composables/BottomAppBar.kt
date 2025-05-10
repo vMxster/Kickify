@@ -17,7 +17,9 @@ import androidx.navigation.NavController
 import it.unibo.kickify.ui.KickifyRoute
 
 @Composable
-fun BottomBar(navController: NavController){
+fun BottomBar(
+    navController: NavController,
+){
     BottomAppBar(
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground
@@ -27,7 +29,7 @@ fun BottomBar(navController: NavController){
             navController.navigate(KickifyRoute.Home) {
                 popUpTo(KickifyRoute.Home) { inclusive = true }
             }
-        } ) {
+        }) {
             Icon(Icons.Outlined.Home, contentDescription = "Home")
         }
         Spacer(Modifier.weight(1f, true))
@@ -35,7 +37,7 @@ fun BottomBar(navController: NavController){
             Icon(Icons.Outlined.FavoriteBorder, contentDescription = "")
         }
         Spacer(Modifier.weight(1f, true))
-        IconButton(onClick = { navController.navigate(KickifyRoute.Cart ) }) {
+        IconButton(onClick = { navController.navigate(KickifyRoute.Cart) }) {
             Icon(Icons.Outlined.ShoppingBag, contentDescription = "")
         }
         Spacer(Modifier.weight(1f, true))
