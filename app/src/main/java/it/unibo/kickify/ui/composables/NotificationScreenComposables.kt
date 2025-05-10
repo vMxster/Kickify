@@ -3,7 +3,6 @@ package it.unibo.kickify.ui.composables
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -44,9 +44,8 @@ fun NotificationItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ){
-        NotificationImageFromType(notificationType, darkTheme = isSystemInDarkTheme())
-
-        Spacer(Modifier.width(6.dp))
+        NotificationImageFromType(notificationType)
+        Spacer(Modifier.width(8.dp))
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.Start
@@ -82,30 +81,20 @@ fun NotificationItem(
 }
 
 @Composable
-private fun NotificationImageFromType(notificationType: NotificationType, darkTheme: Boolean
-){
+private fun NotificationImageFromType(notificationType: NotificationType){
     Image(
-        painter = if(darkTheme) {
-            when(notificationType){
-                NotificationType.ProductBackinStock -> painterResource(R.drawable.stock_dark)
-                NotificationType.OrderShipped -> painterResource(R.drawable.order_dark)
-                NotificationType.FlashSale -> painterResource(R.drawable.sale_dark)
-                NotificationType.ItemsinCart -> painterResource(R.drawable.cart_dark)
-                NotificationType.OrderPlaced -> painterResource(R.drawable.pack_black)
-                NotificationType.RequestedProductReview -> painterResource(R.drawable.review_dark)}
-        } else {
-            when(notificationType){
+        painter = when(notificationType){
                 NotificationType.ProductBackinStock -> painterResource(R.drawable.stock_light)
                 NotificationType.OrderShipped -> painterResource(R.drawable.order_light)
                 NotificationType.FlashSale -> painterResource(R.drawable.sale_light)
                 NotificationType.ItemsinCart -> painterResource(R.drawable.cart_light)
                 NotificationType.OrderPlaced -> painterResource(R.drawable.pack_light)
                 NotificationType.RequestedProductReview -> painterResource(R.drawable.review_light)
-            }
         },
         contentDescription = "",
         contentScale = ContentScale.Fit,
-        modifier = Modifier.size(60.dp)
+        modifier = Modifier.size(60.dp).padding(end = 6.dp),
+        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
     )
 }
 
