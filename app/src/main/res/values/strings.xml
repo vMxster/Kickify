@@ -53,6 +53,7 @@
     <string name="womensShoes">Women\'s Shoes</string>
     <string name="kidsShoes">Kids\' Shoes</string>
     <string name="shoes">Shoes</string>
+    <string name="home">Home</string>
     <string name="homescreen_popular">Popular Shoes</string>
     <string name="homescreen_novelties">Novelties</string>
     <string name="homescreen_discounted">Discounted</string>
@@ -63,6 +64,7 @@
     <string name="subtotal">Subtotal</string>
     <string name="shipping">Shipping</string>
     <string name="totalCost">Total Cost</string>
+    <string name="cart">Cart</string>
     <string name="cartscreen_title">My Cart</string>
     <string name="cartscreen_checkOutBtn">Checkout</string>
     <string name="cartscreen_paymentSuccessful">Your Payment Is Successful</string>
