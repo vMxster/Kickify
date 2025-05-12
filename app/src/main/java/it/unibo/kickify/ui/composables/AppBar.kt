@@ -119,7 +119,13 @@ fun AppBar(
                         }
                     },
                     sheetState = sheetState,
-                    onFilter = {},
+                    onApplyFilter = {
+                        /* TODO items filter */
+                        coroutineScope.launch {
+                            showSheet = false
+                            sheetState.hide()
+                        }
+                    },
                     onResetFilter = {}
                 )
             }

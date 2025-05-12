@@ -17,19 +17,13 @@ fun ScreenTemplate(
     navController: NavController,
     showTopAppBar: Boolean,
     bottomAppBarContent: @Composable () -> Unit = { },
+    showModalDrawer: Boolean,
     content: @Composable (PaddingValues) -> Unit
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet(drawerState) {
-                SideMenuContent()
-            }
-        }
-    ) {
+    val scaffoldContent: @Composable () -> Unit = {
         Scaffold(
             topBar = {
                 if(showTopAppBar) {
@@ -40,7 +34,7 @@ fun ScreenTemplate(
                             if (navController.previousBackStackEntry != null) {
                                 navController.popBackStack()
                             } else {
-                                scope.launch { drawerState.open() }
+                                coroutineScope.launch { drawerState.open() }
                             }
                         }
                     )
@@ -52,5 +46,19 @@ fun ScreenTemplate(
         ) { contentPadding ->
             content(contentPadding)
         }
+    }
+
+    if(showModalDrawer) { // show modal with scaffold content only when requested
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                ModalDrawerSheet(drawerState) {
+                    SideMenuContent()
+                }
+            },
+            content = { scaffoldContent() }
+        )
+    } else {
+        scaffoldContent()
     }
 }
