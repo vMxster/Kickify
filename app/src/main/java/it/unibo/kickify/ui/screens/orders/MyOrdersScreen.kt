@@ -28,7 +28,8 @@ fun MyOrdersScreen(
         screenTitle = stringResource(R.string.myordersScreen_title),
         navController = navController,
         showTopAppBar = true,
-        bottomAppBarContent = { BottomBar(navController) }
+        bottomAppBarContent = { BottomBar(navController) },
+        showModalDrawer = true
     ) { contentPadding ->
         val scrollState = rememberScrollState()
 

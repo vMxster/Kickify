@@ -45,7 +45,8 @@ fun ProfileScreen(
         screenTitle = stringResource(R.string.profileScreen_title),
         navController = navController,
         showTopAppBar = true,
-        bottomAppBarContent = { BottomBar(navController) }
+        bottomAppBarContent = { BottomBar(navController) },
+        showModalDrawer = true
     ) { contentPadding ->
         val scrollState = rememberScrollState()
 

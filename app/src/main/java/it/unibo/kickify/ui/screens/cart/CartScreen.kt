@@ -27,7 +27,8 @@ fun CartScreen(
         screenTitle = stringResource(R.string.cartscreen_title),
         navController = navController,
         showTopAppBar = true,
-        bottomAppBarContent = { BottomBar(navController) }
+        bottomAppBarContent = { BottomBar(navController) },
+        showModalDrawer = true
     ) { contentPadding ->
         Column(
             modifier = Modifier.fillMaxSize()
@@ -40,7 +41,8 @@ fun CartScreen(
             CartAndCheckoutResume(
                 subTotal = (69.99+129.99+87.99),
                 shipping = 10.0,
-                onButtonClickAction = { navController.navigate(KickifyRoute.Checkout) })
+                onButtonClickAction = { navController.navigate(KickifyRoute.Checkout) }
+            )
         }
     }
 }

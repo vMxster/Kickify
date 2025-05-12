@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,7 +41,8 @@ fun CheckOutScreen(
         screenTitle = stringResource(R.string.checkoutScreen_title),
         navController = navController,
         showTopAppBar = true,
-        bottomAppBarContent = { }
+        bottomAppBarContent = { },
+        showModalDrawer = false
     ) { contentPadding ->
         var showLoading: Boolean by rememberSaveable { mutableStateOf(false) }
         var showDialog by rememberSaveable { mutableStateOf(false) }
@@ -78,11 +81,15 @@ fun CheckOutScreen(
             }
             if(showDialog){
                 DialogWithImage(
+                    imageVector = Icons.Outlined.Check,
+                    mainMessage = stringResource(R.string.cartscreen_paymentSuccessful),
+                    dismissButtonText = stringResource(R.string.cartscreen_backToShopping),
                     onDismissRequest = {
-                        navController.navigate(KickifyRoute.Home){
-                            popUpTo(KickifyRoute.Cart)
+                        navController.navigate(KickifyRoute.Home) {
+                            popUpTo(KickifyRoute.Cart) { inclusive = true }
                         }
                     },
+
                 )
             }
         }
@@ -109,7 +116,7 @@ fun LoadingAnimation(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f)) // Sfondo semi-trasparente
+                    .background(Color.Black.copy(alpha = 0.5f))
                     .pointerInput(Unit) {
                         detectTapGestures {} // block all click on screen
                     }

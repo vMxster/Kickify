@@ -30,7 +30,8 @@ fun ForgotPasswordScreen(
         screenTitle = stringResource(R.string.signin_forgotPassword),
         navController = navController,
         showTopAppBar = true,
-        bottomAppBarContent = { }
+        bottomAppBarContent = { },
+        showModalDrawer = false
     ) { contentPadding ->
         val forgotScreenModifier = Modifier
             .fillMaxWidth()
@@ -69,12 +70,8 @@ fun ForgotPasswordScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = {
-                    navController.navigate(KickifyRoute.OTPScreen) {
-                        //popUpTo(KickifyRoute.ForgotPassword) { inclusive = true }
-                    }
-                },
-                modifier = forgotScreenModifier,
+                onClick = { navController.navigate(KickifyRoute.OTPScreen) },
+                modifier = forgotScreenModifier
             ) {
                 Text(
                     text = stringResource(R.string.continue_button),

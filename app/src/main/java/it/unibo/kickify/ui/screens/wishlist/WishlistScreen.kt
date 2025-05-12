@@ -28,7 +28,8 @@ fun WishlistScreen(
         screenTitle = stringResource(R.string.wishlist_title),
         navController = navController,
         showTopAppBar = true,
-        bottomAppBarContent = { BottomBar(navController) }
+        bottomAppBarContent = { BottomBar(navController) },
+        showModalDrawer = true
     ) { contentPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

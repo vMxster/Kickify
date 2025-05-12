@@ -52,7 +52,8 @@ fun OnBoardScreen(
         screenTitle = "",
         navController = navController,
         showTopAppBar = true,
-        bottomAppBarContent = { }
+        bottomAppBarContent = { },
+        showModalDrawer = false
     ) { contentPadding ->
         Column (
             modifier = Modifier.fillMaxSize()

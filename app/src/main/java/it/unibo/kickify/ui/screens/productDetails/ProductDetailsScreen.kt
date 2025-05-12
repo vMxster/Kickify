@@ -43,7 +43,8 @@ fun ProductDetailsScreen(
         screenTitle = stringResource(R.string.details),
         navController = navController,
         showTopAppBar = true,
-        bottomAppBarContent = { ProductDetailsFooter(price) }
+        bottomAppBarContent = { ProductDetailsFooter(price) },
+        showModalDrawer = true
     ) { contentPadding ->
         val state = rememberScrollState()
 

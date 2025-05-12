@@ -48,7 +48,8 @@ fun OTPScreen(
         screenTitle = "",
         navController = navController,
         showTopAppBar = true,
-        bottomAppBarContent = { }
+        bottomAppBarContent = { },
+        showModalDrawer = false
     ) { contentPadding ->
         val forgotScreenModifier = Modifier
             .fillMaxWidth()

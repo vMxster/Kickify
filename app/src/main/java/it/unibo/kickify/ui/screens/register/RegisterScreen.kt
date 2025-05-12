@@ -44,7 +44,8 @@ fun RegisterScreen(
         screenTitle = "",
         navController = navController,
         showTopAppBar = true,
-        bottomAppBarContent = { }
+        bottomAppBarContent = { },
+        showModalDrawer = false
     ) { contentPadding ->
         val registerScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)

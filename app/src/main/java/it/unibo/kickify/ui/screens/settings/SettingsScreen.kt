@@ -34,14 +34,14 @@ fun SettingsScreen(
     settingsViewModel: SettingsViewModel
 ) {
     val themeState by settingsViewModel.theme.collectAsStateWithLifecycle()
-    val locationEnabledState by settingsViewModel.enabledLocation.collectAsStateWithLifecycle()
     val biometricLoginState by settingsViewModel.biometricLogin.collectAsStateWithLifecycle()
 
     ScreenTemplate(
         screenTitle = stringResource(R.string.settings_title),
         navController = navController,
         showTopAppBar = true,
-        bottomAppBarContent = { BottomBar(navController) }
+        bottomAppBarContent = { BottomBar(navController) },
+        showModalDrawer = true
     ) { contentPadding ->
         Column(
             modifier = Modifier
@@ -85,13 +85,6 @@ fun SettingsScreen(
                     }
                 )
             }
-            SettingsItemWithTrailingSwitchButton(
-                stringResource(R.string.settings_enableLocationServices),
-                checked = locationEnabledState,
-                onSwitchChange = {
-                    settingsViewModel.setEnabledLocation(it)
-                }
-            )
             ThemeChooserRow(
                 selectedTheme = themeState,
                 onThemeSelected = {

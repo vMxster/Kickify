@@ -36,7 +36,8 @@ fun OrderDetailsScreen(
         screenTitle = stringResource(R.string.trackOrder),
         navController = navController,
         showTopAppBar = true,
-        bottomAppBarContent = { BottomBar(navController) }
+        bottomAppBarContent = { BottomBar(navController) },
+        showModalDrawer = true
     ) { contentPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
