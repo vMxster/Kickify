@@ -4,6 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,7 +34,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,23 +46,20 @@ import it.unibo.kickify.R
 import it.unibo.kickify.data.models.ShopCategory
 import it.unibo.kickify.ui.composables.ShoesColorIndicator
 import it.unibo.kickify.ui.theme.BluePrimary
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterScreen(
     onDismissRequest: () -> Unit,
     sheetState: SheetState,
-    onFilter: () -> Unit,
+    onApplyFilter: () -> Unit,
     onResetFilter: () -> Unit
 ){
-    val coroutineScope = rememberCoroutineScope()
-
     ModalBottomSheet(
         onDismissRequest = { onDismissRequest() },
         sheetState = sheetState
     ){
-        val sizeList = listOf(40, 41, 42, 43, 44, 45)
+        val sizeList = listOf(37, 38, 39, 40, 41, 42, 43, 44, 45, 46)
 
         Column(
             verticalArrangement = Arrangement.Center,
@@ -68,6 +67,7 @@ fun FilterScreen(
             modifier = Modifier
                 .padding(horizontal = 12.dp)
                 .padding(vertical = 8.dp)
+                .verticalScroll(rememberScrollState())
         ){
             FilterTitleRow(onResetFilter = onResetFilter)
             Spacer(Modifier.height(8.dp))
@@ -88,6 +88,14 @@ fun FilterScreen(
             GenderGroup()
             Spacer(Modifier.height(8.dp))
 
+            FilterGroupTitle(stringResource(R.string.brand))
+            BrandsGroup(listOf("Adidas", "Asics", "Converse", "Crocs", "Diadora", "Fila",
+                "Havaianas", "Hoka", "Kappa", "Lacoste", "New Balance", "Nike", "On",
+                "Puma", "Reebok", "Salomon", "Saucony", "Sergio Tacchini", "Ugg",
+                "Under Armour", "Vans")
+            )
+            Spacer(Modifier.height(8.dp))
+
             FilterGroupTitle(stringResource(R.string.color))
             ColorGroup(
                 listOf(Color.White, Color.Red, Color.Gray, Color.Blue,
@@ -97,18 +105,13 @@ fun FilterScreen(
 
             FilterGroupTitle(stringResource(R.string.size))
             SizeGroup(sizeList)
-
             Spacer(Modifier.height(8.dp))
+
             FilterGroupTitle(stringResource(R.string.price))
             PriceSlider(minValue = 40, maxValue = 500)
-
             Spacer(Modifier.height(8.dp))
-            ApplyFilterButton(onClick = {
-                onFilter()
-                coroutineScope.launch {
-                    sheetState.hide()
-                }
-            })
+
+            ApplyFilterButton(onClick = { onApplyFilter() })
         }
     }
 }
@@ -248,6 +251,22 @@ fun FilterGroupTitle(title: String){
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun BrandsGroup(brandsList: List<String>){
+    FlowRow(
+        verticalArrangement = Arrangement.Center,
+        horizontalArrangement = Arrangement.Start,
+        maxItemsInEachRow = 4,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        brandsList.forEach {
+            SingleOptionSelectableButton(it)
+            Spacer(Modifier.width(10.dp))
+        }
+    }
+}
+
 @Composable
 fun GenderGroup(){
     Row(
@@ -256,7 +275,7 @@ fun GenderGroup(){
         modifier = Modifier.fillMaxWidth()
     ) {
         ShopCategory.entries.forEach {
-            SingleGenderButton(it.toString())
+            SingleOptionSelectableButton(it.toString())
             Spacer(Modifier.width(10.dp))
         }
     }
@@ -266,15 +285,15 @@ fun GenderGroup(){
 fun ColorGroup(
     colorList: List<Color>
 ){
-    val scrollState = rememberScrollState()
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
-            .horizontalScroll(scrollState)
+            .horizontalScroll(rememberScrollState())
     ) {
         for (color in colorList) {
-            ShoesColorIndicator(color, indicatorSize = 32.dp)
+            SingleColorSelectableButton(color)
             Spacer(Modifier.width(14.dp))
         }
     }
@@ -318,7 +337,7 @@ fun SingleSizeButton(shownText: String){
 }
 
 @Composable
-fun SingleGenderButton(shownText: String){
+fun SingleOptionSelectableButton(shownText: String){
     var selected by remember { mutableStateOf(false) }
 
     Button(
@@ -329,5 +348,21 @@ fun SingleGenderButton(shownText: String){
         )
     ){
         Text(text = shownText, fontSize = 18.sp)
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun SingleColorSelectableButton(color: Color){
+    var selected by remember { mutableStateOf(false) }
+
+    Button(
+        onClick = { selected = !selected },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (selected) BluePrimary else MaterialTheme.colorScheme.background,
+        ),
+        contentPadding = ButtonDefaults.ExtraSmallContentPadding
+    ){
+        ShoesColorIndicator(color, indicatorSize = 32.dp)
     }
 }
