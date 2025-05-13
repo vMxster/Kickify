@@ -14,7 +14,7 @@ import it.unibo.kickify.ui.screens.login.ForgotPasswordScreen
 import it.unibo.kickify.ui.screens.login.LoginScreen
 import it.unibo.kickify.ui.screens.login.OTPScreen
 import it.unibo.kickify.ui.screens.notifications.NotificationScreen
-import it.unibo.kickify.ui.screens.onboard.OnBoardScreen
+import it.unibo.kickify.ui.screens.onboard.OnboardingScreen
 import it.unibo.kickify.ui.screens.orders.MyOrdersScreen
 import it.unibo.kickify.ui.screens.orders.OrderDetailsScreen
 import it.unibo.kickify.ui.screens.productDetails.ProductDetailsScreen
@@ -90,7 +90,13 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.Onboard> {
-            OnBoardScreen(navController)
+            OnboardingScreen(navController,
+                onReachedLastPage = {
+                    navController.navigate(KickifyRoute.Login) {
+                        popUpTo(KickifyRoute.Onboard) { inclusive = true }
+                    }
+                }
+            )
         }
 
         composable<KickifyRoute.ProductDetails> { backStackEntry ->

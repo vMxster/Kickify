@@ -9,13 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -27,26 +27,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
-import it.unibo.kickify.ui.KickifyRoute
-import it.unibo.kickify.ui.composables.ExpandingDotIndicator
+import it.unibo.kickify.ui.composables.PageIndicator
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import kotlinx.coroutines.launch
 
 @Composable
-fun OnBoardScreen(
-    navController: NavController
+fun OnboardingScreen(
+    navController: NavController,
+    onReachedLastPage: () -> Unit
 ) {
-    val totalDots = 3
-    var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
-
-    fun selectedIndexMgr() {
-        if (selectedIndex == (totalDots - 1)) {
-            navController.navigate(KickifyRoute.Login) {
-                popUpTo(KickifyRoute.Onboard) { inclusive = true }
-            }
-        } else if (selectedIndex < (totalDots -1 )){
-            selectedIndex += 1
-        }
-    }
+    val totalPages = 3
+    val pagerState = rememberPagerState(pageCount = { totalPages })
+    val coroutineScope = rememberCoroutineScope()
 
     ScreenTemplate(
         screenTitle = "",
@@ -55,63 +47,48 @@ fun OnBoardScreen(
         bottomAppBarContent = { },
         showModalDrawer = false
     ) { contentPadding ->
-        Column (
+        Column(
             modifier = Modifier.fillMaxSize()
                 .padding(contentPadding)
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
-            Image(
-                painter = when (selectedIndex) {
-                    1 -> painterResource(R.drawable.nike_onboard)
-                    2 -> painterResource(R.drawable.newbalance_onboard)
-                    else -> painterResource(R.drawable.adidas_onboard)
-                },
-                modifier = Modifier.fillMaxWidth(),
-                contentScale = ContentScale.FillWidth,
-                contentDescription = "Welcome page"
-            )
-            Text(
-                when (selectedIndex) {
-                    0 -> stringResource(R.string.onboard_title_1)
-                    1 -> stringResource(R.string.onboard_title_2)
-                    else -> stringResource(R.string.onboard_title_3)
-                }, style = TextStyle(
-                    fontSize = 33.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-
-            Text(
-                when (selectedIndex) { // messages
-                    0 -> stringResource(R.string.onboard_text_1)
-                    1 -> stringResource(R.string.onboard_text_2)
-                    else -> stringResource(R.string.onboard_text_3)
-                }, style = TextStyle(
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Normal,
-                )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                pageSize = PageSize.Fill
+            ) { page ->
+                OnboardingPage(page = page)
+            }
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                ExpandingDotIndicator(
-                    totalDots = totalDots,
-                    selectedIndex = selectedIndex,
-                    modifier = Modifier.padding(16.dp)
+                PageIndicator(
+                    numberOfPages = totalPages,
+                    currentPage = pagerState.currentPage,
+                    modifier = Modifier.padding(start = 16.dp)
                 )
-
                 Button(
-                    onClick = { selectedIndexMgr() }
+                    onClick = {
+                        if (pagerState.currentPage < 2) {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            }
+                        } else {
+                            onReachedLastPage()
+                        }
+                    },
                 ) {
                     Text(
-                        when (selectedIndex) {
+                        text = when (pagerState.currentPage) {
                             0 -> stringResource(R.string.getStarted_button)
                             else -> stringResource(R.string.nextPage_button)
                         }
@@ -119,5 +96,57 @@ fun OnBoardScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun OnboardingPage(page: Int) {
+    when (page) {
+        0 -> OnboardingContent(
+            title = stringResource(R.string.onboard_title_1),
+            description = stringResource(R.string.onboard_text_1),
+            imageResourceID = R.drawable.adidas_onboard
+        )
+        1 -> OnboardingContent(
+            title = stringResource(R.string.onboard_title_2),
+            description = stringResource(R.string.onboard_text_2),
+            imageResourceID = R.drawable.nike_onboard
+        )
+        else -> OnboardingContent(
+            title = stringResource(R.string.onboard_title_3),
+            description = stringResource(R.string.onboard_text_3),
+            imageResourceID = R.drawable.newbalance_onboard
+        )
+    }
+}
+
+@Composable
+fun OnboardingContent(
+    title: String,
+    description: String,
+    imageResourceID: Int
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        Image(
+            painter = painterResource(imageResourceID),
+            modifier = Modifier.fillMaxWidth(),
+            contentScale = ContentScale.FillWidth,
+            contentDescription = stringResource(R.string.welcomePage)
+        )
+        Text(
+            text = title,
+            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 33.sp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = description,
+            style = TextStyle(fontWeight = FontWeight.Normal, fontSize = 22.sp)
+        )
     }
 }

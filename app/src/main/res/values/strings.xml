@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Kickify</string>
+    <string name="welcomePage">Welcome Page</string>
     <string name="onboard_title_1">Start Your Urban Adventure</string>
     <string name="onboard_text_1">Premium designs for urban rhythm - smart, bold, always in step.</string>
     <string name="onboard_title_2">Trendsetter\'s Playground</string>
