@@ -4,11 +4,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -131,8 +131,8 @@ fun AppBar(
             }
 
             if (title == stringResource(R.string.profileScreen_title)){
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(Icons.Outlined.Edit, contentDescription = "Edit profile")
+                IconButton(onClick = { navController.navigate(KickifyRoute.BadgesScreen) }) {
+                    Icon(Icons.Outlined.StarOutline, contentDescription = "View achievements")
                 }
                 IconButton(onClick = { navController.navigate(KickifyRoute.Settings) }) {
                     Icon(Icons.Outlined.Settings, contentDescription = "Edit app settings")

@@ -22,6 +22,7 @@ import it.unibo.kickify.ui.screens.productList.ProductListScreen
 import it.unibo.kickify.ui.screens.profile.ProfileScreen
 import it.unibo.kickify.ui.screens.profile.TakePhotoScreen
 import it.unibo.kickify.ui.screens.register.RegisterScreen
+import it.unibo.kickify.ui.screens.rewards.BadgeScreen
 import it.unibo.kickify.ui.screens.settings.SettingsScreen
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.screens.wishlist.WishlistScreen
@@ -47,6 +48,7 @@ sealed interface KickifyRoute {
     @Serializable data object MyOrders : KickifyRoute
     @Serializable data class OrderDetails(val orderID: String) : KickifyRoute
     @Serializable data object TakeProfilePhoto : KickifyRoute
+    @Serializable data object BadgesScreen : KickifyRoute
 }
 
 @Composable
@@ -140,6 +142,10 @@ fun KickifyNavGraph(
 
         composable<KickifyRoute.TakeProfilePhoto> {
             TakePhotoScreen(navController, activity, cameraXutils, settingsViewModel)
+        }
+
+        composable<KickifyRoute.BadgesScreen>{
+            BadgeScreen(navController)
         }
     }
 }

@@ -132,4 +132,20 @@
     <string name="profileScreen_takePhoto">Take a photo</string>
     <string name="view">View</string>
     <string name="details">Details</string>
+    <string name="myAchievements">My Achievements</string>
+    <string name="allAchievements">All Achievements</string>
+    <string name="achieved_achievement">Achieved</string>
+    <string name="notAchieved_achievement">Not achieved</string>
+    <string name="achievement_1stAppLogin">First in-app login</string>
+    <string name="achievement_1stAppLogin_descr">Log in for the first time</string>
+    <string name="achievement_1stReview">First review</string>
+    <string name="achievement_1stReview_descr">Publish your first review</string>
+    <string name="achievement_1stShareLink">First product shared by link</string>
+    <string name="achievement_1stShareLink_descr">Share a product with a friend</string>
+    <string name="achievement_1stOrder">First order placed</string>
+    <string name="achievement_1stOrder_descr">Place your first order</string>
+    <string name="achievement_1stItemInWishlist">First item added in wishlist</string>
+    <string name="achievement_1stItemInWishlist_descr">Add the first item to your wishlist</string>
+    <string name="achievement_onlyDarkTheme">Set to use always dark theme</string>
+    <string name="achievement_onlyDarkTheme_descr">You love dark theme too, don\'t you?</string>
 </resources>
