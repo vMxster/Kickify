@@ -15,8 +15,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -26,7 +26,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -75,10 +74,6 @@ fun LoginScreen(navController: NavController) {
         }
     }
 
-    LaunchedEffect(Unit){
-        emailFocusRequester.requestFocus()
-    }
-
     ScreenTemplate(
         screenTitle = "",
         navController = navController,
@@ -103,6 +98,7 @@ fun LoginScreen(navController: NavController) {
                 textAlign = TextAlign.Center,
                 modifier = loginScreenModifier
             )
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.signin_Text),
                 fontSize = 18.sp,
@@ -116,7 +112,6 @@ fun LoginScreen(navController: NavController) {
                 modifier =loginScreenModifier
             )
             Spacer(modifier = Modifier.height(12.dp))
-
             OutlinedTextField(
                 value = email,
                 onValueChange = {
@@ -173,7 +168,7 @@ fun LoginScreen(navController: NavController) {
                             loginAction()
 
                         } else {
-                            pswError = ctx.getString(R.string.emptyPsw)
+                            pswError = ctx.getString(R.string.emptyPswMessage)
                         }
                     }
                 ),
@@ -184,8 +179,8 @@ fun LoginScreen(navController: NavController) {
                     }
                 },
                 trailingIcon = {
-                    val image = if (passwordVisibility) Icons.Filled.Visibility
-                    else Icons.Filled.VisibilityOff
+                    val image = if (passwordVisibility) Icons.Outlined.Visibility
+                    else Icons.Outlined.VisibilityOff
 
                     IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
                         Icon(imageVector = image,
@@ -245,6 +240,7 @@ fun LoginScreen(navController: NavController) {
                 onClick = { navController.navigate(KickifyRoute.Register) },
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = 32.dp)
                     .padding(vertical = 20.dp)
             ) {
                 Text(
