@@ -39,9 +39,13 @@
     <string name="settings_notifications">Notifications</string>
     <string name="settings_shippingAddress">Shipping Address</string>
     <string name="payment">Payment</string>
+    <string name="currentlyUnavailableFeature">Currently unavailable feauture</string>
     <string name="settings_deleteAccount">Delete Account</string>
     <string name="settings_appSettingsTitle">App Settings</string>
     <string name="settings_enableBiometricLogin">Enable Biometric Log In</string>
+    <string name="settings_enablePushNotifications">Enable Push Notifications</string>
+    <string name="settings_pushNotificationPermissionNotGranted">Grant permission to enable push notifications</string>
+    <string name="settings_biometricLoginUnavailable">Biometric Log In is unavailable on this device</string>
     <string name="settings_enableLocationServices">Enable Location Services</string>
     <string name="settings_appTheme">App Theme</string>
     <string name="theme_light">Light</string>
@@ -131,6 +135,7 @@
     <string name="close">Close</string>
     <string name="profileScreen_choosePhotoFromGallery">Choose Profile Photo From Gallery</string>
     <string name="profileScreen_takePhoto">Take a photo</string>
+    <string name="editProfileScreen_title">Edit Profile Info</string>
     <string name="view">View</string>
     <string name="details">Details</string>
     <string name="myAchievements">My Achievements</string>

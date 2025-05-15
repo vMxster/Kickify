@@ -19,11 +19,11 @@ class PushNotificationManager(
     private var lastUsedNotificationID = 0
 
     init {
-        checkNotificationPermission()
+        isPermissionGranted()
         createNotificationChannel()
     }
 
-    fun checkNotificationPermission(): Boolean {
+    fun isPermissionGranted(): Boolean {
         if (Build.VERSION.SDK_INT >= 33) { // in API >= 33 required to give permission
             return ContextCompat.checkSelfPermission(
                 this.context, android.Manifest.permission.POST_NOTIFICATIONS
