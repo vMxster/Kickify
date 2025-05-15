@@ -8,7 +8,7 @@ import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -132,7 +132,7 @@ fun AppBar(
 
             if (title == stringResource(R.string.profileScreen_title)){
                 IconButton(onClick = { navController.navigate(KickifyRoute.BadgesScreen) }) {
-                    Icon(Icons.Outlined.StarOutline, contentDescription = "View achievements")
+                    Icon(Icons.Outlined.EmojiEvents, contentDescription = "View achievements")
                 }
                 IconButton(onClick = { navController.navigate(KickifyRoute.Settings) }) {
                     Icon(Icons.Outlined.Settings, contentDescription = "Edit app settings")

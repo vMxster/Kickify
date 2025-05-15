@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Kickify</string>
+    <string name="app_name" translatable="false">Kickify</string>
     <string name="welcomePage">Welcome Page</string>
     <string name="onboard_title_1">Start Your Urban Adventure</string>
     <string name="onboard_text_1">Premium designs for urban rhythm - smart, bold, always in step.</string>
@@ -41,6 +41,9 @@
     <string name="payment">Payment</string>
     <string name="currentlyUnavailableFeature">Currently unavailable feauture</string>
     <string name="settings_deleteAccount">Delete Account</string>
+    <string name="settings_deleteAccountConfirmMessage">Are you sure you want to delete your account?\nIt will disabled for 30 days, then will be definively deleted.</string>
+    <string name="settings_cancel">Cancel</string>
+    <string name="caution">Caution!</string>
     <string name="settings_appSettingsTitle">App Settings</string>
     <string name="settings_enableBiometricLogin">Enable Biometric Log In</string>
     <string name="settings_enablePushNotifications">Enable Push Notifications</string>
@@ -48,6 +51,8 @@
     <string name="settings_biometricLoginUnavailable">Biometric Log In is unavailable on this device</string>
     <string name="settings_enableLocationServices">Enable Location Services</string>
     <string name="settings_appTheme">App Theme</string>
+    <string name="logout">Logout</string>
+    <string name="logout_confirmMessage">Are you sure you want to log out?</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_system">System</string>

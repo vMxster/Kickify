@@ -21,7 +21,7 @@ class SettingsRepository(
         private val BIOMETRIC_LOGIN = booleanPreferencesKey("biometric_login")
         private val LAST_ACCESS_KEY = longPreferencesKey("last_access")
         private val ENABLED_LOCATION = booleanPreferencesKey("enabled_location")
-        private val ENABLED_PUSH_NOTIFICATION = booleanPreferencesKey("enabled_location")
+        private val ENABLED_PUSH_NOTIFICATION = booleanPreferencesKey("enabled_pushNotification")
     }
 
     // get userid

@@ -1,8 +1,9 @@
 package it.unibo.kickify.ui.composables
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -67,33 +69,51 @@ fun SettingsItemWithLeadingIcon(
             textAlign = TextAlign.Start,
             modifier = Modifier.fillMaxWidth(fraction = 0.8f)
         )
-        Icon(
-            Icons.Outlined.ChevronRight,
-            modifier = Modifier.clickable(onClick = onClick)
-                .size(30.dp),
-            contentDescription = "",
-        )
+        IconButton(
+            onClick = onClick
+        ) {
+            Icon(
+                Icons.Outlined.ChevronRight,
+                modifier = Modifier.size(30.dp),
+                contentDescription = "",
+            )
+        }
     }
 }
 
 @Composable
 fun SettingsItemWithTrailingSwitchButton(
+    enabled: Boolean,
+    textIfDisabled: String?,
     text: String,
     checked: Boolean,
     onSwitchChange: (Boolean) -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth()
-            .padding(vertical = 6.dp)
-            .height(30.dp),
+            .padding(vertical = 6.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ){
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyLarge
-        )
+        Column(
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth(fraction = 0.6f)
+        ){
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            if(!enabled) {
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    text = textIfDisabled ?: stringResource(R.string.currentlyUnavailableFeature),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
         SwitchButton(
+            enabled = enabled,
             isChecked = checked,
             onChangeCheckedAction = { onSwitchChange(!checked) },
         )

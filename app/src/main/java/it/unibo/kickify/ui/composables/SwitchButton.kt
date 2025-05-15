@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import it.unibo.kickify.ui.theme.BluePrimary
@@ -14,16 +14,18 @@ import it.unibo.kickify.ui.theme.GhostWhite
 
 @Composable
 fun SwitchButton(
+    enabled: Boolean,
     isChecked: Boolean,
     onChangeCheckedAction: (Boolean) -> Unit
 ) {
-    var switchState by remember { mutableStateOf(isChecked) }
+    var switchState by rememberSaveable { mutableStateOf(isChecked) }
 
     LaunchedEffect(isChecked) {
         switchState = isChecked
     }
 
     Switch(
+        enabled = enabled,
         checked = switchState,
         onCheckedChange = { newValue ->
             switchState = newValue
