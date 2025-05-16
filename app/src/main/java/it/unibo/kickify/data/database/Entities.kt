@@ -341,7 +341,7 @@ data class NotificationState(
     indices = [Index(value = ["Email"], unique = true)]
 )
 data class Address(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     @ColumnInfo(name = "Email")
     val email: String,
 
@@ -415,7 +415,7 @@ data class Message(
     ],
     indices = [
         Index(value = ["Email"], unique = true),
-        Index(value = ["Tipo_Notifica"], unique = true)
+        Index(value = ["TipoNotifica"], unique = true)
               ]
 )
 data class Notification(
@@ -635,35 +635,19 @@ data class Image(
     val url: String
 )
 
-// Relazioni per la query getOrderTracking
-data class OrderWithTracking(
+// Relation Classes
+data class CartWithProductInfo(
     @Embedded
-    val order: Order,
+    val cartProduct: CartProduct,
 
-    @Relation(
-        parentColumn = "ID_Ordine",
-        entityColumn = "ID_Ordine"
-    )
-    val trackingStates: List<TrackingShipping> = listOf(),
+    @ColumnInfo(name = "Nome")
+    val nome: String,
 
-    @Relation(
-        entity = OrderProduct::class,
-        parentColumn = "ID_Ordine",
-        entityColumn = "ID_Ordine",
-        projection = ["ID_Prodotto", "Colore", "Taglia"]
-    )
-    val productVersions: List<ProductVersion> = listOf()
-)
+    @ColumnInfo(name = "Prezzo")
+    val prezzo: Double,
 
-data class ProductVersion(
-    @ColumnInfo(name = "ID_Prodotto")
-    val productId: Int,
-
-    @ColumnInfo(name = "Colore")
-    val color: String,
-
-    @ColumnInfo(name = "Taglia")
-    val size: Double
+    @ColumnInfo(name = "Genere")
+    val genere: String
 )
 
 data class CompleteProduct(
@@ -675,4 +659,104 @@ data class CompleteProduct(
         entityColumn = "ID_Prodotto"
     )
     val versions: List<Version> = listOf()
+)
+
+data class CartQuantity(val quantity: Int)
+
+data class ReviewWithUser(
+    @Embedded val review: Review,
+    val Nome: String,
+    val Cognome: String
+)
+
+data class ProductDetail(
+    val product: Product,
+    val variants: List<Version>,
+    val reviews: List<ReviewWithUser>,
+    val inWishlist: Boolean,
+    val inCart: Boolean,
+    val cartQuantity: Int
+)
+
+data class OrderDetailedTracking(
+    val order_info: OrderBasicInfo?,
+    val tracking_states: List<TrackingState>,
+    val products: List<OrderProductDetail>
+)
+
+data class OrderBasicInfo(
+    val shipping_type: String,
+    val order_date: String,
+    val current_status: String,
+    val current_location: String,
+    val estimated_arrival: String
+)
+
+data class TrackingState(
+    val status: String,
+    val location: String,
+    val timestamp: String,
+    val estimated_arrival: String,
+    val actual_arrival: String?
+)
+
+data class OrderProductDetail(
+    val image: String,
+    val name: String,
+    val size: Double,
+    val quantity: Int,
+    val color: String,
+    val price: Double,
+    val original_price: Double
+)
+
+data class OrderTrackingRowData(
+    val shipping_type: String,
+    val order_date: String,
+    val location: String?,
+    val status: String?,
+    val actual_arrival: String?,
+    val estimated_arrival: String?,
+    val timestamp: String?,
+    val product_id: Int,
+    val name: String,
+    val price: Double,
+    val original_price: Double,
+    val color: String,
+    val size: Double,
+    val quantity: Int
+)
+
+data class NotificationWithMessage(
+    @Embedded
+    val notification: Notification,
+    val MessaggioCompleto: String?
+)
+
+data class ReviewWithUserInfo(
+    @Embedded
+    val review: Review,
+    val Nome: String,
+    val Cognome: String
+)
+
+data class OrderProductDetails(
+    val ID_Ordine: Int,
+    val Data_Ordine: String,
+    val Costo_Totale: Double,
+    val Metodo_Pagamento: String,
+    val Regalo: Boolean,
+    val Tipo: String,
+    val ID_Sconto: Int?,
+
+    val ID_Prodotto: Int,
+    val Nome: String,
+    val Genere: String,
+
+    val Prezzo_Acquisto: Double,
+    val Quantita: Int,
+    val Taglia: Double,
+    val Colore: String,
+
+    val delivered_flag: Boolean
 )
