@@ -142,25 +142,35 @@ interface ProductDao {
 
 @Dao
 interface UserDao {
-    @Query("SELECT * FROM UTENTE WHERE Email = :email")
+    @Query("""
+        SELECT * FROM UTENTE WHERE Email = :email
+    """)
     suspend fun getUserProfile(email: String): User?
 
     @Insert
     suspend fun registerUser(user: User): Long
 
-    @Query("SELECT * FROM UTENTE WHERE Email = :email AND Password = :password")
+    @Query("""
+        SELECT * FROM UTENTE WHERE Email = :email AND Password = :password
+    """)
     suspend fun loginUser(email: String, password: String): User?
 
-    @Query("UPDATE UTENTE SET Password = :password WHERE Email = :email")
+    @Query("""
+        UPDATE UTENTE SET Password = :password WHERE Email = :email
+    """)
     suspend fun changePassword(email: String, password: String): Int
 
-    @Query("SELECT Email FROM UTENTE WHERE Email = :email")
+    @Query("""
+        SELECT Email FROM UTENTE WHERE Email = :email
+    """)
     suspend fun checkUserExists(email: String): String?
 }
 
 @Dao
 interface CartDao {
-    @Query("SELECT * FROM CARRELLO WHERE Email = :email")
+    @Query("""
+        SELECT * FROM CARRELLO WHERE Email = :email
+    """)
     suspend fun getCartByEmail(email: String): Cart?
 
     @Transaction
@@ -179,35 +189,70 @@ interface CartDao {
         updateCartTotal(cart.cartId)
     }
 
-    @Query("SELECT * FROM comprendere WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId AND Colore = :color AND Taglia = :size LIMIT 1")
+    @Query("""
+        SELECT * FROM comprendere 
+        WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
+        AND Colore = :color AND Taglia = :size LIMIT 1
+    """)
     suspend fun getCartItemIfExists(cartId: Int, productId: Int, color: String, size: Double): CartProduct?
 
     @Insert
     suspend fun insertCartItem(cartProduct: CartProduct): Long
 
-    @Query("UPDATE comprendere SET Quantita = :quantity WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId AND Colore = :color AND Taglia = :size")
+    @Query("""
+        UPDATE comprendere SET Quantita = :quantity 
+        WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
+        AND Colore = :color AND Taglia = :size
+    """)
     suspend fun updateCartItemQuantity(cartId: Int, productId: Int, color: String, size: Double, quantity: Int): Int
 
-    @Query("DELETE FROM comprendere WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId AND Colore = :color AND Taglia = :size")
+    @Query("""
+        DELETE FROM comprendere 
+        WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
+        AND Colore = :color AND Taglia = :size
+    """)
     suspend fun removeFromCart(cartId: Int, productId: Int, color: String, size: Double): Int
 
-    @Query("SELECT c.*, p.Nome, p.Prezzo, p.Genere FROM comprendere c JOIN PRODOTTO p ON c.ID_Prodotto = p.ID_Prodotto WHERE c.ID_Carrello = :cartId")
+    @Query("""
+        SELECT c.*, p.Nome, p.Prezzo, p.Genere 
+        FROM comprendere c JOIN PRODOTTO p ON c.ID_Prodotto = p.ID_Prodotto 
+        WHERE c.ID_Carrello = :cartId
+    """)
     suspend fun getCartItems(cartId: Int): List<CartWithProductInfo>
 
-    @Query("UPDATE comprendere SET Colore = :newColor WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId AND Colore = :oldColor AND Taglia = :size")
+    @Query("""
+        UPDATE comprendere SET Colore = :newColor 
+        WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
+        AND Colore = :oldColor AND Taglia = :size
+    """)
     suspend fun updateCartItemColor(cartId: Int, productId: Int, oldColor: String, newColor: String, size: Double): Int
 
-    @Query("UPDATE comprendere SET Taglia = :newSize WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId AND Colore = :color AND Taglia = :oldSize")
+    @Query("""
+        UPDATE comprendere SET Taglia = :newSize 
+        WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
+        AND Colore = :color AND Taglia = :oldSize
+    """)
     suspend fun updateCartItemSize(cartId: Int, productId: Int, color: String, oldSize: Double, newSize: Double): Int
 
-    @Query("UPDATE comprendere SET Colore = :newColor, Taglia = :newSize WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId AND Colore = :oldColor AND Taglia = :oldSize")
+    @Query("""
+        UPDATE comprendere SET Colore = :newColor, Taglia = :newSize 
+        WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
+        AND Colore = :oldColor AND Taglia = :oldSize
+    """)
     suspend fun updateCartItemColorAndSize(cartId: Int, productId: Int, oldColor: String, oldSize: Double, newColor: String, newSize: Double): Int
 
     @Transaction
-    @Query("UPDATE CARRELLO SET Valore_Totale = (SELECT SUM(c.Quantita * p.Prezzo) FROM comprendere c JOIN PRODOTTO p ON c.ID_Prodotto = p.ID_Prodotto WHERE c.ID_Carrello = :cartId) WHERE ID_Carrello = :cartId")
+    @Query("""
+        UPDATE CARRELLO SET Valore_Totale = (SELECT SUM(c.Quantita * p.Prezzo) 
+            FROM comprendere c JOIN PRODOTTO p ON c.ID_Prodotto = p.ID_Prodotto 
+            WHERE c.ID_Carrello = :cartId) 
+        WHERE ID_Carrello = :cartId
+    """)
     suspend fun updateCartTotal(cartId: Int): Int
 
-    @Query("DELETE FROM comprendere WHERE ID_Carrello = :cartId")
+    @Query("""
+        DELETE FROM comprendere WHERE ID_Carrello = :cartId
+    """)
     suspend fun clearCart(cartId: Int): Int
 }
 
@@ -224,7 +269,11 @@ interface OrderDao {
     suspend fun insertTrackingInfo(trackingShipping: TrackingShipping): Long
 
     @Transaction
-    @Query("SELECT * FROM ORDINE o WHERE o.Email = :email ORDER BY o.Data_Ordine DESC")
+    @Query("""
+        SELECT * FROM ORDINE o 
+        WHERE o.Email = :email 
+        ORDER BY o.Data_Ordine DESC
+    """)
     suspend fun getOrders(email: String): List<Order>
 
     @Query("""
@@ -267,18 +316,18 @@ interface OrderDao {
         val rawData = getOrderTrackingRawData(orderId)
 
         if (rawData.isEmpty()) return OrderDetailedTracking(
-            order_info = null,
-            tracking_states = emptyList(),
+            orderInfo = null,
+            trackingStates = emptyList(),
             products = emptyList()
         )
 
         val first = rawData.first()
         val orderInfo = OrderBasicInfo(
-            shipping_type = first.shipping_type,
-            order_date = first.order_date,
-            current_status = first.status ?: "",
-            current_location = first.location ?: "",
-            estimated_arrival = first.estimated_arrival ?: ""
+            shippingType = first.shippingType,
+            orderDate = first.orderDate,
+            currentStatus = first.status ?: "",
+            currentLocation = first.location ?: "",
+            estimatedArrival = first.estimatedArrival ?: ""
         )
 
         val states = listOf("Placed", "In progress", "Shipped", "Delivered")
@@ -289,14 +338,14 @@ interface OrderDao {
                 status = state,
                 location = matchingStatus?.location ?: "",
                 timestamp = matchingStatus?.timestamp ?: "",
-                estimated_arrival = matchingStatus?.estimated_arrival ?: "",
-                actual_arrival = matchingStatus?.actual_arrival
+                estimatedArrival = matchingStatus?.estimatedArrival ?: "",
+                actualArrival = matchingStatus?.actualArrival
             )
         }
 
         val uniqueProducts = mutableMapOf<String, OrderProductDetail>()
         rawData.forEach { row ->
-            val productKey = "${row.product_id}_${row.size}_${row.color}"
+            val productKey = "${row.productId}_${row.size}_${row.color}"
             if (!uniqueProducts.containsKey(productKey)) {
                 uniqueProducts[productKey] = OrderProductDetail(
                     image = "${row.name}_1",
@@ -305,14 +354,14 @@ interface OrderDao {
                     quantity = row.quantity,
                     color = row.color,
                     price = row.price,
-                    original_price = row.original_price
+                    originalPrice = row.originalPrice
                 )
             }
         }
 
         return OrderDetailedTracking(
-            order_info = orderInfo,
-            tracking_states = trackingStates,
+            orderInfo = orderInfo,
+            trackingStates = trackingStates,
             products = uniqueProducts.values.toList()
         )
     }
@@ -346,22 +395,40 @@ interface OrderDao {
 
 @Dao
 interface WishlistDao {
-    @Query("SELECT p.* FROM PRODOTTO p JOIN aggiungere a ON p.ID_Prodotto = a.ID_Prodotto WHERE a.Email = :email ORDER BY p.Nome")
+    @Query("""
+        SELECT p.* FROM PRODOTTO p 
+        JOIN aggiungere a ON p.ID_Prodotto = a.ID_Prodotto 
+        WHERE a.Email = :email ORDER BY p.Nome
+    """)
     suspend fun getWishlistItems(email: String): List<Product>
 
     @Insert
     suspend fun addToWishlist(wishlistProduct: WishlistProduct): Long
 
-    @Query("DELETE FROM aggiungere WHERE Email = :email AND ID_Prodotto = :productId")
+    @Query("""
+        DELETE FROM aggiungere 
+        WHERE Email = :email 
+        AND ID_Prodotto = :productId
+    """)
     suspend fun removeFromWishlist(email: String, productId: Int): Int
 
-    @Query("DELETE FROM aggiungere WHERE Email = :email")
+    @Query("""
+        DELETE FROM aggiungere 
+        WHERE Email = :email
+    """)
     suspend fun clearWishlist(email: String): Int
 
-    @Query("SELECT COUNT(*) FROM aggiungere WHERE Email = :email")
+    @Query("""
+        SELECT COUNT(*) FROM aggiungere 
+        WHERE Email = :email
+    """)
     suspend fun getWishlistCount(email: String): Int
 
-    @Query("SELECT COUNT(*) FROM aggiungere WHERE Email = :email AND ID_Prodotto = :productId")
+    @Query("""
+        SELECT COUNT(*) FROM aggiungere 
+        WHERE Email = :email 
+        AND ID_Prodotto = :productId
+    """)
     suspend fun isInWishlist(email: String, productId: Int): Int
 }
 
@@ -370,16 +437,31 @@ interface ReviewDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addReview(review: Review): Long
 
-    @Query("SELECT r.*, u.Nome, u.Cognome FROM RECENSIONE r JOIN UTENTE u ON r.Email = u.Email WHERE r.ID_Prodotto = :productId AND r.Data_Recensione > :lastAccess ORDER BY r.Data_Recensione DESC")
+    @Query("""
+        SELECT r.*, u.Nome, u.Cognome 
+        FROM RECENSIONE r 
+        JOIN UTENTE u ON r.Email = u.Email 
+        WHERE r.ID_Prodotto = :productId AND r.Data_Recensione > :lastAccess 
+        ORDER BY r.Data_Recensione DESC
+    """)
     suspend fun getProductReviews(productId: Int, lastAccess: String): List<ReviewWithUserInfo>
 
-    @Query("DELETE FROM RECENSIONE WHERE Email = :email AND ID_Prodotto = :productId")
+    @Query("""
+        DELETE FROM RECENSIONE WHERE Email = :email 
+        AND ID_Prodotto = :productId
+    """)
     suspend fun deleteReview(email: String, productId: Int): Int
 
-    @Query("SELECT AVG(Voto) FROM RECENSIONE WHERE ID_Prodotto = :productId")
+    @Query("""
+        SELECT AVG(Voto) FROM RECENSIONE 
+        WHERE ID_Prodotto = :productId
+    """)
     suspend fun getProductRating(productId: Int): Double?
 
-    @Query("SELECT COUNT(*) FROM ORDINE o JOIN PRODOTTO_ORDINE po ON o.ID_Ordine = po.ID_Ordine WHERE o.Email = :email AND po.ID_Prodotto = :productId")
+    @Query("""
+        SELECT COUNT(*) FROM ORDINE o 
+        JOIN PRODOTTO_ORDINE po ON o.ID_Ordine = po.ID_Ordine 
+        WHERE o.Email = :email AND po.ID_Prodotto = :productId""")
     suspend fun canUserReview(email: String, productId: Int): Int
 }
 
@@ -388,15 +470,28 @@ interface NotificationDao {
     @Insert
     suspend fun createNotification(notification: Notification): Long
 
-    @Query("SELECT n.*, m.Corpo as MessaggioCompleto FROM NOTIFICA n LEFT JOIN MESSAGGIO m ON n.Timestamp_Invio = m.Timestamp_Invio AND n.TipoNotifica = 'Admin Message' WHERE n.Email = :email ORDER BY n.Timestamp_Invio DESC")
+    @Query("""
+        SELECT n.*, m.Corpo as MessaggioCompleto 
+        FROM NOTIFICA n LEFT JOIN MESSAGGIO m ON n.Timestamp_Invio = m.Timestamp_Invio 
+        AND n.TipoNotifica = 'Admin Message' WHERE n.Email = :email 
+        ORDER BY n.Timestamp_Invio DESC
+    """)
     suspend fun getUserNotifications(email: String): List<NotificationWithMessage>
 
-    @Query("UPDATE NOTIFICA SET Tipo = 'Read' WHERE Email = :email")
+    @Query("""
+        UPDATE NOTIFICA SET Tipo = 'Read' WHERE Email = :email
+    """)
     suspend fun markAllNotificationsAsRead(email: String): Int
 
-    @Query("UPDATE NOTIFICA SET Tipo = 'Read' WHERE Email = :email AND ID_Notifica IN (:notificationIds)")
+    @Query("""
+        UPDATE NOTIFICA SET Tipo = 'Read' 
+        WHERE Email = :email AND ID_Notifica IN (:notificationIds)
+    """)
     suspend fun markNotificationsAsRead(email: String, notificationIds: List<Int>): Int
 
-    @Query("SELECT COUNT(*) FROM NOTIFICA WHERE Email = :email AND Tipo = 'Unread'")
+    @Query("""
+        SELECT COUNT(*) FROM NOTIFICA 
+        WHERE Email = :email AND Tipo = 'Unread'
+    """)
     suspend fun getUnreadNotificationsCount(email: String): Int
 }

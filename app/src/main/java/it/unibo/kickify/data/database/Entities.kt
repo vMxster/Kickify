@@ -665,8 +665,8 @@ data class CartQuantity(val quantity: Int)
 
 data class ReviewWithUser(
     @Embedded val review: Review,
-    val Nome: String,
-    val Cognome: String
+    val name: String,
+    val surname: String
 )
 
 data class ProductDetail(
@@ -679,25 +679,25 @@ data class ProductDetail(
 )
 
 data class OrderDetailedTracking(
-    val order_info: OrderBasicInfo?,
-    val tracking_states: List<TrackingState>,
+    val orderInfo: OrderBasicInfo?,
+    val trackingStates: List<TrackingState>,
     val products: List<OrderProductDetail>
 )
 
 data class OrderBasicInfo(
-    val shipping_type: String,
-    val order_date: String,
-    val current_status: String,
-    val current_location: String,
-    val estimated_arrival: String
+    val shippingType: String,
+    val orderDate: String,
+    val currentStatus: String,
+    val currentLocation: String,
+    val estimatedArrival: String
 )
 
 data class TrackingState(
     val status: String,
     val location: String,
     val timestamp: String,
-    val estimated_arrival: String,
-    val actual_arrival: String?
+    val estimatedArrival: String,
+    val actualArrival: String?
 )
 
 data class OrderProductDetail(
@@ -707,21 +707,21 @@ data class OrderProductDetail(
     val quantity: Int,
     val color: String,
     val price: Double,
-    val original_price: Double
+    val originalPrice: Double
 )
 
 data class OrderTrackingRowData(
-    val shipping_type: String,
-    val order_date: String,
+    val shippingType: String,
+    val orderDate: String,
     val location: String?,
     val status: String?,
-    val actual_arrival: String?,
-    val estimated_arrival: String?,
+    val actualArrival: String?,
+    val estimatedArrival: String?,
     val timestamp: String?,
-    val product_id: Int,
+    val productId: Int,
     val name: String,
     val price: Double,
-    val original_price: Double,
+    val originalPrice: Double,
     val color: String,
     val size: Double,
     val quantity: Int
@@ -730,33 +730,33 @@ data class OrderTrackingRowData(
 data class NotificationWithMessage(
     @Embedded
     val notification: Notification,
-    val MessaggioCompleto: String?
+    val message: String?
 )
 
 data class ReviewWithUserInfo(
     @Embedded
     val review: Review,
-    val Nome: String,
-    val Cognome: String
+    val name: String,
+    val surname: String
 )
 
 data class OrderProductDetails(
-    val ID_Ordine: Int,
-    val Data_Ordine: String,
-    val Costo_Totale: Double,
-    val Metodo_Pagamento: String,
-    val Regalo: Boolean,
-    val Tipo: String,
-    val ID_Sconto: Int?,
+    val orderId: Int,
+    val orderDate: String,
+    val totalCost: Double,
+    val paymentMethod: String,
+    val isPresent: Boolean,
+    val type: String,
+    val discountId: Int?,
 
-    val ID_Prodotto: Int,
-    val Nome: String,
-    val Genere: String,
+    val productId: Int,
+    val name: String,
+    val genre: String,
 
-    val Prezzo_Acquisto: Double,
-    val Quantita: Int,
-    val Taglia: Double,
-    val Colore: String,
+    val price: Double,
+    val quantity: Int,
+    val size: Double,
+    val color: String,
 
-    val delivered_flag: Boolean
+    val isDelivered: Boolean
 )
