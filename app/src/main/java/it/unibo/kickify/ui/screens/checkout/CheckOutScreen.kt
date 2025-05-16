@@ -66,7 +66,7 @@ fun CheckOutScreen(
                 InformationCard(
                     emailAddress = "mario.rossi@gmail.com",
                     phoneNr = "+39 1234567890",
-                    shippingAddress = "Via Roma 123, Cesena, 47521 - IT",
+                    shippingAddress = "Viale europa 638 47521 Cesena Italia",
                     payMethod = "paypal",
                     paymentDetails = "mario.rossi@gmail.com"
                 )
@@ -86,7 +86,7 @@ fun CheckOutScreen(
                     dismissButtonText = stringResource(R.string.cartscreen_backToShopping),
                     onDismissRequest = {
                         navController.navigate(KickifyRoute.Home) {
-                            popUpTo(KickifyRoute.Cart) { inclusive = true }
+                            popUpTo(KickifyRoute.Home) { inclusive = true }
                         }
                     },
 

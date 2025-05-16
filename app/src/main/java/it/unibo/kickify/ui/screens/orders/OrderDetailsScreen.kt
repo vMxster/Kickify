@@ -30,7 +30,6 @@ fun OrderDetailsScreen(
     navController: NavController,
     orderID: String
 ) {
-    val scrollState = rememberScrollState()
 
     ScreenTemplate(
         screenTitle = stringResource(R.string.trackOrder),
@@ -46,7 +45,7 @@ fun OrderDetailsScreen(
                 .fillMaxSize()
                 .padding(contentPadding)
                 .padding(horizontal = 16.dp)
-                .verticalScroll(scrollState)
+                .verticalScroll(rememberScrollState())
         ) {
             OrderIDCenterTitle(orderID)
 
@@ -101,7 +100,8 @@ fun OrderDetailsScreen(
 
             OrdersTitleLine(stringResource(R.string.parceLocation))
 
-            AddressOnMapBox("Via Roma 123, Cesena, 47521, Italia")
+            AddressOnMapBox("Via Cavalcavia, 345, 47521 Cesena, Italia",
+                zoomLevel = 18.0, showAddressLabelIfAvailable = true)
         }
     }
 }

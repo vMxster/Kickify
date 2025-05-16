@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Edit
@@ -20,16 +21,32 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import io.ktor.client.HttpClient
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.PaymentMethod
-import it.unibo.kickify.data.models.PaymentMethod.*
+import it.unibo.kickify.data.models.PaymentMethod.AMEX
+import it.unibo.kickify.data.models.PaymentMethod.MAESTRO
+import it.unibo.kickify.data.models.PaymentMethod.MASTERCARD
+import it.unibo.kickify.data.models.PaymentMethod.PAYPAL
+import it.unibo.kickify.data.models.PaymentMethod.VISA
+import it.unibo.kickify.data.remote.OSMDataSource
+import it.unibo.kickify.utils.Coordinates
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @Composable
 fun InformationCard(
@@ -76,7 +93,10 @@ fun InformationCard(
             )
 
             Spacer(Modifier.height(10.dp))
-            AddressOnMapBox(address = shippingAddress)
+            AddressOnMapBox(
+                address = shippingAddress, zoomLevel = 18.0,
+                showAddressLabelIfAvailable = false
+            )
 
             Spacer(Modifier.height(10.dp))
             InformationSectionTitle(stringResource(R.string.paymentMethod))
@@ -154,12 +174,45 @@ fun InformationSectionTitle(
 
 @Composable
 fun AddressOnMapBox(
-    address: String
+    address: String,
+    zoomLevel: Double,
+    showAddressLabelIfAvailable: Boolean
 ){
-    Icon(Icons.Outlined.Map, contentDescription = "",
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp))
+    val ctx = LocalContext.current
+    val osmDataSource = OSMDataSource(koinInject<HttpClient>())
+    val coroutineScope = rememberCoroutineScope()
+    val defaultCoordinates = listOf(41.9028, 12.4964)
+    var foundOsmPlaceString: String by rememberSaveable { mutableStateOf("") }
+    var foundPlace by rememberSaveable { mutableStateOf(defaultCoordinates) }
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            val tmp = osmDataSource.searchPlaces(address).firstOrNull()
+            foundOsmPlaceString = tmp?.displayName ?: ctx.getString(R.string.unavailableAddress)
+            if (tmp != null) {
+                foundPlace = listOf(tmp.latitude, tmp.longitude)
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        val mapBoxModifier = Modifier.fillMaxWidth().requiredHeight(180.dp)
+        if(foundPlace != defaultCoordinates) {
+            OSMmapBox(Coordinates(foundPlace[0], foundPlace[1]), zoomLevel, mapBoxModifier)
+            if(showAddressLabelIfAvailable) {
+                Text(foundOsmPlaceString)
+            }
+        } else {
+            Icon(
+                Icons.Outlined.Map, contentDescription = "Map unavailable",
+                modifier = mapBoxModifier
+            )
+        }
+    }
 }
 
 @Composable

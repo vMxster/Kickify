@@ -93,4 +93,7 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.video)
     implementation(libs.androidx.camera.extensions)
+
+    /* to show open street map in compose*/
+    implementation(libs.osmdroid.android)
 }
