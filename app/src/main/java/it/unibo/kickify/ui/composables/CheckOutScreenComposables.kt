@@ -80,7 +80,7 @@ fun InformationCard(
             CheckOutInformationRow(
                 leadingIcon = Icons.Outlined.Phone,
                 primaryText = phoneNr,
-                secondaryText = stringResource(R.string.checkoutScreen_phone),
+                secondaryText = stringResource(R.string.phone),
                 showEditButton = true,
                 onEditInformation = {}
             )

@@ -9,11 +9,22 @@ class LoginRegisterUtils {
         }
 
         fun isValidUsername(username: String):Boolean{
-            return !username.contains(" ") && username.length >= 4
+            return !username.contains(" ") && username.length >= 8
         }
 
+        /**
+         * Return true if the password is at least 10 characters long and contains:
+         *  - at least 1 lowercase character
+         *  - at least 1 uppercase character
+         *  - at least 1 digit
+         *  - at least 1 symbol
+         */
         fun isValidPassword(psw: String): Boolean{
-            return psw.length >= 10
+            return psw.length >= 10 &&
+                    psw.any { it.isLowerCase() } &&
+                    psw.any { it.isUpperCase() } &&
+                    psw.any { it.isDigit() } &&
+                    psw.any { !it.isLetterOrDigit() }
         }
     }
 }

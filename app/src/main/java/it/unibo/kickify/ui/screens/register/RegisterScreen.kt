@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,11 +42,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -257,6 +262,8 @@ fun RegisterScreen(
                 )
             }
             Spacer(modifier = Modifier.height(15.dp))
+
+            LoginRegisterMethodDividerRow()
             Button(
                 onClick = { /* google oauth login */ },
                 modifier = registerScreenModifier,
@@ -282,10 +289,32 @@ fun RegisterScreen(
                 modifier = registerScreenModifier,
             ) {
                 Text(
-                    text = stringResource(R.string.signup_alreadyPartOfCrew) + " " + stringResource(R.string.signin_button),
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Normal)){
+                            append(stringResource(R.string.signup_alreadyPartOfCrew) + " ")
+                        }
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)){
+                            append(stringResource(R.string.signin_button))
+                        }
+                    },
                     color = MaterialTheme.colorScheme.inverseSurface
                 )
             }
         }
+    }
+}
+
+@Composable
+fun LoginRegisterMethodDividerRow(){
+    Row(
+        modifier = Modifier.fillMaxWidth()
+            .padding(horizontal = 16.dp).padding(vertical = 6.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Text(
+            text = stringResource(R.string.or),
+            color = MaterialTheme.colorScheme.inverseSurface,
+        )
     }
 }

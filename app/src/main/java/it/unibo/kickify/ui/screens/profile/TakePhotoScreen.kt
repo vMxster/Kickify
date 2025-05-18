@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
-import it.unibo.kickify.camerax.CameraXutils
+import it.unibo.kickify.camerax.CameraXUtils
 import it.unibo.kickify.camerax.TakePhotoCameraScreen
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 
@@ -17,7 +17,7 @@ import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 fun TakePhotoScreen(
     navController: NavController,
     mainActivity: ComponentActivity,
-    cameraXutils: CameraXutils,
+    cameraXutils: CameraXUtils,
     settingsViewModel: SettingsViewModel
 ){
     if (!cameraXutils.hasRequiredPermissions()) {

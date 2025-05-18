@@ -98,8 +98,7 @@ fun OrderDetailsScreen(
                 currentStep = 1
             )
 
-            OrdersTitleLine(stringResource(R.string.parceLocation))
-
+            OrdersTitleLine(stringResource(R.string.parcelLocation))
             AddressOnMapBox("Via Cavalcavia, 345, 47521 Cesena, Italia",
                 zoomLevel = 18.0, showAddressLabelIfAvailable = true)
         }

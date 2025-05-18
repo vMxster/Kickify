@@ -14,9 +14,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,17 +30,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
-import it.unibo.kickify.camerax.CameraXutils
+import it.unibo.kickify.camerax.CameraXUtils
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.PaymentMethodRow
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.settings.EditProfileSections
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    cameraXutils: CameraXutils,
+    cameraXUtils: CameraXUtils,
     settingsViewModel: SettingsViewModel
 ){
     ScreenTemplate(
@@ -59,15 +62,21 @@ fun ProfileScreen(
                 .verticalScroll(scrollState)
         ) {
 
-            ProfileCardContainer(cardTitle = "User Profile") {
+            ProfileCardContainer(
+                cardTitle = stringResource(R.string.userProfile),
+                showEditIcon = true,
+                editAction = {
+                    navController.navigate(KickifyRoute.EditProfile(EditProfileSections.USER_INFO))
+                }
+            ) {
                 //val userImg
                 //if (userImg == null) {
-                    /*Image(
-                    bitmap = userBitmap.asImageBitmap(),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                    )*/
+                /*Image(
+                bitmap = userBitmap.asImageBitmap(),
+                contentDescription = "",
+                modifier = Modifier
+                    .clip(RoundedCornerShape(10.dp))
+                )*/
                 // } else { // otherwise use user profile icon
                 Icon(
                     imageVector = Icons.Outlined.AccountCircle,
@@ -81,8 +90,8 @@ fun ProfileScreen(
                     .padding(vertical = 4.dp).padding(start = 10.dp),
                     style = MaterialTheme.typography.titleMedium)
                 TextInformationRow("email@example.com")
-                TextInformationRow("Phone:", "+39 321 1234567")
-                TextInformationRow("Language:", "English")
+                TextInformationRow("${stringResource(R.string.phone)}:", "+39 321 1234567")
+                TextInformationRow("${stringResource(R.string.language)}:", "English")
             }
 
             ProfileActionRow(
@@ -97,27 +106,38 @@ fun ProfileScreen(
                 buttonText = stringResource(R.string.view)
             )
 
-            ProfileCardContainer(cardTitle = "Address") {
+            ProfileCardContainer(
+                cardTitle = stringResource(R.string.checkoutScreen_address),
+                showEditIcon = false,
+                editAction = { }
+            ) {
                 val addressList = listOf(
-                    listOf("Address 1", "Via Roma, 100", "Cesena", "Forlì-Cesena", "Emilia Romagna", "47521", "Italia"),
-                    listOf("Address 2", "Via della vittoria, 421", "Forlì", "Forlì-Cesena", "Emilia Romagna", "47121", "Italia")
+                    listOf("Address 1", "Via Roma", "100", "Cesena", "Forli-Cesena", "Emilia Romagna", "47521", "Italia"),
+                    listOf("Address 2", "Via della vittoria", "421", "Forlì", "Forlì-Cesena", "Emilia Romagna", "47121", "Italia")
                 )
                 for(addr in addressList){
                     AddressContainer(
                         addressDescription = addr[0],
                         address = addr[1],
-                        city = addr[2],
-                        province = addr[3],
-                        region = addr[4],
-                        postCode = addr[5],
-                        country = addr[6]
+                        number = addr[2],
+                        city = addr[3],
+                        province = addr[4],
+                        region = addr[5],
+                        postCode = addr[6],
+                        country = addr[7]
                     )
                 }
             }
 
             val payMethods = listOf("Paypal", "Maestro")
             val cardInfo = listOf(listOf("", "", "email@example.com"), listOf("1234", "01/29", ""))
-            ProfileCardContainer(cardTitle = stringResource(R.string.paymentMethod)) {
+            ProfileCardContainer(
+                cardTitle = stringResource(R.string.paymentMethod),
+                showEditIcon = false,
+                editAction = {
+                    navController.navigate(KickifyRoute.EditProfile(EditProfileSections.PAYMENT_METHOD))
+                }
+            ) {
                 for(i in payMethods.indices){
                     PaymentMethodRow(payMethods[i], cardInfo[i][0], cardInfo[i][1], cardInfo[i][2])
                 }
@@ -165,6 +185,7 @@ fun ProfileActionRow(
 fun AddressContainer(
     addressDescription: String,
     address: String,
+    number: String,
     city: String,
     province: String,
     region: String,
@@ -172,13 +193,25 @@ fun AddressContainer(
     country: String
 ){
     val txtModifier = Modifier.fillMaxWidth().padding(start = 10.dp).padding(vertical = 2.dp)
-    Column(modifier = txtModifier.padding(vertical = 8.dp)) {
-        Text(text = addressDescription, modifier = txtModifier,
-            style = MaterialTheme.typography.titleMedium
-        )
-        Text(text = "$address, $city, $postCode", textAlign = TextAlign.Start, modifier = txtModifier)
-        Text(text = "$province, $region", textAlign = TextAlign.Start, modifier = txtModifier)
-        Text(text = country, textAlign = TextAlign.Start, modifier = txtModifier)
+    Row(
+        modifier = txtModifier,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Column(modifier = Modifier.fillMaxWidth(fraction = 0.7f).padding(vertical = 8.dp)) {
+            Text(text = addressDescription, modifier = txtModifier,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(text = "$address, $number", textAlign = TextAlign.Start, modifier = txtModifier)
+            Text(text = "$city, $postCode, $province", textAlign = TextAlign.Start, modifier = txtModifier)
+            Text(text = "$region, $country", textAlign = TextAlign.Start, modifier = txtModifier)
+        }
+        IconButton(
+            onClick = {},
+            modifier = Modifier.padding(end = 8.dp)
+        ) {
+            Icon(Icons.Outlined.Edit, contentDescription = "Edit $addressDescription")
+        }
     }
 }
 
@@ -211,6 +244,8 @@ fun TextInformationRow(
 @Composable
 fun ProfileCardContainer(
     cardTitle: String,
+    showEditIcon: Boolean,
+    editAction: () -> Unit,
     columnCardContent: @Composable () -> Unit
 ){
     Card(
@@ -221,11 +256,26 @@ fun ProfileCardContainer(
                 .padding(horizontal = 8.dp)
                 .padding(vertical = 6.dp)
         ) {
-            Text(
-                text = cardTitle,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.fillMaxWidth().padding(10.dp)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(
+                    text = cardTitle,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.fillMaxWidth(fraction = 0.7f).padding(10.dp)
+                )
+                if(showEditIcon) {
+                    IconButton(
+                        onClick = editAction
+                    ) {
+                        Icon(Icons.Outlined.Edit,
+                            contentDescription = "Edit $cardTitle"
+                        )
+                    }
+                }
+            }
         }
         columnCardContent()
         Spacer(Modifier.height(8.dp))

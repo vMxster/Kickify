@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import it.unibo.kickify.camerax.CameraXutils
+import it.unibo.kickify.camerax.CameraXUtils
 import it.unibo.kickify.ui.screens.cart.CartScreen
 import it.unibo.kickify.ui.screens.checkout.CheckOutScreen
 import it.unibo.kickify.ui.screens.home.HomeScreen
@@ -23,6 +23,8 @@ import it.unibo.kickify.ui.screens.profile.ProfileScreen
 import it.unibo.kickify.ui.screens.profile.TakePhotoScreen
 import it.unibo.kickify.ui.screens.register.RegisterScreen
 import it.unibo.kickify.ui.screens.rewards.BadgeScreen
+import it.unibo.kickify.ui.screens.settings.EditProfileScreen
+import it.unibo.kickify.ui.screens.settings.EditProfileSections
 import it.unibo.kickify.ui.screens.settings.SettingsScreen
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.screens.wishlist.WishlistScreen
@@ -49,6 +51,7 @@ sealed interface KickifyRoute {
     @Serializable data class OrderDetails(val orderID: String) : KickifyRoute
     @Serializable data object TakeProfilePhoto : KickifyRoute
     @Serializable data object BadgesScreen : KickifyRoute
+    @Serializable data class EditProfile(val section: EditProfileSections): KickifyRoute
 }
 
 @Composable
@@ -57,7 +60,7 @@ fun KickifyNavGraph(
     activity: ComponentActivity,
     settingsViewModel: SettingsViewModel
 ) {
-    val cameraXutils =  koinInject<CameraXutils>()
+    val cameraXutils =  koinInject<CameraXUtils>()
 
     NavHost(
         navController = navController,
@@ -146,6 +149,11 @@ fun KickifyNavGraph(
 
         composable<KickifyRoute.BadgesScreen>{
             BadgeScreen(navController)
+        }
+
+        composable<KickifyRoute.EditProfile> { backStackEntry ->
+            val route = backStackEntry.toRoute<KickifyRoute.EditProfile>()
+            EditProfileScreen(navController, route.section, cameraXutils, settingsViewModel)
         }
     }
 }

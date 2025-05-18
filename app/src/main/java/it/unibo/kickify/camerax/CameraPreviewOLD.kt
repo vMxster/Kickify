@@ -56,7 +56,7 @@ import kotlinx.coroutines.launch
 import androidx.camera.core.Preview as CameraPreview
 
 @Composable
-fun TakePhotoCameraScreen(
+fun TakePhotoCameraScreenOLD(
     navController: NavController,
     cameraXutils: CameraXutils,
     settingsViewModel: SettingsViewModel
@@ -93,9 +93,10 @@ private fun CameraContainer(
 
     val coroutineScope = rememberCoroutineScope()
 
-    val cameraSelector = CameraSelector.Builder()
+    val cameraSelector = cameraXutils.cameraSelector
+    /*val cameraSelector = CameraSelector.Builder()
         .requireLensFacing(lensFacing)
-        .build()
+        .build()*/
 
     LaunchedEffect(Unit) {
         bindCamera(context, lifecycleOwner, preview, imageCapture, previewView, cameraSelector)

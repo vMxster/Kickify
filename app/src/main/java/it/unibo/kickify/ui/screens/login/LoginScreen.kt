@@ -39,17 +39,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.register.LoginRegisterMethodDividerRow
 import it.unibo.kickify.ui.theme.MediumGray
 import it.unibo.kickify.utils.LoginRegisterUtils
 
@@ -218,6 +223,8 @@ fun LoginScreen(navController: NavController) {
                 )
             }
             Spacer(modifier = Modifier.height(15.dp))
+
+            LoginRegisterMethodDividerRow()
             Button(
                 onClick = { /* google oauth */ },
                 modifier = Modifier
@@ -244,7 +251,14 @@ fun LoginScreen(navController: NavController) {
                     .padding(vertical = 20.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.signin_joinForFree),
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Normal)){
+                            append(stringResource(R.string.signin_newToKickify) + " ")
+                        }
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)){
+                            append(stringResource(R.string.signin_joinForFree))
+                        }
+                    },
                     color = MaterialTheme.colorScheme.inverseSurface
                 )
             }
