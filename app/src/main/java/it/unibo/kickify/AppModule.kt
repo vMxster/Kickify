@@ -15,9 +15,15 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import it.unibo.kickify.camerax.CameraXutils
 import it.unibo.kickify.data.database.KickifyDatabase
-import it.unibo.kickify.data.repositories.LocalRepository
-import it.unibo.kickify.data.repositories.RepositoryHandler
+import it.unibo.kickify.data.repositories.AppRepository
+import it.unibo.kickify.data.repositories.CartRepository
+import it.unibo.kickify.data.repositories.OrderRepository
+import it.unibo.kickify.data.repositories.ProductRepository
 import it.unibo.kickify.data.repositories.RemoteRepository
+import it.unibo.kickify.data.repositories.UserRepository
+import it.unibo.kickify.data.repositories.WishlistRepository
+import it.unibo.kickify.data.repositories.NotificationRepository
+import it.unibo.kickify.data.repositories.ReviewRepository
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 
@@ -33,8 +39,6 @@ val appModule = module {
             "kickify"
         ).fallbackToDestructiveMigration(false).build()
     }
-
-    single { get<KickifyDatabase>().tripsDAO() }
 
     single {
         HttpClient(OkHttp) {
@@ -56,10 +60,16 @@ val appModule = module {
         PushNotificationManager(androidContext())
     }
 
-    single { LocalRepository(dao = get(), contentResolver = androidContext().contentResolver) }
+    single { ProductRepository(productDao = get<KickifyDatabase>().productDao()) }
+    single { UserRepository(userDao = get<KickifyDatabase>().userDao()) }
+    single { CartRepository(cartDao = get<KickifyDatabase>().cartDao()) }
+    single { OrderRepository(orderDao = get<KickifyDatabase>().orderDao(), database = get()) }
+    single { WishlistRepository(wishlistDao = get<KickifyDatabase>().wishlistDao()) }
+    single { ReviewRepository(reviewDao = get<KickifyDatabase>().reviewDao()) }
+    single { NotificationRepository(notificationDao = get<KickifyDatabase>().notificationDao()) }
     single { SettingsRepository(dataStore = get()) }
     single { RemoteRepository(httpClient = get()) }
-    single { RepositoryHandler(get(), get()) }
+    single { AppRepository(get(), get(), get(), get(), get(), get(), get(), get()) }
 
     viewModel { SettingsViewModel(get()) }
 }

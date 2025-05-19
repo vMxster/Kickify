@@ -760,3 +760,64 @@ data class OrderProductDetails(
 
     val isDelivered: Boolean
 )
+
+data class ProductVariant(
+    val color: String,
+    val size: String,
+    val quantity: Int
+)
+
+data class ProductDetails(
+    val product: Product,
+    val variants: List<ProductVariant>,
+    val reviews: List<Review>,
+    val inWishlist: Boolean,
+    val inCart: Boolean,
+    val cartQuantity: Int
+)
+
+data class OrderTracking(
+    val orderId: Int,
+    val shippingType: String,
+    val orderDate: String,
+    val currentStatus: String,
+    val currentLocation: String,
+    val estimatedArrival: String,
+    val trackingStates: List<TrackingStateOrder>,
+    val products: List<TrackingProduct>
+)
+
+data class TrackingStateOrder(
+    val orderId: Int,
+    val status: String,
+    val location: String,
+    val timestamp: String,
+    val estimatedArrival: String,
+    val actualArrival: String?
+)
+
+data class TrackingProduct(
+    val orderId: Int,
+    val image: String,
+    val name: String,
+    val size: String,
+    val quantity: Int,
+    val color: String,
+    val price: Double,
+    val originalPrice: Double
+)
+
+data class OrderDetails(
+    val orderId: Int = 0,
+    val orderDate: String,
+    val totalCost: Double,
+    val paymentMethod: String,
+    val shippingType: String,
+    val isPresent: Boolean,
+    val nomeDestinatario: String = "",
+    val cognomeDestinatario: String = "",
+    val email: String,
+    val discountId: Int? = null,
+    val isDelivered: Boolean = false,
+    val products: List<OrderProduct> = emptyList()
+)
