@@ -13,7 +13,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
-import it.unibo.kickify.camerax.CameraXutils
+import it.unibo.kickify.camerax.CameraXUtils
 import it.unibo.kickify.data.database.KickifyDatabase
 import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.data.repositories.CartRepository
@@ -52,13 +52,9 @@ val appModule = module {
         }
     }
 
-    single {
-        CameraXutils(androidContext())
-    }
+    single { CameraXUtils(androidContext()) }
 
-    single {
-        PushNotificationManager(androidContext())
-    }
+    single { PushNotificationManager(androidContext()) }
 
     single { ProductRepository(productDao = get<KickifyDatabase>().productDao()) }
     single { UserRepository(userDao = get<KickifyDatabase>().userDao()) }

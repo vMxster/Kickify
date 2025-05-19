@@ -28,7 +28,8 @@
     <string name="signin_joinForFree">Join for Free</string>
     <string name="signup_title">Join The Crew!</string>
     <string name="signup_text">Create your account and step into the latest trends.</string>
-    <string name="signup_yourname">Your Username</string>
+    <string name="signup_yourname">Name</string>
+    <string name="signup_yourLastName">Last Name</string>
     <string name="signup_button">Sign Up</string>
     <string name="signup_alreadyPartOfCrew">Already Part Of The Crew?</string>
     <string name="forgotpsw_title">Reset Your Password In A Snap!</string>

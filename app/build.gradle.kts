@@ -85,7 +85,7 @@ dependencies {
 
     /* for biometric authentication */
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.biometric.v120alpha05)
+    implementation(libs.androidx.biometric)
 
     /* for camerax */
     implementation(libs.androidx.camera.core)

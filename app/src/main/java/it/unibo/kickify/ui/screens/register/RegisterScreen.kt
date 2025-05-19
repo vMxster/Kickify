@@ -75,9 +75,12 @@ fun RegisterScreen(
         val registerScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)
 
-        var username by rememberSaveable { mutableStateOf("") }
-        var usernameError by remember { mutableStateOf("") }
-        val usernameFocusRequester = remember { FocusRequester() }
+        var name by rememberSaveable { mutableStateOf("") }
+        var lastname by rememberSaveable { mutableStateOf("") }
+        var nameError by remember { mutableStateOf("") }
+        var lastnameError by remember { mutableStateOf("") }
+        val nameFocusRequester = remember { FocusRequester() }
+        val lastnameFocusRequester = remember { FocusRequester() }
 
         var email by rememberSaveable { mutableStateOf("") }
         var emailError by remember { mutableStateOf("") }
@@ -97,7 +100,7 @@ fun RegisterScreen(
         }
 
         LaunchedEffect(Unit){
-            usernameFocusRequester.requestFocus()
+            nameFocusRequester.requestFocus()
         }
 
         Column(
@@ -125,40 +128,97 @@ fun RegisterScreen(
             )
             Spacer(Modifier.height(16.dp))
 
-            Text(
-                text = stringResource(R.string.signup_yourname),
-                modifier = registerScreenModifier
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            OutlinedTextField(
-                value = username,
-                onValueChange = {
-                    username = it
-                    usernameError = ""
-                },
-                placeholder = { Text(stringResource(R.string.signup_yourname)) },
-                shape = RoundedCornerShape(16.dp),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = {
-                        if (LoginRegisterUtils.isValidUsername(username)) {
-                            emailFocusRequester.requestFocus()
-                        } else {
-                            usernameError = ctx.getString(R.string.invalidUsernameMessage)
-                        }
-                    }
-                ),
-                isError = usernameError != "",
-                supportingText = {
-                    if (usernameError != "") {
-                        Text(text = usernameError, color = MaterialTheme.colorScheme.error)
-                    }
-                },
-                modifier = registerScreenModifier.focusRequester(usernameFocusRequester)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ){
+                Column(
+                    modifier = Modifier.fillMaxWidth(fraction = 0.5f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ){
+                    Text(
+                        text = stringResource(R.string.signup_yourname),
+                        modifier = registerScreenModifier
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = {
+                            name = it
+                            nameError = ""
+                        },
+                        placeholder = { Text(stringResource(R.string.signup_yourname)) },
+                        shape = RoundedCornerShape(16.dp),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = {
+                                if (LoginRegisterUtils.isValidNameLastname(name)) {
+                                    lastnameFocusRequester.requestFocus()
+                                } else {
+                                    nameError = ctx.getString(R.string.invalidUsernameMessage)
+                                }
+                            }
+                        ),
+                        isError = nameError != "",
+                        supportingText = {
+                            if (nameError != "") {
+                                Text(text = nameError, color = MaterialTheme.colorScheme.error)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(start = 24.dp)
+                            .padding(end = 8.dp)
+                            .focusRequester(nameFocusRequester)
+                    )
+                }
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ){
+                    Text(
+                        text = stringResource(R.string.signup_yourLastName),
+                        modifier = registerScreenModifier
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = lastname,
+                        onValueChange = {
+                            lastname = it
+                            lastnameError = ""
+                        },
+                        placeholder = { Text(stringResource(R.string.signup_yourLastName)) },
+                        shape = RoundedCornerShape(16.dp),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = {
+                                if (LoginRegisterUtils.isValidNameLastname(lastname)) {
+                                    emailFocusRequester.requestFocus()
+                                } else {
+                                    lastnameError = ctx.getString(R.string.invalidUsernameMessage)
+                                }
+                            }
+                        ),
+                        isError = lastnameError != "",
+                        supportingText = {
+                            if (lastnameError != "") {
+                                Text(text = lastnameError, color = MaterialTheme.colorScheme.error)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(start = 8.dp)
+                            .padding(end = 24.dp).focusRequester(lastnameFocusRequester)
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
