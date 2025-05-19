@@ -289,14 +289,13 @@ class DatabaseHelper {
     }
 
     // Get product history
-    public function getProductHistory($productId, $lastAccess) {
+    public function getProductHistory($productId) {
         $query = "SELECT ps.* 
                   FROM PRODOTTO_STORICO ps 
-                  WHERE ps.ID_Prodotto = ? 
-                  AND ps.Data_Modifica > ?";
+                  WHERE ps.ID_Prodotto = ? ";
         
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param("is", $productId, $lastAccess);
+        $stmt->bind_param("i", $productId);
         $stmt->execute();
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }

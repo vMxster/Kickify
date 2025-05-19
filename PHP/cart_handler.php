@@ -14,6 +14,46 @@ try {
 
     if (isset($_POST['action'])) {
         switch ($_POST['action']) {
+            case 'getCart':
+                if (empty($email)) {
+                    throw new Exception('Email is required');
+                }
+                $cart = $dbh->getCartByEmail($email);
+                if ($cart) {
+                    $cartInfo = calculateCartInfo($dbh, $cart['ID_Carrello']);
+                    $response = [
+                        'success' => true,
+                        'cartId' => $cart['ID_Carrello'],
+                        'itemCount' => $cartInfo['itemCount'],
+                        'cartTotal' => $cartInfo['total']
+                    ];
+                } else {
+                    $response = [
+                        'success' => false,
+                        'message' => 'Cart not found'
+                    ];
+                }
+                break;
+
+            case 'getCartItems':
+                if (empty($email)) {
+                    throw new Exception('Email is required');
+                }
+                $cart = $dbh->getCartByEmail($email);
+                if ($cart) {
+                    $items = $dbh->getCartItems($cart['ID_Carrello']);
+                    $response = [
+                        'success' => true,
+                        'items' => $items
+                    ];
+                } else {
+                    $response = [
+                        'success' => false,
+                        'message' => 'Cart not found'
+                    ];
+                }
+                break;
+
             case 'getAvailableSizes':
                 if (!isset($_POST['productId']) || !isset($_POST['color'])) {
                     throw new Exception('Missing required parameters');

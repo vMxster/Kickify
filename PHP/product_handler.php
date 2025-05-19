@@ -207,7 +207,7 @@ try {
                 throw new Exception("Missing required fields");
             }
     
-            $history = $dbh->getProductHistory($_POST["productId"], $_POST["last_access"]);
+            $history = $dbh->getProductHistory($_POST["productId"]);
     
             $response = [
                 "success" => true,
