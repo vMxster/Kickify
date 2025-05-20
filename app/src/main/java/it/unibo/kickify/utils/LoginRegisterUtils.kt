@@ -8,8 +8,8 @@ class LoginRegisterUtils {
             return Patterns.EMAIL_ADDRESS.matcher(email).matches()
         }
 
-        fun isValidUsername(username: String):Boolean{
-            return !username.contains(" ") && username.length >= 8
+        fun isValidNameLastname(name: String):Boolean{
+            return name.length >= 3 && name.all{ it.isLetterOrDigit() || it.isWhitespace() }
         }
 
         /**

@@ -160,7 +160,7 @@ fun RegisterScreen(
                                 if (LoginRegisterUtils.isValidNameLastname(name)) {
                                     lastnameFocusRequester.requestFocus()
                                 } else {
-                                    nameError = ctx.getString(R.string.invalidUsernameMessage)
+                                    nameError = ctx.getString(R.string.invalidNameMessage)
                                 }
                             }
                         ),
@@ -203,7 +203,7 @@ fun RegisterScreen(
                                 if (LoginRegisterUtils.isValidNameLastname(lastname)) {
                                     emailFocusRequester.requestFocus()
                                 } else {
-                                    lastnameError = ctx.getString(R.string.invalidUsernameMessage)
+                                    lastnameError = ctx.getString(R.string.invalidLastnameMessage)
                                 }
                             }
                         ),
@@ -280,9 +280,8 @@ fun RegisterScreen(
                         if (LoginRegisterUtils.isValidPassword(password)) {
                             focusManager.clearFocus()
                             registerAction()
-
                         } else {
-                            pswError = ctx.getString(R.string.emptyPswMessage)
+                            pswError = ctx.getString(R.string.invalidPswMessage)
                         }
                     }
                 ),

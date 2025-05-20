@@ -15,10 +15,13 @@
     <string name="emailAddress">Email Address</string>
     <string name="password">Password</string>
     <string name="confirmPassword">Confirm password</string>
+    <string name="confirmPasswordNoMatch">Password and Confirm Password don\'t match</string>
     <string name="showHidePsw">Show/Hide Password</string>
     <string name="invalidEmailMessage">Type in a valid email address</string>
-    <string name="emptyPswMessage">The password must be at least 10 characters long</string>
-    <string name="invalidUsernameMessage">Choose a username at least 4 characters long without spaces</string>
+    <string name="invalidPswMessage">The password must be at least 10 characters long\n
+    and must contain at least \n1 lowercase character,\n1 uppercase character,\n1 digit and 1 symbol</string>
+    <string name="invalidNameMessage">Type in your name</string>
+    <string name="invalidLastnameMessage">Type in your last name</string>
     <string name="loginGoogle">Login in with Google</string>
     <string name="or">Or</string>
     <string name="signin_forgotPassword">Forgot Password?</string>

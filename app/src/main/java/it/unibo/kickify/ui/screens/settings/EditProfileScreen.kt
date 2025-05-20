@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,14 +45,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -63,6 +66,7 @@ import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.theme.BluePrimary
 import it.unibo.kickify.ui.theme.GhostWhite
 import it.unibo.kickify.ui.theme.LightGray
+import it.unibo.kickify.utils.LoginRegisterUtils
 import kotlinx.coroutines.launch
 
 enum class EditProfileSections {
@@ -115,6 +119,7 @@ fun ProfileImageWithChangeButton(
     cameraXUtils: CameraXUtils,
     settingsViewModel: SettingsViewModel
 ) {
+    val ctx = LocalContext.current
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -215,24 +220,126 @@ fun ProfileImageWithChangeButton(
         val profileScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)
 
+        var name by rememberSaveable { mutableStateOf("") }
+        var lastname by rememberSaveable { mutableStateOf("") }
+        var nameError by remember { mutableStateOf("") }
+        var lastnameError by remember { mutableStateOf("") }
+        val nameFocusRequester = remember { FocusRequester() }
+        val lastnameFocusRequester = remember { FocusRequester() }
+
         var email by rememberSaveable { mutableStateOf("") }
         var emailError by remember { mutableStateOf("") }
+        val emailFocusRequester = remember { FocusRequester() }
 
         var password by rememberSaveable { mutableStateOf("") }
         var passwordVisibility by remember { mutableStateOf(false) }
         var pswError by remember { mutableStateOf("") }
+        val passwordFocusRequester = remember { FocusRequester() }
 
         var confirmPassword by rememberSaveable { mutableStateOf("") }
         var confirmPasswordVisibility by remember { mutableStateOf(false) }
         var confirmPswError by remember { mutableStateOf("") }
 
-        Text(
+        val focusManager = LocalFocusManager.current
+
+        /*Text(
             modifier = profileScreenModifier
                 .padding(top = 4.dp),
             text = "Mario Rossi",
             textAlign = TextAlign.Center,
             fontSize = 22.sp
-        )
+        )*/
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ){
+            Column(
+                modifier = Modifier.fillMaxWidth(fraction = 0.5f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ){
+                Text(
+                    text = stringResource(R.string.signup_yourname),
+                    modifier = profileScreenModifier
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = {
+                        name = it
+                        nameError = ""
+                    },
+                    placeholder = { Text(stringResource(R.string.signup_yourname)) },
+                    shape = RoundedCornerShape(16.dp),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {
+                            if (LoginRegisterUtils.isValidNameLastname(name)) {
+                                lastnameFocusRequester.requestFocus()
+                            } else {
+                                nameError = ctx.getString(R.string.invalidNameMessage)
+                            }
+                        }
+                    ),
+                    isError = nameError != "",
+                    supportingText = {
+                        if (nameError != "") {
+                            Text(text = nameError, color = MaterialTheme.colorScheme.error)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(start = 24.dp)
+                        .padding(end = 8.dp)
+                        .focusRequester(nameFocusRequester)
+                )
+            }
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ){
+                Text(
+                    text = stringResource(R.string.signup_yourLastName),
+                    modifier = profileScreenModifier
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = lastname,
+                    onValueChange = {
+                        lastname = it
+                        lastnameError = ""
+                    },
+                    placeholder = { Text(stringResource(R.string.signup_yourLastName)) },
+                    shape = RoundedCornerShape(16.dp),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {
+                            if (LoginRegisterUtils.isValidNameLastname(lastname)) {
+                                emailFocusRequester.requestFocus()
+                            } else {
+                                lastnameError = ctx.getString(R.string.invalidLastnameMessage)
+                            }
+                        }
+                    ),
+                    isError = lastnameError != "",
+                    supportingText = {
+                        if (lastnameError != "") {
+                            Text(text = lastnameError, color = MaterialTheme.colorScheme.error)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(start = 8.dp)
+                        .padding(end = 24.dp).focusRequester(lastnameFocusRequester)
+                )
+            }
+        }
         Spacer(modifier = Modifier.height(15.dp))
 
         Text(
@@ -253,7 +360,13 @@ fun ProfileImageWithChangeButton(
                 imeAction = ImeAction.Next
             ),
             keyboardActions = KeyboardActions(
-                onNext = { }
+                onNext = {
+                    if (LoginRegisterUtils.isValidEmail(email)) {
+                        passwordFocusRequester.requestFocus()
+                    } else {
+                        emailError = ctx.getString(R.string.invalidEmailMessage)
+                    }
+                }
             ),
             isError = emailError != "",
             supportingText = {
@@ -261,7 +374,7 @@ fun ProfileImageWithChangeButton(
                     Text(text = emailError, color = MaterialTheme.colorScheme.error)
                 }
             },
-            modifier = profileScreenModifier
+            modifier = profileScreenModifier.focusRequester(emailFocusRequester)
         )
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -284,7 +397,13 @@ fun ProfileImageWithChangeButton(
                 imeAction = ImeAction.Next
             ),
             keyboardActions = KeyboardActions(
-                onDone = { }
+                onNext = {
+                    if (LoginRegisterUtils.isValidPassword(password)) {
+                        focusManager.clearFocus()
+                    } else {
+                        pswError = ctx.getString(R.string.invalidPswMessage)
+                    }
+                }
             ),
             isError = pswError != "",
             supportingText = {
@@ -301,7 +420,7 @@ fun ProfileImageWithChangeButton(
                         contentDescription = stringResource(R.string.showHidePsw))
                 }
             },
-            modifier = profileScreenModifier
+            modifier = profileScreenModifier.focusRequester(passwordFocusRequester)
         )
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -321,10 +440,16 @@ fun ProfileImageWithChangeButton(
             visualTransformation = if (confirmPasswordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Next
+                imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(
-                onDone = { }
+                onDone = {
+                    if(password != confirmPassword){
+                        confirmPswError = ctx.getString(R.string.confirmPasswordNoMatch)
+                    } else {
+                        // update Profile
+                    }
+                }
             ),
             isError = confirmPswError != "",
             supportingText = {
