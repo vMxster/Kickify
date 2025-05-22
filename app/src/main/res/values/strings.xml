@@ -37,7 +37,6 @@
     <string name="signup_alreadyPartOfCrew">Already Part Of The Crew?</string>
     <string name="forgotpsw_title">Reset Your Password In A Snap!</string>
     <string name="forgotpsw_text">Enter your email - we\'ll send a secure link to get you back on track.</string>
-    <string name="forgotpsw_templateEmail">email@example.com</string>
     <string name="otpScreen_text">Type in the OTP Code we sent you.</string>
     <string name="otpScreen_otp">OTP</string>
     <string name="continue_button">Continue</string>
@@ -63,10 +62,11 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_system">System</string>
-    <string name="language">Language</string>
-    <string name="lang_en">English</string>
-    <string name="lang_it">Italiano</string>
-    <string name="lang_es">Español</string>
+    <string name="language">App Language</string>
+    <string name="lang_en" translatable="false">English</string>
+    <string name="lang_it" translatable="false">Italiano</string>
+    <string name="lang_es" translatable="false">Español</string>
+    <string name="lang_la" translatable="false">Latinum</string>
     <string name="shopCategory_men">Men</string>
     <string name="shopCategory_women">Women</string>
     <string name="shopCategory_kids">Kids</string>
@@ -129,7 +129,6 @@
     <string name="myordersScreen_title">My Orders</string>
     <string name="myordersScreen_ongoingOrders">Ongoing Orders</string>
     <string name="order">Order</string>
-    <string name="myordersScreen_trackOrder">Track order</string>
     <string name="myordersScreen_total">Total</string>
     <string name="myordersScreen_paidWith">Paid with</string>
     <string name="myordersScreen_completedOrders">Completed Orders</string>

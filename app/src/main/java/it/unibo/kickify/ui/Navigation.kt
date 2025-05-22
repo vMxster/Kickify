@@ -58,13 +58,14 @@ sealed interface KickifyRoute {
 fun KickifyNavGraph(
     navController: NavHostController,
     activity: ComponentActivity,
-    settingsViewModel: SettingsViewModel
+    settingsViewModel: SettingsViewModel,
+    startDestination: Any
 ) {
-    val cameraXutils =  koinInject<CameraXUtils>()
+    val cameraXUtils =  koinInject<CameraXUtils>()
 
     NavHost(
         navController = navController,
-        startDestination = KickifyRoute.Onboard
+        startDestination = startDestination
     ) {
         composable<KickifyRoute.Home> {
             HomeScreen(navController)
@@ -119,7 +120,7 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.Profile> {
-            ProfileScreen(navController, cameraXutils, settingsViewModel)
+            ProfileScreen(navController, cameraXUtils, settingsViewModel)
         }
 
         composable<KickifyRoute.Register> {
@@ -144,7 +145,7 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.TakeProfilePhoto> {
-            TakePhotoScreen(navController, activity, cameraXutils, settingsViewModel)
+            TakePhotoScreen(navController, activity, cameraXUtils, settingsViewModel)
         }
 
         composable<KickifyRoute.BadgesScreen>{
@@ -153,7 +154,7 @@ fun KickifyNavGraph(
 
         composable<KickifyRoute.EditProfile> { backStackEntry ->
             val route = backStackEntry.toRoute<KickifyRoute.EditProfile>()
-            EditProfileScreen(navController, route.section, cameraXutils, settingsViewModel)
+            EditProfileScreen(navController, route.section, cameraXUtils, settingsViewModel)
         }
     }
 }

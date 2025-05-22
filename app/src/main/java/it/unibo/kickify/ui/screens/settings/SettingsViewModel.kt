@@ -64,6 +64,12 @@ class SettingsViewModel(
         initialValue = false
     )
 
+    val appLanguage = repository.appLanguage.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = ""
+    )
+
 
     fun setUserId(value: String) = viewModelScope.launch {
         repository.setUserID(value)
@@ -97,13 +103,23 @@ class SettingsViewModel(
         repository.setPushNotificationEnabled(value)
     }
 
+    fun setAppLanguage(appLanguageId: String) = viewModelScope.launch {
+        repository.setAppLanguage(appLanguageId)
+    }
+
+
     fun isStrongAuthenticationAvailable(context: Context): Boolean {
         val biometricManager = BiometricManager.from(context)
         return when (biometricManager.canAuthenticate(
-            BIOMETRIC_STRONG or DEVICE_CREDENTIAL
-        )) {
+            BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
+        ) {
             BiometricManager.BIOMETRIC_SUCCESS -> true // faceid or fingerprint auth available
+            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> true // available but not configured
             else -> false // no faceid nor fingerprint available
         }
+    }
+
+    fun isUserLoggedIn(): Boolean{
+        return this.userId.value != "" && this.userName.value != ""
     }
 }

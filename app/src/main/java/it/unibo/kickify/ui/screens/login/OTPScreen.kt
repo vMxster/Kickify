@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -90,13 +91,14 @@ fun OTPScreen(
                     OutlinedTextField(
                         value = value,
                         onValueChange = {
-                            if (it.length <= 1) {
+                            if(it.length <= 1){
                                 otpValues[index] = it
-                                if (it.isNotEmpty() && index < 5) {
+                                if(it.isNotEmpty() && index <= 5){
                                     focusManager.moveFocus(FocusDirection.Next)
                                 }
                             }
                         },
+                        shape = RoundedCornerShape(16.dp),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text,
                             imeAction = if (index == 5) ImeAction.Done else ImeAction.Next

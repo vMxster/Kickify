@@ -22,6 +22,7 @@ class SettingsRepository(
         private val LAST_ACCESS_KEY = stringPreferencesKey("last_access")
         private val ENABLED_LOCATION = booleanPreferencesKey("enabled_location")
         private val ENABLED_PUSH_NOTIFICATION = booleanPreferencesKey("enabled_pushNotification")
+        private val APP_LANG = stringPreferencesKey("app_lang")
     }
 
     // get userid
@@ -96,4 +97,10 @@ class SettingsRepository(
     suspend fun setPushNotificationEnabled(enabled: Boolean) = dataStore.edit {
         it[ENABLED_PUSH_NOTIFICATION] = enabled
     }
+
+    // get app language
+    val appLanguage = dataStore.data.map { it[APP_LANG] ?: "en" }
+
+    // set app language id
+    suspend fun setAppLanguage(appLanguageId: String) = dataStore.edit { it[APP_LANG] = appLanguageId }
 }
