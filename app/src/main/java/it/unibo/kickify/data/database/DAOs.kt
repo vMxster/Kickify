@@ -369,20 +369,20 @@ interface OrderDao {
     @Query("""
         SELECT 
             o.ID_Ordine,
-            o.Tipo_Spedizione as shipping_type,
-            o.Data_Ordine as order_date,
-            ts.Posizione as location,
-            ts.Stato as status,
-            ts.Arrivo_Effettivo as actual_arrival,
-            ts.Arrivo_Stimato as estimated_arrival,
-            ts.Timestamp_Aggiornamento as timestamp,
-            p.ID_Prodotto as product_id,
-            p.Nome as name,
-            p.Prezzo as price,
-            po.Prezzo_Acquisto as original_price,
-            po.Colore as color,
-            po.Taglia as size,
-            po.Quantita as quantity
+            o.Tipo_Spedizione, 
+            o.Data_Ordine, 
+            ts.Posizione, 
+            ts.Stato, 
+            ts.Arrivo_Effettivo, 
+            ts.Arrivo_Stimato, 
+            ts.Timestamp_Aggiornamento, 
+            p.ID_Prodotto, 
+            p.Nome, 
+            p.Prezzo, 
+            po.Prezzo_Acquisto, 
+            po.Colore, 
+            po.Taglia, 
+            po.Quantita 
         FROM ORDINE o
         LEFT JOIN Tracking_Spedizione ts ON o.ID_Ordine = ts.ID_Ordine
         JOIN PRODOTTO_ORDINE po ON o.ID_Ordine = po.ID_Ordine

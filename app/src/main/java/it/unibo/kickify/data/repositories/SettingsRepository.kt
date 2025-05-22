@@ -19,7 +19,7 @@ class SettingsRepository(
         private val USER_IMG = stringPreferencesKey("userImgFilename")
         private val THEME = stringPreferencesKey("theme")
         private val BIOMETRIC_LOGIN = booleanPreferencesKey("biometric_login")
-        private val LAST_ACCESS_KEY = longPreferencesKey("last_access")
+        private val LAST_ACCESS_KEY = stringPreferencesKey("last_access")
         private val ENABLED_LOCATION = booleanPreferencesKey("enabled_location")
         private val ENABLED_PUSH_NOTIFICATION = booleanPreferencesKey("enabled_pushNotification")
     }
@@ -68,12 +68,12 @@ class SettingsRepository(
     }
 
     // get last access
-    val lastAccess: Flow<Long> = dataStore.data.map { preferences ->
-        preferences[LAST_ACCESS_KEY] ?: 0L
+    val lastAccess: Flow<String> = dataStore.data.map { preferences ->
+        preferences[LAST_ACCESS_KEY] ?: "0"
     }
 
     // set last access
-    suspend fun setLastAccess(timestamp: Long) = dataStore.edit { preferences ->
+    suspend fun setLastAccess(timestamp: String) = dataStore.edit { preferences ->
         preferences[LAST_ACCESS_KEY] = timestamp
     }
 

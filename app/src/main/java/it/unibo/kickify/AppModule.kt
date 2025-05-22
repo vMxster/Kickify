@@ -16,14 +16,14 @@ import io.ktor.serialization.kotlinx.json.json
 import it.unibo.kickify.camerax.CameraXUtils
 import it.unibo.kickify.data.database.KickifyDatabase
 import it.unibo.kickify.data.repositories.AppRepository
-import it.unibo.kickify.data.repositories.CartRepository
-import it.unibo.kickify.data.repositories.OrderRepository
-import it.unibo.kickify.data.repositories.ProductRepository
+import it.unibo.kickify.data.repositories.local.CartRepository
+import it.unibo.kickify.data.repositories.local.OrderRepository
+import it.unibo.kickify.data.repositories.local.ProductRepository
 import it.unibo.kickify.data.repositories.RemoteRepository
-import it.unibo.kickify.data.repositories.UserRepository
-import it.unibo.kickify.data.repositories.WishlistRepository
-import it.unibo.kickify.data.repositories.NotificationRepository
-import it.unibo.kickify.data.repositories.ReviewRepository
+import it.unibo.kickify.data.repositories.local.UserRepository
+import it.unibo.kickify.data.repositories.local.WishlistRepository
+import it.unibo.kickify.data.repositories.local.NotificationRepository
+import it.unibo.kickify.data.repositories.local.ReviewRepository
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 

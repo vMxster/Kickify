@@ -181,7 +181,10 @@ try {
             break;
 
         case "getProducts":
-            $products = $dbh->getProducts();
+            if (!isset($_POST["last_access"])) {
+                throw new Exception("Missing required fields");
+            }
+            $products = $dbh->getProducts($_POST["last_access"]);
             $response = [
                 "success" => true,
                 "products" => $products
@@ -207,7 +210,7 @@ try {
                 throw new Exception("Missing required fields");
             }
     
-            $history = $dbh->getProductHistory($_POST["productId"]);
+            $history = $dbh->getProductHistory($_POST["productId"], $_POST["last_access"]);
     
             $response = [
                 "success" => true,

@@ -20,9 +20,12 @@ class RemoteRepository(
     private val baseUrl = "https://kickify.altervista.org"
 
     // PRODOTTI
-    suspend fun getProducts(): Result<List<Product>> = withContext(Dispatchers.IO) {
+    suspend fun getProducts(lastAccess: String): Result<List<Product>> = withContext(Dispatchers.IO) {
         try {
-            val params = mapOf("action" to "getProducts")
+            val params = mapOf(
+                "action" to "getProducts",
+                "last_access" to lastAccess
+            )
             val response = makeRequest("product_handler.php", params)
             val jsonArray = JSONArray(response)
             val products = RemoteResponseParser.parseProducts(jsonArray)
@@ -33,11 +36,30 @@ class RemoteRepository(
         }
     }
 
-    suspend fun getProductById(productId: Int): Result<ProductDetails> = withContext(Dispatchers.IO) {
+    suspend fun getProductData(productId: Int, userEmail: String?, lastAccess: String): Result<ProductDetails> = withContext(Dispatchers.IO) {
         try {
             val params = mapOf(
                 "action" to "getProductData",
-                "productId" to productId.toString()
+                "productId" to productId.toString(),
+                "user_email" to (userEmail ?: ""),
+                "last_access" to lastAccess
+            )
+            val response = makeRequest("product_handler.php", params)
+            val jsonObject = JSONObject(response)
+            val product = RemoteResponseParser.parseProductDetails(jsonObject)
+            Result.success(product)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante il recupero dei dati del prodotto $productId", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getProductById(productId: Int, lastAccess: String): Result<ProductDetails> = withContext(Dispatchers.IO) {
+        try {
+            val params = mapOf(
+                "action" to "getProductData",
+                "productId" to productId.toString(),
+                "last_access" to lastAccess
             )
             val response = makeRequest("product_handler.php", params)
             val jsonObject = JSONObject(response)
@@ -49,9 +71,13 @@ class RemoteRepository(
         }
     }
 
-    suspend fun getProductHistory(productId: Int): Result<List<HistoryProduct>> = withContext(Dispatchers.IO) {
+    suspend fun getProductHistory(productId: Int, lastAccess: String): Result<List<HistoryProduct>> = withContext(Dispatchers.IO) {
         try {
-            val params = mapOf("action" to "getProductHistory", "productId" to productId.toString())
+            val params = mapOf(
+                "action" to "getProductHistory",
+                "productId" to productId.toString(),
+                "last_access" to lastAccess
+            )
             val response = makeRequest("product_handler.php", params)
             val jsonArray = JSONArray(response)
             val history = RemoteResponseParser.parseProductHistory(jsonArray)
@@ -76,9 +102,13 @@ class RemoteRepository(
         }
     }
 
-    suspend fun getCartItems(email: String): Result<List<CartProduct>> = withContext(Dispatchers.IO) {
+    suspend fun getCartItems(email: String, lastAccess: String): Result<List<CartProduct>> = withContext(Dispatchers.IO) {
         try {
-            val params = mapOf("action" to "getCartItems", "user_email" to email)
+            val params = mapOf(
+                "action" to "getCartItems",
+                "user_email" to email,
+                "last_access" to lastAccess
+            )
             val response = makeRequest("cart_handler.php", params)
             val jsonArray = JSONArray(response)
             val items = RemoteResponseParser.parseCartItems(jsonArray)
@@ -97,7 +127,8 @@ class RemoteRepository(
                     "email" to email,
                     "productId" to productId.toString(),
                     "color" to color,
-                    "size" to size.toString()
+                    "size" to size.toString(),
+                    "quantity" to quantity.toString()
                 )
                 val response = makeRequest("product_handler.php", params)
                 val jsonObject = JSONObject(response)
@@ -197,11 +228,12 @@ class RemoteRepository(
     }
 
     // NOTIFICHE
-    suspend fun getNotifications(email: String): Result<List<Notification>> = withContext(Dispatchers.IO) {
+    suspend fun getNotifications(email: String, lastAccess: String): Result<List<Notification>> = withContext(Dispatchers.IO) {
         try {
             val params = mapOf(
                 "action" to "getUserNotifications",
-                "email" to email
+                "email" to email,
+                "last_access" to lastAccess
             )
             val response = makeRequest("notification_handler.php", params)
             val jsonArray = JSONArray(response)
@@ -252,11 +284,12 @@ class RemoteRepository(
     }
 
     // ORDINI
-    suspend fun getOrders(email: String): Result<List<OrderDetails>> = withContext(Dispatchers.IO) {
+    suspend fun getOrders(email: String, lastAccess: String): Result<List<OrderDetails>> = withContext(Dispatchers.IO) {
         try {
             val params = mapOf(
                 "action" to "getOrders",
-                "email" to email
+                "email" to email,
+                "last_access" to lastAccess
             )
             val response = makeRequest("order_handler.php", params)
             val jsonArray = JSONArray(response)

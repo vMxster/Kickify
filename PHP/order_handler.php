@@ -34,8 +34,12 @@ try {
                 break;
                 
             case "getOrders":
+                if (!isset($_POST["email"]) || !isset($_POST["last_access"])) {
+                    throw new Exception("Email non specificata");
+                }
                 $email = $_POST["email"];
-                $orders = $dbh->getOrders($email);
+                $lastAccess = $_POST["last_access"];
+                $orders = $dbh->getOrders($email, $lastAccess);
                 $response = [
                     "success" => true,
                     "orders" => $orders

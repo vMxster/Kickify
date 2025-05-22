@@ -665,7 +665,11 @@ data class CartQuantity(val quantity: Int)
 
 data class ReviewWithUser(
     @Embedded val review: Review,
+
+    @ColumnInfo(name = "Nome")
     val name: String,
+
+    @ColumnInfo(name = "Cognome")
     val surname: String
 )
 
@@ -711,19 +715,49 @@ data class OrderProductDetail(
 )
 
 data class OrderTrackingRowData(
+    @ColumnInfo(name = "ID_Ordine")
+    val orderId: Int,
+
+    @ColumnInfo(name = "Tipo_Spedizione")
     val shippingType: String,
+
+    @ColumnInfo(name = "Data_Ordine")
     val orderDate: String,
+
+    @ColumnInfo(name = "Posizione")
     val location: String?,
+
+    @ColumnInfo(name = "Stato")
     val status: String?,
+
+    @ColumnInfo(name = "Arrivo_Effettivo")
     val actualArrival: String?,
+
+    @ColumnInfo(name = "Arrivo_Stimato")
     val estimatedArrival: String?,
+
+    @ColumnInfo(name = "Timestamp_Aggiornamento")
     val timestamp: String?,
+
+    @ColumnInfo(name = "ID_Prodotto")
     val productId: Int,
+
+    @ColumnInfo(name = "Nome")
     val name: String,
+
+    @ColumnInfo(name = "Prezzo")
     val price: Double,
+
+    @ColumnInfo(name = "Prezzo_Acquisto")
     val originalPrice: Double,
+
+    @ColumnInfo(name = "Colore")
     val color: String,
+
+    @ColumnInfo(name = "Taglia")
     val size: Double,
+
+    @ColumnInfo(name = "Quantita")
     val quantity: Int
 )
 
@@ -736,28 +770,58 @@ data class NotificationWithMessage(
 data class ReviewWithUserInfo(
     @Embedded
     val review: Review,
+
+    @ColumnInfo(name = "Nome")
     val name: String,
+
+    @ColumnInfo(name = "Cognome")
     val surname: String
 )
 
 data class OrderProductDetails(
+    @ColumnInfo(name = "ID_Ordine")
     val orderId: Int,
+
+    @ColumnInfo(name = "Data_Ordine")
     val orderDate: String,
+
+    @ColumnInfo(name = "Costo_Totale")
     val totalCost: Double,
+
+    @ColumnInfo(name = "Metodo_Pagamento")
     val paymentMethod: String,
+
+    @ColumnInfo(name = "Regalo")
     val isPresent: Boolean,
+
+    @ColumnInfo(name = "Tipo")
     val type: String,
+
+    @ColumnInfo(name = "ID_Sconto")
     val discountId: Int?,
 
+    @ColumnInfo(name = "ID_Prodotto")
     val productId: Int,
+
+    @ColumnInfo(name = "Nome")
     val name: String,
+
+    @ColumnInfo(name = "Genere")
     val genre: String,
 
+    @ColumnInfo(name = "Prezzo_Acquisto")
     val price: Double,
+
+    @ColumnInfo(name = "Quantita")
     val quantity: Int,
+
+    @ColumnInfo(name = "Taglia")
     val size: Double,
+
+    @ColumnInfo(name = "Colore")
     val color: String,
 
+    @ColumnInfo(name = "delivered_flag")
     val isDelivered: Boolean
 )
 

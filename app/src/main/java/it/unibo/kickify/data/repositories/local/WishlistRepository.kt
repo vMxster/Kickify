@@ -1,4 +1,4 @@
-package it.unibo.kickify.data.repositories
+package it.unibo.kickify.data.repositories.local
 
 import it.unibo.kickify.data.database.*
 

@@ -37,12 +37,14 @@ class DatabaseHelper {
     }
     
     // Get all products
-    public function getProducts() {
+    public function getProducts($lastAccess) {
         $query = "SELECT p.*, i.* 
                   FROM PRODOTTO p, IMMAGINE i 
                   WHERE p.ID_Prodotto = i.ID_Prodotto 
+                  AND p.Data_Aggiunta > ? 
                   ORDER BY p.Data_Aggiunta DESC";
         $stmt = $this->db->prepare($query);
+        $stmt->bind_param("s", $lastAccess);
         $stmt->execute();
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
@@ -289,13 +291,14 @@ class DatabaseHelper {
     }
 
     // Get product history
-    public function getProductHistory($productId) {
+    public function getProductHistory($productId, $lastAccess) {
         $query = "SELECT ps.* 
                   FROM PRODOTTO_STORICO ps 
-                  WHERE ps.ID_Prodotto = ? ";
+                  WHERE ps.ID_Prodotto = ? 
+                  AND ps.Data_Modifica > ?";
         
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param("i", $productId);
+        $stmt->bind_param("is", $productId, $lastAccess);
         $stmt->execute();
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
@@ -684,7 +687,7 @@ class DatabaseHelper {
     }
 
     // Get user notifications
-    public function getUserNotifications($email) {
+    public function getUserNotifications($email, $lastAccess) {
         $query = "SELECT DISTINCT n.*, 
                   CASE 
                     WHEN n.TipoNotifica = 'Admin Message' THEN m.Corpo 
@@ -693,11 +696,11 @@ class DatabaseHelper {
                   FROM NOTIFICA n 
                   LEFT JOIN MESSAGGIO m ON n.Timestamp_Invio = m.Timestamp_Invio 
                     AND n.TipoNotifica = 'Admin Message'
-                  WHERE n.Email = ? 
+                  WHERE n.Email = ? AND n.Timestamp_Invio > ?
                   ORDER BY n.Timestamp_Invio DESC";
         
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param('s', $email);
+        $stmt->bind_param('ss', $email, $lastAccess);
         $stmt->execute();
         $result = $stmt->get_result();
         
@@ -1025,8 +1028,7 @@ class DatabaseHelper {
     public function getWishlistItems($email) {
         $query = "SELECT p.* FROM PRODOTTO p
                   JOIN aggiungere a ON p.ID_Prodotto = a.ID_Prodotto
-                  WHERE a.Email = ?
-                  ORDER BY p.Nome";
+                  WHERE a.Email = ? ORDER BY p.Nome";
         $stmt = $this->db->prepare($query);
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -1297,14 +1299,14 @@ class DatabaseHelper {
     }
 
     // Get all items in cart
-    public function getCartItems($cartId) {
+    public function getCartItems($cartId, $lastAccess) {
         $query = "SELECT c.*, p.Prezzo, p.Nome, p.Genere, car.Valore_Totale 
                   FROM comprendere c 
                   JOIN PRODOTTO p ON c.ID_Prodotto = p.ID_Prodotto 
                   JOIN Carrello car ON c.ID_Carrello = car.ID_Carrello 
-                  WHERE c.ID_Carrello = ?";
+                  WHERE c.ID_Carrello = ? AND car.Data_Modifica > ?";
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param("i", $cartId);
+        $stmt->bind_param("is", $cartId, $lastAccess);
         $stmt->execute();
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
@@ -1445,7 +1447,7 @@ class DatabaseHelper {
      *********************/
     
     // Get all orders for a user
-    public function getOrders($email) {
+    public function getOrders($email, $lastAccess) {
         // Utilizziamo una subquery in SELECT per verificare la consegna
         // (restituirà 1 se esiste almeno un tracking "Delivered" con data non NULL, altrimenti 0)
         $query = "SELECT 
@@ -1480,12 +1482,12 @@ class DatabaseHelper {
                       ON o.ID_Ordine = po.ID_Ordine
                 JOIN PRODOTTO p 
                       ON po.ID_Prodotto = p.ID_Prodotto
-                WHERE o.Email = ?
+                WHERE o.Email = ? AND o.Data_Ordine > ?
                 -- Esempio: ordina per Data_Ordine (decrescente) e poi per ID_Prodotto
                 ORDER BY o.Data_Ordine DESC, p.ID_Prodotto ASC";
     
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param("s", $email);
+        $stmt->bind_param("ss", $email, $lastAccess);
         $stmt->execute();
         $result = $stmt->get_result();
     

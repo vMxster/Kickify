@@ -13,6 +13,9 @@ try {
     if (isset($_POST["action"])) {
         switch ($_POST["action"]) {
             case "getOrderTracking":
+                if (!isset($_POST["orderId"])) {
+                    throw new Exception("ID ordine non specificato");
+                }
                 $orderId = $_POST["orderId"];
                 $trackingInfo = $dbh->getOrderTracking($orderId);
                 
