@@ -86,7 +86,7 @@ fun OrderCardContainer(
                     navController.navigate(KickifyRoute.OrderDetails(orderID))
                 }
             ) {
-                Text(text = stringResource(R.string.myordersScreen_trackOrder))
+                Text(text = stringResource(R.string.trackOrder))
             }
         }
     }

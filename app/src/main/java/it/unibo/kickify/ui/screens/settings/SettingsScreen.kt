@@ -2,10 +2,17 @@ package it.unibo.kickify.ui.screens.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
@@ -13,12 +20,20 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.PushNotificationManager
 import it.unibo.kickify.R
+import it.unibo.kickify.data.models.Language
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ScreenTemplate
@@ -49,6 +65,7 @@ fun SettingsScreen(
     val biometricLoginState by settingsViewModel.biometricLogin.collectAsStateWithLifecycle()
     val pushNotificationState by settingsViewModel.enabledPushNotification.collectAsStateWithLifecycle()
     val pushNotificationManager = koinInject<PushNotificationManager>()
+    val languageState by settingsViewModel.appLanguage.collectAsStateWithLifecycle()
 
     ScreenTemplate(
         screenTitle = stringResource(R.string.settings_title),
@@ -61,7 +78,8 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
@@ -150,13 +168,72 @@ fun SettingsScreen(
                     settingsViewModel.setEnabledPushNotification(it)
                 }
             )
-
             ThemeChooserRow(
                 selectedTheme = themeState,
                 onThemeSelected = {
                     settingsViewModel.setTheme(it)
                 }
             )
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(vertical = 13.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(stringResource(R.string.language))
+                LanguageSelector(
+                    languageCodeState = languageState,
+                    onSelectedLanguageChange = {
+                        settingsViewModel.setAppLanguage(
+                            Language.getCodeFromLanguageString(it)
+                        )
+                    }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LanguageSelector(
+    languageCodeState: String,
+    onSelectedLanguageChange: (String) -> Unit
+) {
+    val options = Language.getLanguagesStringList()
+    var expanded by remember { mutableStateOf(false) }
+    val textFieldState = rememberTextFieldState(Language.getLanguageStringFromCode(languageCodeState))
+
+    LaunchedEffect(languageCodeState) {
+        textFieldState.setTextAndPlaceCursorAtEnd(
+            Language.getLanguageStringFromCode(languageCodeState))
+    }
+
+    ExposedDropdownMenuBox(
+        modifier = Modifier.fillMaxWidth(fraction = 0.7f),
+        expanded = expanded,
+        onExpandedChange = { expanded = it }
+    ) {
+        TextField(
+            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+            state = textFieldState,
+            readOnly = true,
+            lineLimits = TextFieldLineLimits.SingleLine,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+        )
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option, style = MaterialTheme.typography.bodyLarge) },
+                    onClick = {
+                        textFieldState.setTextAndPlaceCursorAtEnd(option)
+                        expanded = false
+                        onSelectedLanguageChange(option)
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                )
+            }
         }
     }
 }
