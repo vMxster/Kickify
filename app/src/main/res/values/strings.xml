@@ -175,4 +175,7 @@
     <string name="retry">Retry</string>
     <string name="savePhoto">Save Photo</string>
     <string name="saveChanges">Save Changes</string>
+    <string name="biometricAuthTitle">Unlock Kickify</string>
+    <string name="biometricAuthSubtitle">Use fingerprint or face to unlock</string>
+    <string name="biometricAuthDescription">Otherwise you can use your device credentials</string>
 </resources>

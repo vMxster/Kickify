@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -54,7 +55,7 @@ fun BottomBar(
                     }
                 }
             },
-            label = { Text(stringResource(R.string.home)) }
+            label = { Text(stringResource(R.string.home), textAlign = TextAlign.Center) }
         )
 
         NavigationBarItem(
@@ -70,7 +71,7 @@ fun BottomBar(
                     navController.navigate(KickifyRoute.Wishlist)
                 }
             },
-            label = { Text(stringResource(R.string.wishlist_title)) }
+            label = { Text(stringResource(R.string.wishlist_title), textAlign = TextAlign.Center) }
         )
 
         val cartItems by rememberSaveable { mutableIntStateOf(11) }
@@ -92,7 +93,7 @@ fun BottomBar(
                     navController.navigate(KickifyRoute.Cart)
                 }
             },
-            label = { Text(stringResource(R.string.cart)) }
+            label = { Text(stringResource(R.string.cart), textAlign = TextAlign.Center) }
         )
 
         val notificationCount by rememberSaveable { mutableIntStateOf(3) }
@@ -114,7 +115,7 @@ fun BottomBar(
                     navController.navigate(KickifyRoute.Notifications)
                 }
             },
-            label = { Text(stringResource(R.string.notificationscreen_title)) }
+            label = { Text(stringResource(R.string.notificationscreen_title), textAlign = TextAlign.Center) }
         )
 
         NavigationBarItem(
@@ -127,7 +128,7 @@ fun BottomBar(
                     navController.navigate(KickifyRoute.Profile)
                 }
             },
-            label = { Text(stringResource(R.string.profileScreen_title)) }
+            label = { Text(stringResource(R.string.profileScreen_title), textAlign = TextAlign.Center) }
         )
     }
 }

@@ -1,5 +1,7 @@
 package it.unibo.kickify.ui.screens.login
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -51,15 +54,27 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import it.unibo.kickify.R
+import it.unibo.kickify.data.database.User
+import it.unibo.kickify.data.repositories.RemoteRepository
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.screens.register.LoginRegisterMethodDividerRow
+import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.theme.MediumGray
 import it.unibo.kickify.utils.LoginRegisterUtils
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
+import kotlin.coroutines.coroutineContext
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(
+    navController: NavController,
+    settingsViewModel: SettingsViewModel
+) {
+    val remoteRepo = koinInject<RemoteRepository>()
+    val coroutineScope = rememberCoroutineScope()
     val ctx = LocalContext.current
 
     var email by rememberSaveable { mutableStateOf("") }
@@ -170,10 +185,8 @@ fun LoginScreen(navController: NavController) {
                     onDone = {
                         if (password.isNotEmpty()) {
                             focusManager.clearFocus()
-                            loginAction()
-
                         } else {
-                            pswError = ctx.getString(R.string.emptyPswMessage)
+                            pswError = ctx.getString(R.string.invalidPswMessage)
                         }
                     }
                 ),
@@ -210,8 +223,27 @@ fun LoginScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    //ctx.startActivity(Intent(ctx, AuthActivity::class.java))
-                    loginAction()
+                    coroutineScope.launch {
+                        if(LoginRegisterUtils.isValidEmail(email) &&
+                            LoginRegisterUtils.isValidPassword(password)){
+                            val loginRes = remoteRepo.login(email, password)
+                            val user = loginRes.getOrNull()
+
+                            if(loginRes.isSuccess && user != null){
+                                Toast.makeText(ctx, "Login successful", Toast.LENGTH_LONG).show()
+                                settingsViewModel.setUserAccount(
+                                    userid = email,
+                                    username = "${user.name} ${user.surname}"
+                                )
+                                Log.i("LOGIN", "userid: ${settingsViewModel.userId} - username ${settingsViewModel.userName}")
+                                loginAction()
+                            } else {
+                                Toast.makeText(ctx, "Login ERROR", Toast.LENGTH_LONG).show()
+                            }
+                        } else {
+                            Toast.makeText(ctx, "Check all fields are valid", Toast.LENGTH_LONG).show()
+                        }
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()

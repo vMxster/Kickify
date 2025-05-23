@@ -14,7 +14,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
-    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <uses-feature android:name="android.hardware.fingerprint" android:required="false" />
 
     <queries>
@@ -50,14 +49,5 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!-- <activity android:name=".AuthActivityOLD"
-            android:exported="false"
-            android:theme="@style/Theme.UrbanKicks">
-        </activity>-->
-        <activity android:name=".AuthActivity"
-            android:exported="false"
-            android:theme="@style/AppCompatTheme.UrbanKicks">
-        </activity>
     </application>
-
 </manifest>

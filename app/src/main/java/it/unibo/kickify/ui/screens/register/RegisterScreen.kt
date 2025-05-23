@@ -1,5 +1,6 @@
 package it.unibo.kickify.ui.screens.register
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,14 +57,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
+import it.unibo.kickify.data.repositories.RemoteRepository
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.theme.MediumGray
 import it.unibo.kickify.utils.LoginRegisterUtils
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @Composable
 fun RegisterScreen(
-    navController: NavController
+    navController: NavController,
+    settingsViewModel: SettingsViewModel
 ) {
     val ctx = LocalContext.current
     ScreenTemplate(
@@ -74,6 +81,9 @@ fun RegisterScreen(
     ) { contentPadding ->
         val registerScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)
+
+        val remoteRepo = koinInject<RemoteRepository>()
+        val coroutineScope = rememberCoroutineScope()
 
         var name by rememberSaveable { mutableStateOf("") }
         var lastname by rememberSaveable { mutableStateOf("") }
@@ -279,7 +289,6 @@ fun RegisterScreen(
                     onDone = {
                         if (LoginRegisterUtils.isValidPassword(password)) {
                             focusManager.clearFocus()
-                            registerAction()
                         } else {
                             pswError = ctx.getString(R.string.invalidPswMessage)
                         }
@@ -306,13 +315,30 @@ fun RegisterScreen(
 
             Button(
                 onClick = {
-                    /* if(registration successful) {
-                        navController.navigate(KickifyRoute.Home){
-                            popUpTo(KickifyRoute.Home) { inclusive = true }
+                    coroutineScope.launch {
+                        if(LoginRegisterUtils.isValidEmail(email)
+                            && LoginRegisterUtils.isValidPassword(password)
+                            && LoginRegisterUtils.isValidNameLastname(name)
+                            && LoginRegisterUtils.isValidNameLastname(lastname)) {
+                            val registerRes = remoteRepo.register(
+                                email = email, firstName = name,
+                                lastName = lastname, password = password,
+                                newsletter = false, phone = null
+                            )
+                            if (registerRes.isSuccess) {
+                                Toast.makeText(ctx, "Register successful", Toast.LENGTH_LONG).show()
+                                settingsViewModel.setUserAccount(
+                                    userid = email, username = "$name $lastname"
+                                )
+                                Log.i("LOGIN", "userid: $email - username: '$name $lastname'")
+                                registerAction()
+                            } else {
+                                Toast.makeText(ctx, "Register ERROR", Toast.LENGTH_LONG).show()
+                            }
+                        } else {
+                            Toast.makeText(ctx, "Check all fields are valid", Toast.LENGTH_LONG).show()
                         }
-                    } else { */
-                    Toast.makeText(ctx, "Registration error", Toast.LENGTH_LONG).show()
-                    // }
+                    }
                 },
                 modifier = registerScreenModifier,
             ) {

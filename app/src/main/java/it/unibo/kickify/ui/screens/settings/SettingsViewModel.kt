@@ -11,6 +11,9 @@ import it.unibo.kickify.data.repositories.SettingsRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class SettingsViewModel(
     private val repository: SettingsRepository
@@ -49,7 +52,7 @@ class SettingsViewModel(
     val lastAccess = repository.lastAccess.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
-        initialValue = 0L
+        initialValue = "0"
     )
 
     val enabledLocation = repository.locationEnabled.stateIn(
@@ -91,8 +94,14 @@ class SettingsViewModel(
         repository.setBiometricLogin(value)
     }
 
-    fun setLastAccess(value: Long) = viewModelScope.launch {
+    fun setLastAccess(value: String) = viewModelScope.launch {
         repository.setLastAccess(value)
+    }
+
+    fun setLastAccessNow() = viewModelScope.launch {
+        val currentTime = Date()
+        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        repository.setLastAccess( formatter.format(currentTime))
     }
 
     fun setEnabledLocation(value: Boolean) = viewModelScope.launch {
@@ -105,6 +114,24 @@ class SettingsViewModel(
 
     fun setAppLanguage(appLanguageId: String) = viewModelScope.launch {
         repository.setAppLanguage(appLanguageId)
+    }
+
+    fun setUserAccount(userid: String, username: String) = viewModelScope.launch {
+        this@SettingsViewModel.setUserId(userid)
+        this@SettingsViewModel.setUserName(username)
+        this@SettingsViewModel.setLastAccessNow()
+    }
+
+    fun removeUserAccount() = viewModelScope.launch {
+        this@SettingsViewModel.setUserId("")
+        this@SettingsViewModel.setUserName("")
+        this@SettingsViewModel.setUserImg("")
+        this@SettingsViewModel.setTheme(Theme.System)
+        this@SettingsViewModel.setBiometricLogin(false)
+        this@SettingsViewModel.setLastAccess("")
+        this@SettingsViewModel.setEnabledLocation(false)
+        this@SettingsViewModel.setEnabledPushNotification(false)
+        this@SettingsViewModel.setAppLanguage("en")
     }
 
 

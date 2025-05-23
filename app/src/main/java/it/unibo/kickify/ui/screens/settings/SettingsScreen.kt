@@ -46,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.PushNotificationManager
 import it.unibo.kickify.R
+import it.unibo.kickify.authentication.BiometricAuthManager
 import it.unibo.kickify.data.models.Language
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
@@ -61,6 +62,7 @@ fun SettingsScreen(
     navController: NavController,
     settingsViewModel: SettingsViewModel
 ) {
+    val ctx = LocalContext.current
     val themeState by settingsViewModel.theme.collectAsStateWithLifecycle()
     val biometricLoginState by settingsViewModel.biometricLogin.collectAsStateWithLifecycle()
     val pushNotificationState by settingsViewModel.enabledPushNotification.collectAsStateWithLifecycle()
@@ -121,7 +123,8 @@ fun SettingsScreen(
                 confirmText = stringResource(R.string.logout),
                 onConfirm = {
                     showDialogLogout = false
-                    /* TODO delete settings view model */
+                    settingsViewModel.removeUserAccount()
+
                     navController.navigate(KickifyRoute.Login){
                         launchSingleTop = true
                         popUpTo(KickifyRoute.Home){ inclusive = true }
@@ -138,7 +141,8 @@ fun SettingsScreen(
                 confirmText = stringResource(R.string.settings_deleteAccount),
                 onConfirm = {
                     showDialogDeleteAccount = false
-                    /* TODO delete settings view model */
+                    settingsViewModel.removeUserAccount()
+
                     navController.navigate(KickifyRoute.Login){
                         launchSingleTop = true
                         popUpTo(KickifyRoute.Home){ inclusive = true }
@@ -151,12 +155,18 @@ fun SettingsScreen(
             SettingsTitleLine(stringResource(R.string.settings_appSettingsTitle))
 
             SettingsItemWithTrailingSwitchButton(
-                enabled = settingsViewModel.isStrongAuthenticationAvailable(LocalContext.current),
+                enabled = settingsViewModel.isStrongAuthenticationAvailable(ctx),
                 textIfDisabled = stringResource(R.string.settings_biometricLoginUnavailable),
                 text = stringResource(R.string.settings_enableBiometricLogin),
                 checked = biometricLoginState,
-                onSwitchChange = {
-                    settingsViewModel.setBiometricLogin(it)
+                onSwitchChange = { enabled ->
+                    if(enabled) {
+                        if (BiometricAuthManager.canAuthenticate(ctx)) {
+                            settingsViewModel.setBiometricLogin(true)
+                        }
+                    } else {
+                        settingsViewModel.setBiometricLogin(false)
+                    }
                 }
             )
             SettingsItemWithTrailingSwitchButton(
