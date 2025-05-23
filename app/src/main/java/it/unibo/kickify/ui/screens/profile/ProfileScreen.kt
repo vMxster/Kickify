@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
@@ -22,21 +23,32 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import it.unibo.kickify.R
 import it.unibo.kickify.camerax.CameraXUtils
+import it.unibo.kickify.data.database.User
+import it.unibo.kickify.data.models.Language
+import it.unibo.kickify.data.repositories.RemoteRepository
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.PaymentMethodRow
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.screens.settings.EditProfileSections
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @Composable
 fun ProfileScreen(
@@ -44,6 +56,24 @@ fun ProfileScreen(
     cameraXUtils: CameraXUtils,
     settingsViewModel: SettingsViewModel
 ){
+    val appLang by settingsViewModel.appLanguage.collectAsStateWithLifecycle()
+    val userID by settingsViewModel.userId.collectAsStateWithLifecycle()
+    val username by settingsViewModel.userName.collectAsStateWithLifecycle()
+    val coroutineScope = rememberCoroutineScope()
+    val remoteRepo = koinInject<RemoteRepository>()
+    var user: User? = null
+
+    LaunchedEffect(Unit) {
+        delay(500)
+        coroutineScope.launch {
+            val res = remoteRepo.getUserProfile(userID)
+            val resUser = res.getOrNull()
+            if(res.isSuccess && resUser != null){
+                user = resUser
+            }
+        }
+    }
+
     ScreenTemplate(
         screenTitle = stringResource(R.string.profileScreen_title),
         navController = navController,
@@ -51,15 +81,13 @@ fun ProfileScreen(
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true
     ) { contentPadding ->
-        val scrollState = rememberScrollState()
-
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
-                .verticalScroll(scrollState)
+                .verticalScroll(rememberScrollState())
         ) {
 
             ProfileCardContainer(
@@ -69,29 +97,29 @@ fun ProfileScreen(
                     navController.navigate(KickifyRoute.EditProfile(EditProfileSections.USER_INFO))
                 }
             ) {
-                //val userImg
-                //if (userImg == null) {
-                /*Image(
-                bitmap = userBitmap.asImageBitmap(),
-                contentDescription = "",
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                )*/
-                // } else { // otherwise use user profile icon
-                Icon(
-                    imageVector = Icons.Outlined.AccountCircle,
-                    contentDescription = "",
-                    modifier = Modifier.size(120.dp).clip(CircleShape)
-                        .align(Alignment.CenterHorizontally)
-                )
-                //}
+                if (user?.urlPhoto != null) {
+                    AsyncImage(
+                        model = user?.urlPhoto,
+                        contentDescription = "",
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                    )
+                } else { // otherwise use default user profile icon
+                    Icon(
+                        imageVector = Icons.Outlined.AccountCircle,
+                        contentDescription = "",
+                        modifier = Modifier.size(120.dp).clip(CircleShape)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                }
 
-                Text("Mario Rossi", modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
+                Text(username, modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
                     .padding(vertical = 4.dp).padding(start = 10.dp),
                     style = MaterialTheme.typography.titleMedium)
-                TextInformationRow("email@example.com")
-                TextInformationRow("${stringResource(R.string.phone)}:", "+39 321 1234567")
-                TextInformationRow("${stringResource(R.string.language)}:", "English")
+                TextInformationRow(userID)
+                TextInformationRow("${stringResource(R.string.phone)}:", user?.phone ?: "-")
+                TextInformationRow("${stringResource(R.string.language)}:",
+                    Language.getLanguageStringFromCode(appLang))
             }
 
             ProfileActionRow(
@@ -99,7 +127,6 @@ fun ProfileScreen(
                 onButtonClickAction = { navController.navigate(KickifyRoute.MyOrders) },
                 buttonText = stringResource(R.string.homescreen_seeAll),
             )
-
             ProfileActionRow(
                 title = stringResource(R.string.wishlist_title),
                 onButtonClickAction = { navController.navigate(KickifyRoute.Wishlist) },
@@ -162,20 +189,16 @@ fun ProfileActionRow(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.fillMaxWidth(fraction = 0.4f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.fillMaxWidth().padding(10.dp)
-                )
-            }
-            Column {
-                Button(
-                    onClick = { onButtonClickAction() },
-                    modifier = Modifier.padding(end = 8.dp)
-                ){
-                    Text(text = buttonText)
-                }
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(10.dp)
+            )
+            Button(
+                onClick = { onButtonClickAction() },
+                modifier = Modifier.padding(end = 8.dp)
+            ){
+                Text(text = buttonText)
             }
         }
     }
@@ -231,7 +254,7 @@ fun TextInformationRow(
                 Text(text = leftValue, textAlign = TextAlign.Start)
             }
         } else {
-            Column(modifier = Modifier.fillMaxWidth(fraction = 0.3f).padding(start = 10.dp)) {
+            Column(modifier = Modifier.fillMaxWidth(fraction = 0.45f).padding(start = 10.dp)) {
                 Text(text = leftValue, textAlign = TextAlign.Start)
             }
             Column(modifier = Modifier.padding(start = 10.dp)) {

@@ -54,9 +54,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import it.unibo.kickify.R
-import it.unibo.kickify.data.database.User
 import it.unibo.kickify.data.repositories.RemoteRepository
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.ScreenTemplate
@@ -66,7 +64,6 @@ import it.unibo.kickify.ui.theme.MediumGray
 import it.unibo.kickify.utils.LoginRegisterUtils
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
-import kotlin.coroutines.coroutineContext
 
 @Composable
 fun LoginScreen(
@@ -83,7 +80,6 @@ fun LoginScreen(
 
     var password by rememberSaveable { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
-    var pswError by remember { mutableStateOf("") }
     val passwordFocusRequester = remember { FocusRequester() }
 
     val focusManager = LocalFocusManager.current
@@ -170,10 +166,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(12.dp))
             OutlinedTextField(
                 value = password,
-                onValueChange = {
-                    password = it
-                    pswError = ""
-                },
+                onValueChange = { password = it },
                 placeholder = { Text(stringResource(R.string.password))},
                 shape = RoundedCornerShape(16.dp),
                 visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
@@ -185,17 +178,9 @@ fun LoginScreen(
                     onDone = {
                         if (password.isNotEmpty()) {
                             focusManager.clearFocus()
-                        } else {
-                            pswError = ctx.getString(R.string.invalidPswMessage)
                         }
                     }
                 ),
-                isError = pswError != "",
-                supportingText = {
-                    if (pswError != "") {
-                        Text(text = pswError, color = MaterialTheme.colorScheme.error)
-                    }
-                },
                 trailingIcon = {
                     val image = if (passwordVisibility) Icons.Outlined.Visibility
                     else Icons.Outlined.VisibilityOff
@@ -224,10 +209,11 @@ fun LoginScreen(
             Button(
                 onClick = {
                     coroutineScope.launch {
-                        if(LoginRegisterUtils.isValidEmail(email) &&
-                            LoginRegisterUtils.isValidPassword(password)){
+                        if(LoginRegisterUtils.isValidEmail(email)
+                            && password.isNotEmpty()){
                             val loginRes = remoteRepo.login(email, password)
                             val user = loginRes.getOrNull()
+                            Log.i("RemoteRepo", "loginRes: ${loginRes.isSuccess} - loginRes: ${loginRes.getOrNull()}")
 
                             if(loginRes.isSuccess && user != null){
                                 Toast.makeText(ctx, "Login successful", Toast.LENGTH_LONG).show()
@@ -237,7 +223,8 @@ fun LoginScreen(
                                 )
                                 Log.i("LOGIN", "userid: ${settingsViewModel.userId} - username ${settingsViewModel.userName}")
                                 loginAction()
-                            } else {
+
+                            } else if(loginRes.isFailure){
                                 Toast.makeText(ctx, "Login ERROR", Toast.LENGTH_LONG).show()
                             }
                         } else {
