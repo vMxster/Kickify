@@ -5,8 +5,11 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
@@ -18,6 +21,7 @@ fun ScreenTemplate(
     showTopAppBar: Boolean,
     bottomAppBarContent: @Composable () -> Unit = { },
     showModalDrawer: Boolean,
+    snackBarHostState: SnackbarHostState = remember { SnackbarHostState() },
     content: @Composable (PaddingValues) -> Unit
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -40,9 +44,8 @@ fun ScreenTemplate(
                     )
                 }
             },
-            bottomBar = {
-                bottomAppBarContent()
-            }
+            bottomBar = { bottomAppBarContent() },
+            snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
         ) { contentPadding ->
             content(contentPadding)
         }

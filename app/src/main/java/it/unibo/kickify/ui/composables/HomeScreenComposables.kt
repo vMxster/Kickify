@@ -59,7 +59,16 @@ fun HomeScreenCategory(categoryName: ShopCategory, onClick: (String) -> Unit) {
             contentColor = MaterialTheme.colorScheme.onBackground
         )
     ) {
-        Text(categoryName.toString())
+        Text( getHomeScreenCategoryString(categoryName) )
+    }
+}
+
+@Composable
+private fun getHomeScreenCategoryString(category: ShopCategory): String {
+    return when(category){
+        ShopCategory.Men -> stringResource(R.string.shopCategory_men)
+        ShopCategory.Women -> stringResource(R.string.shopCategory_women)
+        ShopCategory.Kids -> stringResource(R.string.shopCategory_kids)
     }
 }
 

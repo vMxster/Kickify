@@ -14,12 +14,14 @@
     <string name="signin_Text">We\'ve missed your style. Let\'s get you moving!</string>
     <string name="emailAddress">Email Address</string>
     <string name="password">Password</string>
+    <string name="newPassword">New Password</string>
+    <string name="confirmNewPassword">Confirm new password</string>
     <string name="confirmPassword">Confirm password</string>
     <string name="confirmPasswordNoMatch">Password and Confirm Password don\'t match</string>
     <string name="showHidePsw">Show/Hide Password</string>
     <string name="invalidEmailMessage">Type in a valid email address</string>
     <string name="invalidPswMessage">The password must be at least 10 characters long\n
-    and must contain at least \n1 lowercase character,\n1 uppercase character,\n1 digit and 1 symbol</string>
+    and must contain at least \n1 lowercase character, 1 uppercase character,\n1 digit and 1 symbol</string>
     <string name="invalidNameMessage">Type in your name</string>
     <string name="invalidLastnameMessage">Type in your last name</string>
     <string name="loginGoogle">Login in with Google</string>
@@ -174,7 +176,9 @@
     <string name="photoPreview">Photo Preview</string>
     <string name="retry">Retry</string>
     <string name="savePhoto">Save Photo</string>
-    <string name="saveChanges">Save Changes</string>
+    <string name="changePassword">Change Password</string>
+    <string name="changedPasswordSuccessfully">Password changed successfully</string>
+    <string name="changePasswordError">An error occurred. Password not changed</string>
     <string name="biometricAuthTitle">Unlock Kickify</string>
     <string name="biometricAuthSubtitle">Use fingerprint or face to unlock</string>
     <string name="biometricAuthDescription">Otherwise you can use your device credentials</string>
