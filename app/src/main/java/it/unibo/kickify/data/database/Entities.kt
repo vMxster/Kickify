@@ -632,7 +632,7 @@ data class Image(
     val number: Int,
 
     @ColumnInfo(name = "URL")
-    val url: String
+    var url: String
 )
 
 // Relation Classes

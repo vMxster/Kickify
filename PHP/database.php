@@ -38,13 +38,26 @@ class DatabaseHelper {
     
     // Get all products
     public function getProducts($lastAccess) {
-        $query = "SELECT p.*, i.* 
-                  FROM PRODOTTO p, IMMAGINE i 
+        $query = "SELECT p.* 
+                  FROM PRODOTTO p 
                   WHERE p.ID_Prodotto = i.ID_Prodotto 
                   AND p.Data_Aggiunta > ? 
                   ORDER BY p.Data_Aggiunta DESC";
         $stmt = $this->db->prepare($query);
         $stmt->bind_param("s", $lastAccess);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    // Get product images
+    public function getProductsImages($productIds) {
+        $placeholders = implode(',', array_fill(0, count($productIds), '?'));
+        $query = "SELECT i.* 
+                  FROM IMMAGINE i 
+                  WHERE ID_Prodotto IN ($placeholders)";
+        
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param(str_repeat('i', count($productIds)), ...$productIds);
         $stmt->execute();
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
@@ -195,7 +208,7 @@ class DatabaseHelper {
         }
     }
 
-    public function getProductData($productId, $userEmail = null, $lastAccess) {
+    public function getProductData($productId, $userEmail) {
         $query = "SELECT 
             p.*,
             v.Colore,
@@ -218,11 +231,11 @@ class DatabaseHelper {
             JOIN comprendere comp ON c.ID_Carrello = comp.ID_Carrello 
             WHERE c.Email = ?
         ) cart ON p.ID_Prodotto = cart.ID_Prodotto
-        WHERE p.ID_Prodotto = ? AND p.Data_Aggiunta > ?";
+        WHERE p.ID_Prodotto = ?";
     
         try {
             $stmt = $this->db->prepare($query);
-            $stmt->bind_param("ssis", $userEmail, $userEmail, $productId, $lastAccess);
+            $stmt->bind_param("ssi", $userEmail, $userEmail, $productId);
             $stmt->execute();
             $result = $stmt->get_result();
     
@@ -1299,14 +1312,12 @@ class DatabaseHelper {
     }
 
     // Get all items in cart
-    public function getCartItems($cartId, $lastAccess) {
-        $query = "SELECT c.*, p.Prezzo, p.Nome, p.Genere, car.Valore_Totale 
+    public function getCartItems($cartId) {
+        $query = "SELECT c.* 
                   FROM comprendere c 
-                  JOIN PRODOTTO p ON c.ID_Prodotto = p.ID_Prodotto 
-                  JOIN Carrello car ON c.ID_Carrello = car.ID_Carrello 
-                  WHERE c.ID_Carrello = ? AND car.Data_Modifica > ?";
+                  WHERE c.ID_Carrello = ?";
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param("is", $cartId, $lastAccess);
+        $stmt->bind_param("i", $cartId);
         $stmt->execute();
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }

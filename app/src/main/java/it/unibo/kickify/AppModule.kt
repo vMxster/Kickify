@@ -20,9 +20,11 @@ import it.unibo.kickify.data.repositories.local.CartRepository
 import it.unibo.kickify.data.repositories.local.OrderRepository
 import it.unibo.kickify.data.repositories.local.ProductRepository
 import it.unibo.kickify.data.repositories.RemoteRepository
+import it.unibo.kickify.data.repositories.local.ImageRepository
 import it.unibo.kickify.data.repositories.local.UserRepository
 import it.unibo.kickify.data.repositories.local.WishlistRepository
 import it.unibo.kickify.data.repositories.local.NotificationRepository
+import it.unibo.kickify.data.repositories.local.ProductCartRepository
 import it.unibo.kickify.data.repositories.local.ReviewRepository
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
@@ -56,6 +58,8 @@ val appModule = module {
 
     single { PushNotificationManager(androidContext()) }
 
+    single { ProductCartRepository(productCartDao = get<KickifyDatabase>().productCartDao()) }
+    single { ImageRepository(imageDao = get<KickifyDatabase>().imageDao()) }
     single { ProductRepository(productDao = get<KickifyDatabase>().productDao()) }
     single { UserRepository(userDao = get<KickifyDatabase>().userDao()) }
     single { CartRepository(cartDao = get<KickifyDatabase>().cartDao()) }
@@ -65,7 +69,11 @@ val appModule = module {
     single { NotificationRepository(notificationDao = get<KickifyDatabase>().notificationDao()) }
     single { SettingsRepository(dataStore = get()) }
     single { RemoteRepository(httpClient = get()) }
-    single { AppRepository(get(), get(), get(), get(), get(), get(), get(), get()) }
+    single { AppRepository(
+        get(), get(), get(),
+        get(), get(), get(),
+        get(), get(), get(),
+        get(), get()) }
 
     viewModel { SettingsViewModel(get()) }
 }

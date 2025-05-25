@@ -1,9 +1,15 @@
 package it.unibo.kickify.data.repositories
 
+import android.content.Context
+import android.util.Log
 import it.unibo.kickify.data.database.*
 import it.unibo.kickify.data.repositories.local.*
+import it.unibo.kickify.utils.ImageStorageManager
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
 
 class AppRepository(
+    private val context: Context,
     private val remoteRepository: RemoteRepository,
     private val productRepository: ProductRepository,
     private val userRepository: UserRepository,
@@ -11,38 +17,137 @@ class AppRepository(
     private val orderRepository: OrderRepository,
     private val wishlistRepository: WishlistRepository,
     private val reviewRepository: ReviewRepository,
-    private val notificationRepository: NotificationRepository
+    private val notificationRepository: NotificationRepository,
+    private val imageRepository: ImageRepository,
+    private val productCartRepository: ProductCartRepository
 ) {
+    private val tag = "AppRepository"
+
+    // get last access
+    //val lastAccess: Flow<String> = dataStore.data.map { preferences ->
+    //    preferences[stringPreferencesKey("last_access")] ?: "0"
+    //}
+
+    // set last access
+    //suspend fun setLastAccess(timestamp: String) = dataStore.edit { preferences ->
+    //    preferences[stringPreferencesKey("last_access")] = timestamp
+    //}
+
     // PRODOTTI
-    suspend fun getProducts(lastAccess: String): Result<List<Product>> {
-        return remoteRepository.getProducts(lastAccess)
+    suspend fun getProducts(lastAccess: String): Result<Map<Product, Image>> = withContext(Dispatchers.IO) {
+        try {
+            val remoteResult = remoteRepository.getProducts(lastAccess)
+
+            if (remoteResult.isSuccess) {
+                val remoteProducts = remoteResult.getOrNull() ?: emptyList()
+
+                if (remoteProducts.isNotEmpty()) {
+                    val images = remoteRepository.getProductsImages(remoteProducts.map { it.productId })
+                        .getOrNull() ?: emptyList()
+                    if (images.isNotEmpty()) {
+                        val remoteImages = remoteRepository.downloadImagesFromUrls(images.map { it.url })
+                            .getOrNull() ?: emptyList()
+                        if (remoteImages.isNotEmpty()) {
+                            val savedImages = ImageStorageManager(context).saveAll(remoteImages)
+                            images.forEachIndexed { index, image ->
+                                image.url = savedImages[index].second
+                            }
+                            imageRepository.insertImages(images)
+                        }
+                    }
+                    productRepository.insertProducts(remoteProducts)
+                }
+            }
+
+            Result.success(
+                productRepository.getProductsWithImage()
+            )
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in getProducts", e)
+            Result.failure(e)
+        }
     }
 
-    suspend fun getProductData(productId: Int, userEmail: String?, lastAccess: String): Result<ProductDetails> {
-        return remoteRepository.getProductData(productId, userEmail, lastAccess)
-    }
+    suspend fun getProductData(productId: Int, userEmail: String): Result<ProductDetails> = withContext(Dispatchers.IO) {
+            try {
+                val remoteResult = remoteRepository.getProductData(productId, userEmail)
+                if (remoteResult.isSuccess) {
+                    return@withContext remoteResult
+                }
+                Result.failure(Exception("Prodotto non trovato"))
+            } catch (e: Exception) {
+                Log.e(tag, "Errore in getProductData", e)
+                Result.failure(e)
+            }
+        }
 
-    suspend fun getProductById(productId: Int, lastAccess: String): Result<ProductDetails> {
-        return remoteRepository.getProductById(productId, lastAccess)
-    }
+    suspend fun getProductHistory(productId: Int, lastAccess: String): Result<List<HistoryProduct>> =
+        withContext(Dispatchers.IO) {
+            try {
+                val remoteResult = remoteRepository.getProductHistory(productId, lastAccess)
+                if (remoteResult.isSuccess) {
+                    val remoteHistory = remoteResult.getOrNull() ?: emptyList()
 
-    suspend fun getProductHistory(productId: Int, lastAccess: String): Result<List<HistoryProduct>> {
-        return remoteRepository.getProductHistory(productId, lastAccess)
-    }
+                    if (remoteHistory.isNotEmpty()) {
+                        productRepository.insertProductHistory(remoteHistory)
+                    }
+                }
+                Result.success(
+                    productRepository.getProductHistory(productId)
+                )
+            } catch (e: Exception) {
+                Log.e(tag, "Errore in getProductHistory", e)
+                Result.failure(e)
+            }
+        }
 
     // CARRELLO
     suspend fun getCart(email: String): Result<Cart> {
-        return remoteRepository.getCart(email)
+        val remoteResult = remoteRepository.getCart(email)
+        if (remoteResult.isSuccess) {
+            val remoteCart = remoteResult.getOrNull()
+            remoteCart?.let {
+                cartRepository.insertCart(it)
+            }
+        }
+        return remoteResult
     }
 
-    suspend fun getCartItems(email: String, lastAccess: String): Result<List<CartProduct>> {
-        return remoteRepository.getCartItems(email, lastAccess)
-    }
+    suspend fun getCartItems(email: String): Result<List<CartWithProductInfo>> =
+        withContext(Dispatchers.IO) {
+            try {
+                val cartId = cartRepository.getCartByEmail(email)?.cartId
+                val remoteResult = remoteRepository.getCartItems(email)
+                if (remoteResult.isSuccess) {
+                    val remoteCartItems = remoteResult.getOrNull() ?: emptyList()
+                    if (remoteCartItems.isNotEmpty()) {
+                        remoteCartItems.forEach { item ->
+                            productCartRepository.addToCart(
+                                cartId, item.productId, item.color, item.size, item.quantity
+                            )
+                        }
+                    }
+                }
+                val cart = cartRepository.getCartByEmail(email)
+                Result.success(
+                    cart?.let {
+                        productCartRepository.getCartItems(it.cartId)
+                    } ?: emptyList()
+                )
+            } catch (e: Exception) {
+                Log.e(tag, "Errore in getCartItems", e)
+                Result.failure(e)
+            }
+        }
 
     suspend fun addToCart(email: String, productId: Int, color: String, size: Double, quantity: Int = 1): Result<Boolean> {
         val result = remoteRepository.addToCart(email, productId, color, size, quantity)
         if (result.isSuccess && result.getOrNull() == true) {
-            cartRepository.addToCart(email, productId, color, size, quantity)
+            val cartId = cartRepository.getCartByEmail(email)?.cartId
+            if (cartId != null) {
+                productCartRepository.addToCart(cartId, productId, color, size, quantity)
+                cartRepository.updateCartTotal(cartId)
+            }
         }
         return result
     }
@@ -51,7 +156,8 @@ class AppRepository(
         val cart = cartRepository.getCartByEmail(email)
         val result = remoteRepository.removeFromCart(email, productId, color, size)
         if (result.isSuccess && result.getOrNull() == true && cart != null) {
-            cartRepository.removeFromCart(cart.cartId, productId, color, size)
+            productCartRepository.removeFromCart(cart.cartId, productId, color, size)
+            cartRepository.updateCartTotal(cart.cartId)
         }
         return result
     }

@@ -1,5 +1,6 @@
 package it.unibo.kickify.data.repositories
 
+import android.content.Context
 import android.util.Log
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -12,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.IOException
 
 class RemoteRepository(
     private val httpClient: HttpClient
@@ -36,13 +38,28 @@ class RemoteRepository(
         }
     }
 
-    suspend fun getProductData(productId: Int, userEmail: String?, lastAccess: String): Result<ProductDetails> = withContext(Dispatchers.IO) {
+    suspend fun getProductsImages(productIds: List<Int>): Result<List<Image>> = withContext(Dispatchers.IO) {
+        try {
+            val params = mapOf(
+                "action" to "getProductsImages",
+                "productIds" to productIds.joinToString(",")
+            )
+            val response = makeRequest("product_handler.php", params)
+            val jsonArray = JSONArray(response)
+            val images = RemoteResponseParser.parseProductsWithImages(jsonArray)
+            Result.success(images)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante il recupero delle immagini dei prodotti", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getProductData(productId: Int, userEmail: String): Result<ProductDetails> = withContext(Dispatchers.IO) {
         try {
             val params = mapOf(
                 "action" to "getProductData",
                 "productId" to productId.toString(),
-                "user_email" to (userEmail ?: ""),
-                "last_access" to lastAccess
+                "user_email" to userEmail
             )
             val response = makeRequest("product_handler.php", params)
             val jsonObject = JSONObject(response)
@@ -50,23 +67,6 @@ class RemoteRepository(
             Result.success(product)
         } catch (e: Exception) {
             Log.e(tag, "Errore durante il recupero dei dati del prodotto $productId", e)
-            Result.failure(e)
-        }
-    }
-
-    suspend fun getProductById(productId: Int, lastAccess: String): Result<ProductDetails> = withContext(Dispatchers.IO) {
-        try {
-            val params = mapOf(
-                "action" to "getProductData",
-                "productId" to productId.toString(),
-                "last_access" to lastAccess
-            )
-            val response = makeRequest("product_handler.php", params)
-            val jsonObject = JSONObject(response)
-            val productData = RemoteResponseParser.parseProductDetails(jsonObject)
-            Result.success(productData)
-        } catch (e: Exception) {
-            Log.e(tag, "Errore durante il recupero del prodotto $productId", e)
             Result.failure(e)
         }
     }
@@ -91,7 +91,10 @@ class RemoteRepository(
     // CARRELLO
     suspend fun getCart(email: String): Result<Cart> = withContext(Dispatchers.IO) {
         try {
-            val params = mapOf("action" to "getCart", "user_email" to email)
+            val params = mapOf(
+                "action" to "getCart",
+                "user_email" to email
+            )
             val response = makeRequest("cart_handler.php", params)
             val jsonObject = JSONObject(response)
             val cart = RemoteResponseParser.parseCart(jsonObject)
@@ -102,12 +105,11 @@ class RemoteRepository(
         }
     }
 
-    suspend fun getCartItems(email: String, lastAccess: String): Result<List<CartProduct>> = withContext(Dispatchers.IO) {
+    suspend fun getCartItems(email: String): Result<List<CartProduct>> = withContext(Dispatchers.IO) {
         try {
             val params = mapOf(
                 "action" to "getCartItems",
-                "user_email" to email,
-                "last_access" to lastAccess
+                "user_email" to email
             )
             val response = makeRequest("cart_handler.php", params)
             val jsonArray = JSONArray(response)
@@ -539,6 +541,27 @@ class RemoteRepository(
             Result.failure(e)
         }
     }
+
+    suspend fun downloadImagesFromUrls(urls: List<String>): Result<List<Pair<String, ByteArray>>> = withContext(Dispatchers.IO) {
+        try {
+            val imageDataList = urls.map { url ->
+                val response: HttpResponse = httpClient.get(url)
+
+                if (response.status.isSuccess()) {
+                    val bytes = response.readBytes()
+                    url to bytes
+                } else {
+                    throw IOException("Errore nel caricamento da $url: ${response.status}")
+                }
+            }
+            Result.success(imageDataList)
+        } catch (e: Exception) {
+            Log.e("RemoteRepository", "Errore nella richiesta: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
+
 
     // Funzione helper per effettuare richieste HTTP
     private suspend fun makeRequest(endpoint: String, params: Map<String, String> = emptyMap()): String {

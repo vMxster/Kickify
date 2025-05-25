@@ -9,12 +9,6 @@ import androidx.room.Transaction
 @Dao
 interface ProductDao {
     @Query("""
-        SELECT * FROM PRODOTTO 
-        WHERE ID_Prodotto = :productId
-    """)
-    suspend fun getProductById(productId: Int): Product?
-
-    @Query("""
         SELECT * FROM PRODOTTO p 
         JOIN VARIANTE v ON p.ID_Prodotto = v.ID_Prodotto 
         WHERE p.ID_Prodotto = :productId
@@ -73,18 +67,12 @@ interface ProductDao {
     suspend fun getProductsWithImage(): Map<Product, Image>
 
     @Transaction
-    suspend fun getProductData(productId: Int, userEmail: String?, lastAccess: String): ProductDetail? {
-        val product = getProductBase(productId, lastAccess) ?: return null
+    suspend fun getProductData(productId: Int, userEmail: String): ProductDetail? {
+        val product = getProductBase(productId) ?: return null
         val variants = getProductVariants(productId)
         val reviews = getProductReviews(productId)
-
-        val inWishlist = if (userEmail != null) {
-            isProductInWishlist(productId, userEmail)
-        } else false
-
-        val cartInfo = if (userEmail != null) {
-            getProductCartInfo(productId, userEmail)
-        } else null
+        val inWishlist = isProductInWishlist(productId, userEmail)
+        val cartInfo = getProductCartInfo(productId, userEmail)
 
         return ProductDetail(
             product = product,
@@ -98,9 +86,9 @@ interface ProductDao {
 
     @Query("""
         SELECT * FROM PRODOTTO 
-        WHERE ID_Prodotto = :productId AND Data_Aggiunta > :lastAccess
+        WHERE ID_Prodotto = :productId
     """)
-    suspend fun getProductBase(productId: Int, lastAccess: String): Product?
+    suspend fun getProductBase(productId: Int): Product?
 
     @Query("""
         SELECT * FROM VARIANTE
@@ -138,6 +126,18 @@ interface ProductDao {
         WHERE ps.ID_Prodotto = :productId
     """)
     suspend fun getProductHistory(productId: Int): List<HistoryProduct>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertProducts(remoteProducts: List<Product>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertProductHistory(remoteHistory: List<HistoryProduct>)
+}
+
+@Dao
+interface ImageDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertImages(images: List<Image>)
 }
 
 @Dao
@@ -174,74 +174,6 @@ interface CartDao {
     suspend fun getCartByEmail(email: String): Cart?
 
     @Transaction
-    suspend fun addToCart(email: String, productId: Int, color: String, size: Double, quantity: Int = 1) {
-        val cart = getCartByEmail(email) ?: return
-
-        val existingItem = getCartItemIfExists(cart.cartId, productId, color, size)
-
-        if (existingItem != null) {
-            val newQuantity = existingItem.quantity + quantity
-            updateCartItemQuantity(cart.cartId, productId, color, size, newQuantity)
-        } else {
-            val cartProduct = CartProduct(cart.cartId, productId, color, size, quantity)
-            insertCartItem(cartProduct)
-        }
-        updateCartTotal(cart.cartId)
-    }
-
-    @Query("""
-        SELECT * FROM comprendere 
-        WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
-        AND Colore = :color AND Taglia = :size LIMIT 1
-    """)
-    suspend fun getCartItemIfExists(cartId: Int, productId: Int, color: String, size: Double): CartProduct?
-
-    @Insert
-    suspend fun insertCartItem(cartProduct: CartProduct): Long
-
-    @Query("""
-        UPDATE comprendere SET Quantita = :quantity 
-        WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
-        AND Colore = :color AND Taglia = :size
-    """)
-    suspend fun updateCartItemQuantity(cartId: Int, productId: Int, color: String, size: Double, quantity: Int): Int
-
-    @Query("""
-        DELETE FROM comprendere 
-        WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
-        AND Colore = :color AND Taglia = :size
-    """)
-    suspend fun removeFromCart(cartId: Int, productId: Int, color: String, size: Double): Int
-
-    @Query("""
-        SELECT c.*, p.Nome, p.Prezzo, p.Genere 
-        FROM comprendere c JOIN PRODOTTO p ON c.ID_Prodotto = p.ID_Prodotto 
-        WHERE c.ID_Carrello = :cartId
-    """)
-    suspend fun getCartItems(cartId: Int): List<CartWithProductInfo>
-
-    @Query("""
-        UPDATE comprendere SET Colore = :newColor 
-        WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
-        AND Colore = :oldColor AND Taglia = :size
-    """)
-    suspend fun updateCartItemColor(cartId: Int, productId: Int, oldColor: String, newColor: String, size: Double): Int
-
-    @Query("""
-        UPDATE comprendere SET Taglia = :newSize 
-        WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
-        AND Colore = :color AND Taglia = :oldSize
-    """)
-    suspend fun updateCartItemSize(cartId: Int, productId: Int, color: String, oldSize: Double, newSize: Double): Int
-
-    @Query("""
-        UPDATE comprendere SET Colore = :newColor, Taglia = :newSize 
-        WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
-        AND Colore = :oldColor AND Taglia = :oldSize
-    """)
-    suspend fun updateCartItemColorAndSize(cartId: Int, productId: Int, oldColor: String, oldSize: Double, newColor: String, newSize: Double): Int
-
-    @Transaction
     @Query("""
         UPDATE CARRELLO SET Valore_Totale = (SELECT SUM(c.Quantita * p.Prezzo) 
             FROM comprendere c JOIN PRODOTTO p ON c.ID_Prodotto = p.ID_Prodotto 
@@ -250,10 +182,58 @@ interface CartDao {
     """)
     suspend fun updateCartTotal(cartId: Int): Int
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCart(cart: Cart)
+}
+
+@Dao
+interface ProductCartDao {
     @Query("""
-        DELETE FROM comprendere WHERE ID_Carrello = :cartId
+        SELECT c.*, p.Nome, p.Prezzo, p.Genere 
+        FROM comprendere c JOIN PRODOTTO p ON c.ID_Prodotto = p.ID_Prodotto 
+        WHERE c.ID_Carrello = :cartId
     """)
-    suspend fun clearCart(cartId: Int): Int
+    suspend fun getCartItems(cartId: Int): List<CartWithProductInfo>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertItem(item: CartProduct)
+
+    @Transaction
+    suspend fun addToCart(cartId: Int?, productId: Int, color: String, size: Double, quantity: Int = 1) {
+
+        val existingItem = getCartItemIfExists(cartId, productId, color, size)
+
+        if (existingItem != null) {
+            val newQuantity = existingItem.quantity + quantity
+            updateCartItemQuantity(cartId, productId, color, size, newQuantity)
+        } else {
+            val cartProduct = cartId?.let { CartProduct(it, productId, color, size, quantity) }
+            if (cartProduct != null) {
+                insertItem(cartProduct)
+            }
+        }
+    }
+
+    @Query("""
+        SELECT * FROM comprendere 
+        WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
+        AND Colore = :color AND Taglia = :size LIMIT 1
+    """)
+    suspend fun getCartItemIfExists(cartId: Int?, productId: Int, color: String, size: Double): CartProduct?
+
+    @Query("""
+        UPDATE comprendere SET Quantita = :quantity 
+        WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
+        AND Colore = :color AND Taglia = :size
+    """)
+    suspend fun updateCartItemQuantity(cartId: Int?, productId: Int, color: String, size: Double, quantity: Int): Int
+
+    @Query("""
+        DELETE FROM comprendere 
+        WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
+        AND Colore = :color AND Taglia = :size
+    """)
+    suspend fun removeFromCart(cartId: Int, productId: Int, color: String, size: Double): Int
 }
 
 @Dao

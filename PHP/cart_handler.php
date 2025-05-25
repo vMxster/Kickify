@@ -39,12 +39,9 @@ try {
                 if (empty($email)) {
                     throw new Exception('Email is required');
                 }
-                if (!isset($_POST['last_access'])) {
-                    throw new Exception('Last access is required');
-                }
                 $cart = $dbh->getCartByEmail($email);
                 if ($cart) {
-                    $items = $dbh->getCartItems($cart['ID_Carrello'], $_POST['last_access']);
+                    $items = $dbh->getCartItems($cart['ID_Carrello']);
                     $response = [
                         'success' => true,
                         'items' => $items

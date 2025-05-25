@@ -68,7 +68,7 @@ class RemoteResponseParser {
                 val itemJson = json.getJSONObject(i)
                 items.add(
                     CartProduct(
-                        cartId = itemJson.optInt("ID_Carrello", 0),
+                        cartId = itemJson.getInt("ID_Carrello"),
                         productId = itemJson.getInt("ID_Prodotto"),
                         color = itemJson.getString("Colore"),
                         size = itemJson.getDouble("Taglia"),
@@ -249,6 +249,20 @@ class RemoteResponseParser {
 
         fun parseProductRating(jsonObject: JSONObject): Double {
             return jsonObject.getDouble("rating")
+        }
+
+        fun parseProductsWithImages(jsonArray: JSONArray): List<Image> {
+            val images = mutableListOf<Image>()
+            for (i in 0 until jsonArray.length()) {
+                val itemJson = jsonArray.getJSONObject(i)
+                val image = Image(
+                    productId = itemJson.getInt("ID_Prodotto"),
+                    url = itemJson.getString("URL"),
+                    number = itemJson.getInt("Numero")
+                )
+                images.add(image)
+            }
+            return images
         }
 
         // Parser per i dati utente

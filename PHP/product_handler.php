@@ -190,10 +190,21 @@ try {
                 "products" => $products
             ];
             break;
+
+        case "getProductsImages":
+            if (!isset($_POST["productIds"])) {
+                throw new Exception("Missing required fields");
+            }
+            $productsImages = $dbh->getProductsImages($_POST["productIds"]);
+            
+            $response = [
+                "success" => true,
+                "productsImages" => $productsImages,
+            ];
+            break;
             
         case "getProductData":
-            if (!isset($_POST["productId"]) || !isset($_POST["email"]) 
-                || !isset($_POST["last_access"])) {
+            if (!isset($_POST["productId"]) || !isset($_POST["email"])) {
                 throw new Exception("Missing required fields");
             }
 
