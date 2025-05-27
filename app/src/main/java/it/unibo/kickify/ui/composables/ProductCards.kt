@@ -1,6 +1,5 @@
 package it.unibo.kickify.ui.composables
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,18 +28,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import it.unibo.kickify.R
+import coil.compose.AsyncImage
 import it.unibo.kickify.data.models.ShopCategory
 
 @Composable
 fun ProductCardWishlistPage(
     productName: String,
+    mainImgUrl: String,
     price: Double,
     onClick: () -> Unit,
     onToggleWishlistIcon: (Boolean) -> Unit
@@ -62,6 +61,7 @@ fun ProductCardWishlistPage(
             ){
                 ProductImage(
                     productName = productName,
+                    imgUrl = mainImgUrl,
                     size = 120.dp,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -98,6 +98,7 @@ fun ProductCardWishlistPage(
 @Composable
 fun SquareProductCardHomePage(
     productName: String,
+    mainImgUrl: String,
     price: Double,
     onClick: (Int) -> Unit
 ){
@@ -113,7 +114,7 @@ fun SquareProductCardHomePage(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ProductImage(productName)
+            ProductImage(imgUrl = mainImgUrl, productName = productName)
             ProductNameText(productName)
             ProductPriceText(price)
         }
@@ -123,6 +124,7 @@ fun SquareProductCardHomePage(
 @Composable
 fun RectangularProductCardHomePage(
     productName: String,
+    mainImgUrl: String,
     price: Double,
     onClick: (Int) -> Unit
 ){
@@ -150,7 +152,7 @@ fun RectangularProductCardHomePage(
                 Spacer(Modifier.height(4.dp))
                 ProductPriceText(price)
             }
-            ProductImage(productName)
+            ProductImage(productName = productName, imgUrl = mainImgUrl)
         }
     }
 }
@@ -160,6 +162,7 @@ fun ProductCardShoesPage(
     productName: String,
     category: ShopCategory,
     price: Double,
+    mainImgUrl: String,
     onClick: () -> Unit
 ) {
     Card(
@@ -172,7 +175,7 @@ fun ProductCardShoesPage(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ProductImage(productName)
+            ProductImage(imgUrl = mainImgUrl, productName = productName)
             ProductNameText(productName)
             ProductCategoryText(category)
             ProductPriceText(price)
@@ -182,13 +185,14 @@ fun ProductCardShoesPage(
 
 @Composable
 fun ProductImage(
+    imgUrl: String,
     productName: String,
     modifier: Modifier = Modifier,
     size: Dp = 120.dp
 ){
-    Image(
-        painterResource(R.drawable.nike_lunarglide),
-        "$productName image",
+    AsyncImage(
+        model = imgUrl,
+        contentDescription = "$productName image",
         contentScale = ContentScale.FillWidth,
         modifier = modifier.size(size)
     )
@@ -223,9 +227,11 @@ fun ProductCategoryText(
 }
 
 @Composable
-fun ProductPriceText(price: Double,
-                     style: TextStyle = MaterialTheme.typography.bodyMedium,
-                     textAlign: TextAlign = TextAlign.Center){
+fun ProductPriceText(
+    price: Double,
+    style: TextStyle = MaterialTheme.typography.bodyMedium,
+    textAlign: TextAlign = TextAlign.Center
+){
     Text(
         text = "€%.2f".format(price),
         style = style,

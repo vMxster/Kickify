@@ -80,9 +80,8 @@ fun HomeScreenSectionSquareProductCards(
     prodList: Map<String, Boolean>,
     modifier: Modifier
 ){
-
     Column (
-        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+        modifier = modifier.fillMaxWidth().padding(vertical = 6.dp),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
@@ -108,6 +107,7 @@ fun HomeScreenSectionSquareProductCards(
                 if(!prod.value){ // to make a square product card
                     SquareProductCardHomePage(
                         productName = prod.key,
+                        mainImgUrl = "",
                         price = price,
                         onClick = { productId ->
                             navController.navigate(
@@ -118,6 +118,7 @@ fun HomeScreenSectionSquareProductCards(
                 } else { // to make a rectangular product card
                     RectangularProductCardHomePage(
                         productName = prod.key,
+                        mainImgUrl = "",
                         price = price,
                         onClick = { productId ->
                             navController.navigate(

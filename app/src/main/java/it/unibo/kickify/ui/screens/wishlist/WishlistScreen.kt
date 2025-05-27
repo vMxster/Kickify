@@ -63,6 +63,7 @@ fun WishlistScreen(
                         items(products.size) { index ->
                             val prodInfo = products[index].product
                             ProductCardWishlistPage(
+                                mainImgUrl = "",
                                 productName = "${prodInfo.brand} ${prodInfo.name}",
                                 price = prodInfo.price,
                                 onClick = {

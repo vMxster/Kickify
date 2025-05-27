@@ -104,6 +104,8 @@
     <string name="wishlist_title">Wishlist</string>
     <string name="emptyWishlist">Empty Wishlist.</string>
     <string name="errorLoadingWishlist">An error occurred while loading the wishlist. Retry later.</string>
+    <string name="errorLoadingData">An error occurred while loading data.</string>
+    <string name="errorProductsNotFound">Error: products not found.</string>
     <string name="prodDetails_gallery">Gallery</string>
     <string name="price">Price</string>
     <string name="prodDetails_addToCart">Add To Cart</string>

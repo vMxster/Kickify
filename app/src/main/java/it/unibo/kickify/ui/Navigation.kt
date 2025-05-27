@@ -153,7 +153,7 @@ fun KickifyNavGraph(
 
                 composable<KickifyRoute.ProductDetails> { backStackEntry ->
                     val route = backStackEntry.toRoute<KickifyRoute.ProductDetails>()
-                    ProductDetailsScreen(navController, route.productId)
+                    ProductDetailsScreen(navController, productsViewModel, route.productId)
                 }
 
                 composable<KickifyRoute.ProductList> {

@@ -62,7 +62,7 @@ fun ProductListScreen(
                 val products = productList.getOrNull() ?: emptyList()
 
                 if (products.isEmpty()) {
-                    Text(stringResource(R.string.emptyWishlist))
+                    Text(stringResource(R.string.errorLoadingData))
 
                 } else {
                     LazyVerticalGrid(
