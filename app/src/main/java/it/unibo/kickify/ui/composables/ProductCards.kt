@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
@@ -43,7 +42,8 @@ import it.unibo.kickify.data.models.ShopCategory
 fun ProductCardWishlistPage(
     productName: String,
     price: Double,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onToggleWishlistIcon: (Boolean) -> Unit
 ){
     Card(
         onClick = onClick,
@@ -54,7 +54,7 @@ fun ProductCardWishlistPage(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            var checked by remember { mutableStateOf(false) }
+            var checked by remember { mutableStateOf(true) }
             Column (
                 modifier = Modifier.align(Alignment.Center),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -75,14 +75,17 @@ fun ProductCardWishlistPage(
 
             IconToggleButton(
                 checked = checked,
-                onCheckedChange = { checked = it },
+                onCheckedChange = {
+                    checked = it
+                    onToggleWishlistIcon(it)
+                },
                 modifier = Modifier.padding(top = 4.dp)
                     .padding(start = 4.dp)
                     .align(Alignment.TopStart)
             ) {
                 Icon(
                     imageVector = if(checked) Icons.Outlined.Favorite
-                        else Icons.Outlined.FavoriteBorder,
+                    else Icons.Outlined.FavoriteBorder,
                     contentDescription = "",
                     tint = Color.Red,
                 )
@@ -180,8 +183,8 @@ fun ProductCardShoesPage(
 @Composable
 fun ProductImage(
     productName: String,
-    size: Dp = 120.dp,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    size: Dp = 120.dp
 ){
     Image(
         painterResource(R.drawable.nike_lunarglide),

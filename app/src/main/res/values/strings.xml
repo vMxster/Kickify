@@ -18,6 +18,7 @@
     <string name="confirmNewPassword">Confirm new password</string>
     <string name="confirmPassword">Confirm password</string>
     <string name="confirmPasswordNoMatch">Password and Confirm Password don\'t match</string>
+    <string name="signin_errorsInEmailOrPassword">Check email and password are correct</string>
     <string name="showHidePsw">Show/Hide Password</string>
     <string name="invalidEmailMessage">Type in a valid email address</string>
     <string name="invalidPswMessage">The password must be at least 10 characters long\n
@@ -101,6 +102,8 @@
     <string name="notificationscreen_productsInCart">Shoes still in your cart</string>
     <string name="notificationscreen_productReviewRequested">Product review requested</string>
     <string name="wishlist_title">Wishlist</string>
+    <string name="emptyWishlist">Empty Wishlist.</string>
+    <string name="errorLoadingWishlist">An error occurred while loading the wishlist. Retry later.</string>
     <string name="prodDetails_gallery">Gallery</string>
     <string name="price">Price</string>
     <string name="prodDetails_addToCart">Add To Cart</string>
