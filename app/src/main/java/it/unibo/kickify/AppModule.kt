@@ -26,6 +26,7 @@ import it.unibo.kickify.data.repositories.local.WishlistRepository
 import it.unibo.kickify.data.repositories.local.NotificationRepository
 import it.unibo.kickify.data.repositories.local.ProductCartRepository
 import it.unibo.kickify.data.repositories.local.ReviewRepository
+import it.unibo.kickify.ui.screens.productList.ProductsViewModel
 import it.unibo.kickify.ui.screens.wishlist.WishlistViewModel
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
@@ -78,4 +79,5 @@ val appModule = module {
 
     viewModel { SettingsViewModel(get()) }
     viewModel { WishlistViewModel(get()) }
+    viewModel { ProductsViewModel(get()) }
 }
