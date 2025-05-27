@@ -1,19 +1,47 @@
 package it.unibo.kickify.data.repositories
 
-import android.content.Context
 import android.util.Log
-import io.ktor.client.*
-import io.ktor.client.request.*
+import io.ktor.client.HttpClient
 import io.ktor.client.request.forms.FormDataContent
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import it.unibo.kickify.data.database.*
+import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.readBytes
+import io.ktor.http.ContentType
+import io.ktor.http.Parameters
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
+import it.unibo.kickify.data.database.Cart
+import it.unibo.kickify.data.database.CartProduct
+import it.unibo.kickify.data.database.HistoryProduct
+import it.unibo.kickify.data.database.Image
+import it.unibo.kickify.data.database.Notification
+import it.unibo.kickify.data.database.OrderDetails
+import it.unibo.kickify.data.database.OrderTracking
+import it.unibo.kickify.data.database.Product
+import it.unibo.kickify.data.database.ProductDetails
+import it.unibo.kickify.data.database.Review
+import it.unibo.kickify.data.database.User
+import it.unibo.kickify.data.database.WishlistProduct
 import it.unibo.kickify.utils.RemoteResponseParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
+import kotlin.collections.List
+import kotlin.collections.Map
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.emptyMap
+import kotlin.collections.forEach
+import kotlin.collections.joinToString
+import kotlin.collections.map
+import kotlin.collections.mapOf
+import kotlin.collections.mutableMapOf
+import kotlin.collections.set
 
 class RemoteRepository(
     private val httpClient: HttpClient
@@ -59,11 +87,12 @@ class RemoteRepository(
             val params = mapOf(
                 "action" to "getProductData",
                 "productId" to productId.toString(),
-                "user_email" to userEmail
+                "email" to userEmail
             )
             val response = makeRequest("product_handler.php", params)
             val jsonObject = JSONObject(response)
-            val product = RemoteResponseParser.parseProductDetails(jsonObject)
+            val productData = jsonObject.getJSONObject("productData")
+            val product = RemoteResponseParser.parseProductDetails(productData)
             Result.success(product)
         } catch (e: Exception) {
             Log.e(tag, "Errore durante il recupero dei dati del prodotto $productId", e)
@@ -170,7 +199,8 @@ class RemoteRepository(
                 "user_email" to email
             )
             val response = makeRequest("wishlist_handler.php", params)
-            val jsonArray = JSONArray(response)
+            val jsonObject = JSONObject(response)
+            val jsonArray = jsonObject.getJSONArray("items")
             val items = RemoteResponseParser.parseWishlistItems(jsonArray)
             Result.success(items)
         } catch (e: Exception) {
