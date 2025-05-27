@@ -7,7 +7,11 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
-import androidx.camera.extensions.ExtensionMode
+import androidx.camera.extensions.ExtensionMode.BOKEH
+import androidx.camera.extensions.ExtensionMode.FACE_RETOUCH
+import androidx.camera.extensions.ExtensionMode.HDR
+import androidx.camera.extensions.ExtensionMode.NIGHT
+import androidx.camera.extensions.ExtensionMode.NONE
 import androidx.camera.extensions.ExtensionsManager
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -70,7 +74,7 @@ fun TakePhotoCameraScreen(
     var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
     var lensFacing by remember { mutableIntStateOf(CameraSelector.LENS_FACING_BACK) }
     var isFlashOn by remember { mutableStateOf(false) }
-    var selectedEffect by remember { mutableIntStateOf(ExtensionMode.NONE) }
+    var selectedEffect by remember { mutableIntStateOf(NONE) }
     val context = LocalContext.current
 
     if (cameraMode == CameraMode.CAPTURE) {
@@ -99,7 +103,10 @@ fun TakePhotoCameraScreen(
             },
             onSavePhoto = {
                 // if captureimageuri != null, then save photo
-                capturedImageUri?.let { cameraXUtils.savePhotoInGallery(context, it) }
+                capturedImageUri?.let {
+                    cameraXUtils.savePhotoInGallery(context, it)
+                    /* TODO save this image in remote server, in app cache and in settings repo */
+                }
                 navController.popBackStack()
             }
         )
@@ -123,6 +130,14 @@ fun CameraCaptureScreen(
 
     val previewView = remember { PreviewView(context) }
     var isFlashAvailable = false
+    val isEffectAvailableFrontCamera: MutableMap<Int, Boolean> = mutableMapOf()
+    val isEffectAvailableBackCamera: MutableMap<Int, Boolean> = mutableMapOf()
+
+    fun getAvailableEffects(): Map<Int, Boolean>{
+        return if(lensFacing == CameraSelector.LENS_FACING_BACK){
+            isEffectAvailableBackCamera.toMap()
+        } else isEffectAvailableFrontCamera.toMap()
+    }
 
     LaunchedEffect(lensFacing, isFlashOn, selectedEffect) {
         val cameraProvider = cameraProviderFuture.get()
@@ -148,8 +163,24 @@ fun CameraCaptureScreen(
         }
         imageCapture = ImageCapture.Builder().build()
 
+        if(isEffectAvailableBackCamera.isEmpty() || isEffectAvailableFrontCamera.isEmpty()) {
+            val modes = listOf(HDR, BOKEH, NIGHT, FACE_RETOUCH)
+            for (mode in modes) {
+                isEffectAvailableFrontCamera[mode] = extensionsManager.isExtensionAvailable(
+                    CameraSelector.DEFAULT_FRONT_CAMERA, mode
+                )
+                isEffectAvailableBackCamera[mode] = extensionsManager.isExtensionAvailable(
+                    CameraSelector.DEFAULT_BACK_CAMERA, mode
+                )
+            }
+            println("back camera: $isEffectAvailableBackCamera"+
+                    "\nfront camera: $isEffectAvailableFrontCamera")
+        }
+
         try{
-            val camera = cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview, imageCapture)
+            val camera = cameraProvider.bindToLifecycle(
+                lifecycleOwner, cameraSelector, preview, imageCapture
+            )
             isFlashAvailable = camera.cameraInfo.hasFlashUnit()
         } catch (e: Exception){
             Log.e("CameraX", "CameraBindingError: ${e.message}")
@@ -165,7 +196,10 @@ fun CameraCaptureScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ){
-            ExpandableButtonRow(onApplyEffect = onApplyEffect)
+            ExpandableButtonRow(
+                onApplyEffect = onApplyEffect,
+                availableEffects = getAvailableEffects()
+            )
         }
         Row(
             modifier = Modifier.fillMaxWidth().padding(16.dp)
@@ -260,42 +294,60 @@ fun PhotoPreviewScreen(
 }
 
 @Composable
-fun ExpandableButtonRow(onApplyEffect: (Int) -> Unit) {
+fun ExpandableButtonRow(
+    onApplyEffect: (Int) -> Unit,
+    availableEffects: Map<Int, Boolean>
+) {
     var isExpanded by remember { mutableStateOf(false) }
 
     Column(
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        AnimatedVisibility(visible = isExpanded) {
+        AnimatedVisibility(
+            modifier = Modifier.fillMaxWidth(),
+            visible = isExpanded
+        ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                IconButton(onClick = { onApplyEffect(ExtensionMode.HDR) }
+
+                fun isEffectAvailable(key: Int): Boolean{
+                    return availableEffects.containsKey(key) && availableEffects.getValue(key)
+                }
+
+                // buttons enabled only if effect is available
+                IconButton(
+                    enabled = isEffectAvailable(HDR),
+                    onClick = { onApplyEffect(HDR) }
                 ) {
                     CameraIconVector(
                         icon = Icons.Outlined.HdrOn,
                         contentDescription = "HDR"
                     )
                 }
-                IconButton(onClick = { onApplyEffect(ExtensionMode.NIGHT) }
+
+                IconButton(
+                    enabled = isEffectAvailable(NIGHT),
+                    onClick = { onApplyEffect(NIGHT) }
                 ) {
                     CameraIconVector(
                         icon = Icons.Outlined.ModeNight,
                         contentDescription = "Night Mode"
                     )
                 }
-                IconButton(onClick = { onApplyEffect(ExtensionMode.BOKEH) }
+
+                IconButton(onClick = { onApplyEffect(BOKEH) }
                 ) {
                     CameraIconVector(
                         icon = Icons.Outlined.BlurOn,
-                        contentDescription = "HDR"
+                        contentDescription = "Bokeh"
                     )
                 }
             }
         }
+
         IconButton(onClick = { isExpanded = !isExpanded }) {
             CameraIconVector(
                 icon = if (isExpanded) Icons.Outlined.Close else Icons.Outlined.FaceRetouchingNatural,
