@@ -45,9 +45,7 @@ fun BottomBar(
 
         NavigationBarItem(
             selected = isSelectedIcon(KickifyRoute.Home),
-            icon = {
-                Icon(Icons.Outlined.Home, contentDescription = stringResource(R.string.home))
-            },
+            icon = { Icon(Icons.Outlined.Home, contentDescription = null) },
             onClick = {
                 if(!isSelectedIcon(KickifyRoute.Home)){
                     navController.navigate(KickifyRoute.Home) {
@@ -60,12 +58,7 @@ fun BottomBar(
 
         NavigationBarItem(
             selected = isSelectedIcon(KickifyRoute.Wishlist),
-            icon = {
-                Icon(
-                    Icons.Outlined.FavoriteBorder,
-                    contentDescription = stringResource(R.string.wishlist_title)
-                )
-            },
+            icon = { Icon(Icons.Outlined.FavoriteBorder, contentDescription = null) },
             onClick = {
                 if(!isSelectedIcon(KickifyRoute.Wishlist)){
                     navController.navigate(KickifyRoute.Wishlist)
@@ -120,9 +113,7 @@ fun BottomBar(
 
         NavigationBarItem(
             selected = isSelectedIcon(KickifyRoute.Profile),
-            icon = {
-                Icon(Icons.Outlined.Person, contentDescription = stringResource(R.string.profileScreen_title))
-            },
+            icon = { Icon(Icons.Outlined.Person, contentDescription = null) },
             onClick = {
                 if(!isSelectedIcon(KickifyRoute.Profile)){
                     navController.navigate(KickifyRoute.Profile)

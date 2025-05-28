@@ -15,6 +15,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import it.unibo.kickify.camerax.CameraXUtils
 import it.unibo.kickify.data.database.KickifyDatabase
+import it.unibo.kickify.data.repositories.AchievementsRepository
 import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.data.repositories.local.CartRepository
 import it.unibo.kickify.data.repositories.local.OrderRepository
@@ -26,6 +27,9 @@ import it.unibo.kickify.data.repositories.local.WishlistRepository
 import it.unibo.kickify.data.repositories.local.NotificationRepository
 import it.unibo.kickify.data.repositories.local.ProductCartRepository
 import it.unibo.kickify.data.repositories.local.ReviewRepository
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
+import it.unibo.kickify.ui.screens.productList.ProductsViewModel
+import it.unibo.kickify.ui.screens.wishlist.WishlistViewModel
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 
@@ -68,6 +72,7 @@ val appModule = module {
     single { ReviewRepository(reviewDao = get<KickifyDatabase>().reviewDao()) }
     single { NotificationRepository(notificationDao = get<KickifyDatabase>().notificationDao()) }
     single { SettingsRepository(dataStore = get()) }
+    single { AchievementsRepository(dataStore = get()) }
     single { RemoteRepository(httpClient = get()) }
     single { AppRepository(
         get(), get(), get(),
@@ -76,4 +81,7 @@ val appModule = module {
         get(), get()) }
 
     viewModel { SettingsViewModel(get()) }
+    viewModel { WishlistViewModel(get()) }
+    viewModel { ProductsViewModel(get()) }
+    viewModel { AchievementsViewModel(get()) }
 }

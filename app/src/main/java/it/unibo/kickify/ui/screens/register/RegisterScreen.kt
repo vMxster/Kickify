@@ -57,7 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
-import it.unibo.kickify.data.repositories.RemoteRepository
+import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
@@ -82,7 +82,7 @@ fun RegisterScreen(
         val registerScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)
 
-        val remoteRepo = koinInject<RemoteRepository>()
+        val appRepo = koinInject<AppRepository>()
         val coroutineScope = rememberCoroutineScope()
 
         var name by rememberSaveable { mutableStateOf("") }
@@ -320,7 +320,7 @@ fun RegisterScreen(
                             && LoginRegisterUtils.isValidPassword(password)
                             && LoginRegisterUtils.isValidNameLastname(name)
                             && LoginRegisterUtils.isValidNameLastname(lastname)) {
-                            val registerRes = remoteRepo.register(
+                            val registerRes = appRepo.register(
                                 email = email, firstName = name,
                                 lastName = lastname, password = password,
                                 newsletter = false, phone = null

@@ -35,7 +35,7 @@ class ProductRepository(private val productDao: ProductDao) {
     suspend fun getProductHistory(productId: Int): List<HistoryProduct> =
         productDao.getProductHistory(productId)
 
-    fun insertProductHistory(remoteHistory: List<HistoryProduct>) {
+    suspend fun insertProductHistory(remoteHistory: List<HistoryProduct>) {
         productDao.insertProductHistory(remoteHistory)
     }
 }
