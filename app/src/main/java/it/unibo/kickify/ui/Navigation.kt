@@ -32,7 +32,8 @@ import it.unibo.kickify.ui.screens.productList.ProductsViewModel
 import it.unibo.kickify.ui.screens.profile.ProfileScreen
 import it.unibo.kickify.ui.screens.profile.TakePhotoScreen
 import it.unibo.kickify.ui.screens.register.RegisterScreen
-import it.unibo.kickify.ui.screens.rewards.BadgeScreen
+import it.unibo.kickify.ui.screens.achievements.AchievementsScreen
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.settings.EditProfileScreen
 import it.unibo.kickify.ui.screens.settings.EditProfileSections
 import it.unibo.kickify.ui.screens.settings.SettingsScreen
@@ -62,7 +63,7 @@ sealed interface KickifyRoute {
     @Serializable data object MyOrders : KickifyRoute
     @Serializable data class OrderDetails(val orderID: String) : KickifyRoute
     @Serializable data object TakeProfilePhoto : KickifyRoute
-    @Serializable data object BadgesScreen : KickifyRoute
+    @Serializable data object AchievementsScreen : KickifyRoute
     @Serializable data class EditProfile(val section: EditProfileSections): KickifyRoute
     @Serializable data object BiometricLoginScreen: KickifyRoute
 }
@@ -81,6 +82,7 @@ fun KickifyNavGraph(
     val cameraXUtils =  koinInject<CameraXUtils>()
     val wishlistViewModel = koinViewModel<WishlistViewModel>()
     val productsViewModel = koinViewModel<ProductsViewModel>()
+    val achievementsViewModel = koinViewModel<AchievementsViewModel>()
 
     val ctx = LocalContext.current
     val isUserLoggedin = settingsViewModel.isUserLoggedIn()
@@ -98,7 +100,7 @@ fun KickifyNavGraph(
                 KickifyRoute.Home
             }
         } else {
-            KickifyRoute.Home
+            KickifyRoute.Onboard
         }
         startDestinationState = StartDestinationResult.Loaded(destination)
     }
@@ -194,8 +196,8 @@ fun KickifyNavGraph(
                     TakePhotoScreen(navController, activity, cameraXUtils, settingsViewModel)
                 }
 
-                composable<KickifyRoute.BadgesScreen> {
-                    BadgeScreen(navController)
+                composable<KickifyRoute.AchievementsScreen> {
+                    AchievementsScreen(navController, achievementsViewModel)
                 }
 
                 composable<KickifyRoute.EditProfile> { backStackEntry ->

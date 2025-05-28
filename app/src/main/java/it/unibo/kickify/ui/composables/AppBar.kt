@@ -131,7 +131,7 @@ fun AppBar(
             }
 
             if (title == stringResource(R.string.profileScreen_title)){
-                IconButton(onClick = { navController.navigate(KickifyRoute.BadgesScreen) }) {
+                IconButton(onClick = { navController.navigate(KickifyRoute.AchievementsScreen) }) {
                     Icon(Icons.Outlined.EmojiEvents, contentDescription = "View achievements")
                 }
                 IconButton(onClick = { navController.navigate(KickifyRoute.Settings) }) {
