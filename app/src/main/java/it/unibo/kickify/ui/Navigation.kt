@@ -63,9 +63,9 @@ sealed interface KickifyRoute {
     @Serializable data object MyOrders : KickifyRoute
     @Serializable data class OrderDetails(val orderID: String) : KickifyRoute
     @Serializable data object TakeProfilePhoto : KickifyRoute
-    @Serializable data object AchievementsScreen : KickifyRoute
+    @Serializable data object Achievements : KickifyRoute
     @Serializable data class EditProfile(val section: EditProfileSections): KickifyRoute
-    @Serializable data object BiometricLoginScreen: KickifyRoute
+    @Serializable data object BiometricLogin: KickifyRoute
 }
 
 sealed class StartDestinationResult {
@@ -95,7 +95,7 @@ fun KickifyNavGraph(
 
         val destination: Any = if (isUserLoggedin) {
             if (biometricLoginEnabled && canUseBiometricsOnDevice) {
-                KickifyRoute.BiometricLoginScreen
+                KickifyRoute.BiometricLogin
             } else {
                 KickifyRoute.Home
             }
@@ -196,7 +196,7 @@ fun KickifyNavGraph(
                     TakePhotoScreen(navController, activity, cameraXUtils, settingsViewModel)
                 }
 
-                composable<KickifyRoute.AchievementsScreen> {
+                composable<KickifyRoute.Achievements> {
                     AchievementsScreen(navController, achievementsViewModel)
                 }
 
@@ -205,7 +205,7 @@ fun KickifyNavGraph(
                     EditProfileScreen(navController, route.section, cameraXUtils, settingsViewModel)
                 }
 
-                composable<KickifyRoute.BiometricLoginScreen> {
+                composable<KickifyRoute.BiometricLogin> {
                     BiometricLoginScreen(navController)
                 }
             }
