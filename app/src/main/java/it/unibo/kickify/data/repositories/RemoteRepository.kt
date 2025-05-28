@@ -1,6 +1,5 @@
 package it.unibo.kickify.data.repositories
 
-import android.content.Context
 import android.util.Log
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -269,10 +268,11 @@ class RemoteRepository(
         }
     }
 
-    suspend fun markNotificationsAsRead(notificationIds: Array<Int>): Result<Boolean> = withContext(Dispatchers.IO) {
+    suspend fun markNotificationsAsRead(email: String, notificationIds: Array<Int>): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
             val params = mapOf(
                 "action" to "markNotificationsAsRead",
+                "email" to email,
                 "notificationIds" to notificationIds.joinToString(",")
             )
             val response = makeRequest("notification_handler.php", params)
@@ -286,7 +286,7 @@ class RemoteRepository(
     }
 
     // ORDINI
-    suspend fun getOrders(email: String, lastAccess: String): Result<List<OrderDetails>> = withContext(Dispatchers.IO) {
+    suspend fun getOrders(email: String, lastAccess: String): Result<List<Order>> = withContext(Dispatchers.IO) {
         try {
             val params = mapOf(
                 "action" to "getOrders",
@@ -303,6 +303,22 @@ class RemoteRepository(
         }
     }
 
+    suspend fun getOrderDetails(orderId: Int): Result<List<OrderDetails>> = withContext(Dispatchers.IO) {
+        try {
+            val params = mapOf(
+                "action" to "getOrderDetails",
+                "orderId" to orderId.toString(),
+            )
+            val response = makeRequest("order_handler.php", params)
+            val jsonArray = JSONArray(response)
+            val orderDetails = RemoteResponseParser.parseOrderDetails(jsonArray)
+            Result.success(orderDetails)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante il recupero dei dettagli degli ordini", e)
+            Result.failure(e)
+        }
+    }
+
     suspend fun placeOrder(
         email: String,
         total: Double,
@@ -310,8 +326,12 @@ class RemoteRepository(
         shippingType: String,
         isGift: Boolean = false,
         giftFirstName: String? = null,
-        giftLastName: String? = null
-    ): Result<Int> = withContext(Dispatchers.IO) {
+        giftLastName: String? = null,
+        street: String,
+        city: String,
+        civic: Int,
+        cap: Int,
+        ): Result<Int> = withContext(Dispatchers.IO) {
         try {
             val params = mutableMapOf(
                 "action" to "placeOrder",
@@ -321,7 +341,11 @@ class RemoteRepository(
                 "shippingType" to shippingType,
                 "isGift" to (if (isGift) "1" else "0"),
                 "giftFirstName" to (giftFirstName ?: ""),
-                "giftLastName" to (giftLastName ?: "")
+                "giftLastName" to (giftLastName ?: ""),
+                "street" to street,
+                "city" to city,
+                "civic" to civic.toString(),
+                "cap" to cap.toString()
             )
 
             if (isGift) {
@@ -343,7 +367,7 @@ class RemoteRepository(
         }
     }
 
-    suspend fun getOrderTracking(orderId: Int): Result<OrderTracking> = withContext(Dispatchers.IO) {
+    suspend fun getOrderTracking(orderId: Int): Result<List<TrackingShipping>> = withContext(Dispatchers.IO) {
         try {
             val params = mapOf(
                 "action" to "getOrderTracking",
@@ -363,7 +387,7 @@ class RemoteRepository(
     suspend fun addReview(
         email: String,
         productId: Int,
-        rating: Int,
+        rating: Double,
         comment: String
     ): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
@@ -417,22 +441,6 @@ class RemoteRepository(
             Result.success(reviews)
         } catch (e: Exception) {
             Log.e(tag, "Errore durante il recupero delle recensioni", e)
-            Result.failure(e)
-        }
-    }
-
-    suspend fun getProductRating(productId: Int): Result<Double> = withContext(Dispatchers.IO) {
-        try {
-            val params = mapOf(
-                "action" to "getProductRating",
-                "productId" to productId.toString()
-            )
-            val response = makeRequest("review_handler.php", params)
-            val jsonObject = JSONObject(response)
-            val rating = RemoteResponseParser.parseProductRating(jsonObject)
-            Result.success(rating)
-        } catch (e: Exception) {
-            Log.e(tag, "Errore durante il recupero della valutazione del prodotto", e)
             Result.failure(e)
         }
     }

@@ -104,39 +104,59 @@ class RemoteResponseParser {
         }
 
         // Parser per gli ordini
-        fun parseOrders(json: JSONArray): List<OrderDetails> {
-            val orders = mutableListOf<OrderDetails>()
+        fun parseOrderDetails(json: JSONArray): List<OrderDetails> {
+            val orderDetailsList = mutableListOf<OrderDetails>()
             for (i in 0 until json.length()) {
                 val orderJson = json.getJSONObject(i)
+                val order = Order(
+                    orderId = orderJson.getInt("ID_Ordine"),
+                    email = orderJson.getString("Email"),
+                    shippingType = orderJson.getString("Tipo"),
+                    orderDate = orderJson.getString("Data_Ordine"),
+                    totalCost = orderJson.getDouble("Costo_Totale"),
+                    paymentMethod = orderJson.getString("Metodo_Pagamento"),
+                    isPresent = orderJson.getBoolean("Regalo"),
+                    discountId = orderJson.optInt("ID_Sconto", 0),
+                    nomeDestinatario = orderJson.optString("Nome_Destinatario", ""),
+                    cognomeDestinatario = orderJson.optString("Cognome_Destinatario", ""),
+                )
+                val isDelivered = orderJson.optBoolean("tracking_delivered", false)
 
-                val productsList = mutableListOf<OrderProduct>()
-                val productsJson = orderJson.getJSONArray("products")
-                for (j in 0 until productsJson.length()) {
-                    val productJson = productsJson.getJSONObject(j)
-                    productsList.add(
-                        OrderProduct(
-                            orderId = orderJson.getInt("ID_Ordine"),
-                            productId = productJson.getInt("ID_Prodotto"),
-                            quantity = productJson.getInt("Quantita"),
-                            color = productJson.getString("Colore"),
-                            size = productJson.getDouble("Taglia"),
-                            purchasePrice = productJson.getDouble("Prezzo")
-                        )
+                val productsArray = orderJson.getJSONArray("prodotti")
+                val products = mutableListOf<OrderProduct>()
+                for (j in 0 until productsArray.length()) {
+                    val productJson = productsArray.getJSONObject(j)
+                    val product = OrderProduct(
+                        productId = productJson.getInt("ID_Prodotto"),
+                        orderId = productJson.getInt("ID_Ordine"),
+                        color = productJson.getString("Colore"),
+                        size = productJson.getDouble("Taglia"),
+                        quantity = productJson.getInt("Quantita"),
+                        purchasePrice = productJson.getDouble("Prezzo_Acquisto")
                     )
+                    products.add(product)
                 }
+                orderDetailsList.add(OrderDetails(order, isDelivered, products.toList()))
+            }
+            return orderDetailsList
+        }
 
+        fun parseOrders(json: JSONArray): List<Order> {
+            val orders = mutableListOf<Order>()
+            for (i in 0 until json.length()) {
+                val orderJson = json.getJSONObject(i)
                 orders.add(
-                    OrderDetails(
+                    Order(
                         orderId = orderJson.getInt("ID_Ordine"),
+                        email = orderJson.getString("Email"),
+                        shippingType = orderJson.getString("Tipo"),
                         orderDate = orderJson.getString("Data_Ordine"),
                         totalCost = orderJson.getDouble("Costo_Totale"),
                         paymentMethod = orderJson.getString("Metodo_Pagamento"),
                         isPresent = orderJson.getBoolean("Regalo"),
-                        shippingType = orderJson.getString("Tipo"),
-                        discountId = orderJson.optInt("ID_Sconto"),
-                        isDelivered = orderJson.getBoolean("tracking_delivered"),
-                        email = orderJson.optString("Email", ""),
-                        products = productsList
+                        discountId = orderJson.optInt("ID_Sconto", 0),
+                        nomeDestinatario = orderJson.optString("Nome_Destinatario", ""),
+                        cognomeDestinatario = orderJson.optString("Cognome_Destinatario", ""),
                     )
                 )
             }
@@ -144,55 +164,26 @@ class RemoteResponseParser {
         }
 
         // Parser per il tracking dell'ordine
-        fun parseOrderTracking(json: JSONObject): OrderTracking {
-            val orderInfo = json.getJSONObject("order_info")
-
-            val trackingStates = mutableListOf<TrackingStateOrder>()
+        fun parseOrderTracking(json: JSONObject): List<TrackingShipping> {
+            val trackingStates = mutableListOf<TrackingShipping>()
             val statesJson = json.getJSONArray("tracking_states")
             for (i in 0 until statesJson.length()) {
                 val stateJson = statesJson.getJSONObject(i)
                 if (!stateJson.isNull("status")) {
                     trackingStates.add(
-                        TrackingStateOrder(
-                            orderId = json.optInt("order_id", 0),
-                            status = stateJson.optString("status", ""),
-                            location = stateJson.optString("location", ""),
-                            timestamp = stateJson.optString("timestamp", ""),
-                            estimatedArrival = stateJson.optString("estimated_arrival", ""),
-                            actualArrival = stateJson.optString("actual_arrival", "")
+                        TrackingShipping(
+                            orderId = json.optInt("order_id"),
+                            state = stateJson.optString("status"),
+                            position = stateJson.optString("location"),
+                            updateTimestamp = stateJson.optString("timestamp"),
+                            estimatedArrival = stateJson.optString("estimated_arrival"),
+                            effectiveArrival = stateJson.optString("actual_arrival", "")
                         )
                     )
                 }
             }
 
-            val products = mutableListOf<TrackingProduct>()
-            val productsJson = json.getJSONArray("products")
-            for (i in 0 until productsJson.length()) {
-                val productJson = productsJson.getJSONObject(i)
-                products.add(
-                    TrackingProduct(
-                        orderId = json.optInt("order_id", 0),
-                        image = productJson.getString("image"),
-                        name = productJson.getString("name"),
-                        size = productJson.getString("size"),
-                        quantity = productJson.getInt("quantity"),
-                        color = productJson.getString("color"),
-                        price = productJson.getDouble("price"),
-                        originalPrice = productJson.getDouble("original_price")
-                    )
-                )
-            }
-
-            return OrderTracking(
-                orderId = json.optInt("order_id", 0),
-                shippingType = orderInfo.getString("shipping_type"),
-                orderDate = orderInfo.getString("order_date"),
-                currentStatus = orderInfo.getString("current_status"),
-                currentLocation = orderInfo.getString("current_location"),
-                estimatedArrival = orderInfo.getString("estimated_arrival"),
-                trackingStates = trackingStates,
-                products = products
-            )
+            return trackingStates
         }
 
         // Parser per le recensioni

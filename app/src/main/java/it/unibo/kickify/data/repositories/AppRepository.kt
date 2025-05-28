@@ -7,6 +7,7 @@ import it.unibo.kickify.data.repositories.local.*
 import it.unibo.kickify.utils.ImageStorageManager
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
+import java.time.LocalDateTime
 
 class AppRepository(
     private val context: Context,
@@ -163,8 +164,24 @@ class AppRepository(
     }
 
     // WISHLIST
-    suspend fun getWishlistItems(email: String): Result<List<WishlistProduct>> {
-        return remoteRepository.getWishlistItems(email)
+    suspend fun getWishlistItems(email: String): Result<List<Product>> = withContext(Dispatchers.IO) {
+        try {
+            val remoteResult = remoteRepository.getWishlistItems(email)
+            if (remoteResult.isSuccess) {
+                val remoteWishlist = remoteResult.getOrNull() ?: emptyList()
+                if (remoteWishlist.isNotEmpty()) {
+                    for (item in remoteWishlist) {
+                        wishlistRepository.addToWishlist(email, item.productId)
+                    }
+                }
+            }
+            Result.success(
+                wishlistRepository.getWishlistItems(email)
+            )
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in getWishlistItems", e)
+            Result.failure(e)
+        }
     }
 
     suspend fun addToWishlist(email: String, productId: Int): Result<Boolean> {
@@ -192,21 +209,123 @@ class AppRepository(
     }
 
     // NOTIFICHE
-    suspend fun getNotifications(email: String, lastAccess: String): Result<List<Notification>> {
-        return remoteRepository.getNotifications(email, lastAccess)
+    suspend fun getNotifications(email: String, lastAccess: String): Result<List<Notification>> = withContext(Dispatchers.IO) {
+        try {
+            val remoteResult = remoteRepository.getNotifications(email, lastAccess)
+            if (remoteResult.isSuccess) {
+                val remoteNotifications = remoteResult.getOrNull() ?: emptyList()
+                if (remoteNotifications.isNotEmpty()) {
+                    for (notification in remoteNotifications) {
+                        notificationRepository.addNotification(
+                            notification.email, notification.message, notification.type)
+                    }
+                }
+            }
+            Result.success(
+                notificationRepository.getUserNotifications(email)
+            )
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in getNotifications", e)
+            Result.failure(e)
+        }
     }
 
     suspend fun createNotification(email: String, message: String, type: String): Result<Boolean> {
-        return remoteRepository.createNotification(email, message, type)
+        val result = remoteRepository.createNotification(email, message, type)
+        if (result.isSuccess && result.getOrNull() == true) {
+            notificationRepository.addNotification(email, message, type)
+        }
+        return result
     }
 
-    suspend fun markNotificationsAsRead(notificationIds: Array<Int>): Result<Boolean> {
-        return remoteRepository.markNotificationsAsRead(notificationIds)
+    suspend fun markNotificationsAsRead(email: String, notificationIds: List<Int>): Result<Boolean> {
+        val result = remoteRepository.markNotificationsAsRead(email, notificationIds.toTypedArray())
+        if (result.isSuccess && result.getOrNull() == true) {
+            notificationRepository.markNotificationsAsRead(email, notificationIds)
+        }
+        return result
+    }
+
+    suspend fun getUnreadNotificationsCount(email: String): Int {
+        return notificationRepository.getUnreadNotificationsCount(email)
     }
 
     // ORDINI
-    suspend fun getOrders(email: String, lastAccess: String): Result<List<OrderDetails>> {
-        return remoteRepository.getOrders(email, lastAccess)
+    suspend fun getOrders(email: String, lastAccess: String): Result<List<Order>> = withContext(Dispatchers.IO) {
+        try {
+            val remoteResult = remoteRepository.getOrders(email, lastAccess)
+            if (remoteResult.isSuccess) {
+                val remoteOrders = remoteResult.getOrNull() ?: emptyList()
+                if (remoteOrders.isNotEmpty()) {
+                    for (order in remoteOrders) {
+                        orderRepository.insertOrder(order)
+                        addOrderDetails(order.orderId).onFailure { e ->
+                            Log.e(tag, "Errore in getOrderDetails per l'ordine ${order.orderId}", e)
+                        }
+                    }
+                }
+            }
+            Result.success(
+                orderRepository.getOrders(email)
+            )
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in getOrders", e)
+            Result.failure(e)
+        }
+    }
+
+    private suspend fun addOrderDetails(orderId: Int): Result<Any> = withContext(Dispatchers.IO) {
+        try {
+            val remoteResult = remoteRepository.getOrderDetails(orderId)
+            if (remoteResult.isSuccess) {
+                val remoteOrder = remoteResult.getOrNull()
+                remoteOrder?.let {
+                    it.forEach { orderDetail ->
+                        orderDetail.products.forEach { product ->
+                            orderRepository.insertOrderProduct(
+                                OrderProduct(
+                                    orderId = product.orderId,
+                                    productId = product.productId,
+                                    color = product.color,
+                                    size = product.size,
+                                    quantity = product.quantity,
+                                    purchasePrice = product.purchasePrice
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+            Result.success(Any())
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in getOrderDetails", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getOrdersWithProducts(email: String): Result<List<OrderProductDetails>> = withContext(Dispatchers.IO) {
+        try {
+            Result.success(orderRepository.getOrdersWithProducts(email))
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in getOrderDetails", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getOrderTracking(orderId: Int): Result<OrderDetailedTracking> = withContext(Dispatchers.IO) {
+        try {
+            val remoteResult = remoteRepository.getOrderTracking(orderId)
+            if (remoteResult.isSuccess) {
+                val remoteTracking = remoteResult.getOrNull()
+                remoteTracking?.forEach() {
+                    orderRepository.insertTrackingInfo(it)
+                }
+            }
+            Result.success(orderRepository.getOrderTracking(orderId))
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in getOrderTracking", e)
+            Result.failure(e)
+        }
     }
 
     suspend fun placeOrder(
@@ -216,23 +335,35 @@ class AppRepository(
         shippingType: String,
         isGift: Boolean = false,
         giftFirstName: String? = null,
-        giftLastName: String? = null
-    ): Result<Int> {
-        return remoteRepository.placeOrder(
-            email, total, paymentMethod, shippingType,
-            isGift, giftFirstName, giftLastName
-        )
-    }
-
-    suspend fun getOrderTracking(orderId: Int): Result<OrderTracking> {
-        return remoteRepository.getOrderTracking(orderId)
+        giftLastName: String? = null,
+        street: String,
+        city: String,
+        civic: Int,
+        cap: Int
+    ) = withContext(Dispatchers.IO) {
+        try {
+            val remoteResult = remoteRepository.placeOrder(email, total, paymentMethod,
+                shippingType, isGift, giftFirstName, giftLastName,
+                street, city, civic, cap)
+            if (remoteResult.isSuccess) {
+                cartRepository.getCartByEmail(email)?.cartId?.let {
+                    productCartRepository.clearCart(it)
+                }
+                cartRepository.getCartByEmail(email)?.cartId?.let {
+                    cartRepository.clearCart(it)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in placeOrder", e)
+            throw e
+        }
     }
 
     // RECENSIONI
     suspend fun addReview(
         email: String,
         productId: Int,
-        rating: Int,
+        rating: Double,
         comment: String
     ): Result<Boolean> {
         val result = remoteRepository.addReview(email, productId, rating, comment)
@@ -240,9 +371,9 @@ class AppRepository(
             val review = Review(
                 productId = productId,
                 email = email,
-                vote = rating.toDouble(),
+                vote = rating,
                 comment = comment,
-                reviewDate = java.time.LocalDateTime.now().toString()
+                reviewDate = LocalDateTime.now().toString()
             )
             reviewRepository.addReview(review)
         }
@@ -257,17 +388,43 @@ class AppRepository(
         return result
     }
 
-    suspend fun getReviews(productId: Int, lastAccess: String): Result<List<Review>> {
-        return remoteRepository.getReviews(productId, lastAccess)
+    suspend fun getReviews(productId: Int, lastAccess: String): Result<List<ReviewWithUserInfo>> = withContext(Dispatchers.IO) {
+        try {
+            val remoteResult = remoteRepository.getReviews(productId, lastAccess)
+            if (remoteResult.isSuccess) {
+                val remoteReviews = remoteResult.getOrNull() ?: emptyList()
+                if (remoteReviews.isNotEmpty()) {
+                    for (review in remoteReviews) {
+                        reviewRepository.addReview(review)
+                    }
+                }
+            }
+            Result.success(
+                reviewRepository.getProductReviews(productId, lastAccess)
+            )
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in getReviews", e)
+            Result.failure(e)
+        }
     }
 
-    suspend fun getProductRating(productId: Int): Result<Double> {
-        return remoteRepository.getProductRating(productId)
+    suspend fun getProductRating(productId: Int): Result<Double> = withContext(Dispatchers.IO) {
+        Result.success(reviewRepository.getProductRating(productId))
+    }
+
+    suspend fun canUserReview(email: String, productId: Int): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val canReview = reviewRepository.canUserReview(email, productId)
+            Result.success(canReview)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in canUserReview", e)
+            Result.failure(e)
+        }
     }
 
     // AUTENTICAZIONE
-    suspend fun login(email: String, password: String): Result<User> {
-        return remoteRepository.login(email, password)
+    suspend fun login(email: String, password: String): Result<User> = withContext(Dispatchers.IO) {
+        remoteRepository.login(email, password)
     }
 
     suspend fun register(
@@ -277,8 +434,17 @@ class AppRepository(
         password: String,
         newsletter: Boolean,
         phone: String? = null
-    ): Result<Boolean> {
-        return remoteRepository.register(email, firstName, lastName, password, newsletter, phone)
+    ): Result<Boolean> = withContext(Dispatchers.IO) {
+        remoteRepository.register(email, firstName, lastName, password, newsletter, phone)
+            .onSuccess {
+                remoteRepository.getUserProfile(email)
+                    .onSuccess { userProfile ->
+                        userRepository.registerUser(userProfile)
+                    }
+                    .onFailure { e ->
+                        Log.e(tag, "Errore nel recupero del profilo utente dopo la registrazione", e)
+                    }
+            }
     }
 
     suspend fun changePassword(email: String, password: String): Result<Boolean> {
@@ -289,8 +455,22 @@ class AppRepository(
         return result
     }
 
-    suspend fun getUserProfile(email: String): Result<User> {
-        return remoteRepository.getUserProfile(email)
+    suspend fun getUserProfile(email: String): Result<User> = withContext(Dispatchers.IO) {
+        try {
+            val remoteResult = remoteRepository.getUserProfile(email)
+            if (remoteResult.isSuccess) {
+                val userProfile = remoteResult.getOrNull()
+                userProfile?.let {
+                    userRepository.registerUser(it)
+                }
+            }
+            Result.success(
+                userRepository.getUserProfile(email) ?: throw Exception("Profilo utente non trovato")
+            )
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in getUserProfile", e)
+            Result.failure(e)
+        }
     }
 
     suspend fun isUserRegistered(email: String): Result<Boolean> {

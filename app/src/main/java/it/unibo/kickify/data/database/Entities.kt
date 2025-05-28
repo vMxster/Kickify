@@ -195,6 +195,13 @@ data class CartProduct(
             childColumns = ["ID_Sconto"],
             onDelete = ForeignKey.NO_ACTION,
             onUpdate = ForeignKey.NO_ACTION
+        ),
+        ForeignKey(
+            entity = Address::class,
+            parentColumns = ["Email, Via, NumeroCivico, CAP, Citta"],
+            childColumns = ["Spe_Email, Spe_Via, Spe_NumeroCivico, Spe_CAP, Spe_Citta"],
+            onDelete = ForeignKey.NO_ACTION,
+            onUpdate = ForeignKey.NO_ACTION
         )
     ],
     indices = [Index("Email", unique = true), Index("ID_Sconto", unique = true)]
@@ -227,6 +234,21 @@ data class Order(
 
     @ColumnInfo(name = "Email")
     val email: String,
+
+    @ColumnInfo(name = "Spe_Email")
+    val shippingEmail: String,
+
+    @ColumnInfo(name = "Spe_Via")
+    val shippingStreet: String,
+
+    @ColumnInfo(name = "Spe_NumeroCivico")
+    val shippingCivic: Int,
+
+    @ColumnInfo(name = "Spe_CAP")
+    val shippingCap: Int,
+
+    @ColumnInfo(name = "Spe_Citta")
+    val shippingCity: String,
 
     @ColumnInfo(name = "ID_Sconto")
     val discountId: Int?
@@ -872,16 +894,24 @@ data class TrackingProduct(
 )
 
 data class OrderDetails(
-    val orderId: Int = 0,
-    val orderDate: String,
-    val totalCost: Double,
-    val paymentMethod: String,
-    val shippingType: String,
-    val isPresent: Boolean,
-    val nomeDestinatario: String = "",
-    val cognomeDestinatario: String = "",
-    val email: String,
-    val discountId: Int? = null,
+    @Embedded
+    val order: Order,
+
     val isDelivered: Boolean = false,
+
     val products: List<OrderProduct> = emptyList()
+)
+
+data class OrderAddress (
+    @ColumnInfo(name = "Spe_Via")
+    val shippingStreet: String,
+
+    @ColumnInfo(name = "Spe_NumeroCivico")
+    val shippingCivic: Int,
+
+    @ColumnInfo(name = "Spe_CAP")
+    val shippingCap: Int,
+
+    @ColumnInfo(name = "Spe_Citta")
+    val shippingCity: String
 )

@@ -13,4 +13,7 @@ class ProductCartRepository (private val productCartDao: ProductCartDao) {
 
     suspend fun removeFromCart(cartId: Int, productId: Int, color: String, size: Double): Int =
         productCartDao.removeFromCart(cartId, productId, color, size)
+
+    suspend fun clearCart(cartId: Int) =
+        productCartDao.clearCart(cartId)
 }

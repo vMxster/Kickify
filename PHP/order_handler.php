@@ -20,8 +20,15 @@ try {
                 $isGift = isset($_POST["isGift"]) ? $_POST["isGift"] == "true" : false;
                 $giftFirstName = isset($_POST["giftFirstName"]) ? $_POST["giftFirstName"] : null;
                 $giftLastName = isset($_POST["giftLastName"]) ? $_POST["giftLastName"] : null;
+                $street = isset($_POST["street"]) ? $_POST["street"] : null;
+                $city = isset($_POST["city"]) ? $_POST["city"] : null;
+                $civic = isset($_POST["civic"]) ? $_POST["civic"] : null;
+                $cap = isset($_POST["cap"]) ? $_POST["cap"] : null;
                 
-                $orderId = $dbh->placeOrder($email, $total, $paymentMethod, $shippingType, $isGift, $giftFirstName, $giftLastName);
+                $orderId = $dbh->placeOrder($email, $total, $paymentMethod, 
+                    $shippingType, $isGift, $giftFirstName, $giftLastName, 
+                    $street, $city, $civic, $cap);
+
                 if ($orderId) {
                     $response = [
                         "success" => true,
@@ -44,6 +51,22 @@ try {
                     "success" => true,
                     "orders" => $orders
                 ];
+                break;
+
+            case "getOrderDetails":
+                if (!isset($_POST["orderId"])) {
+                    throw new Exception("ID ordine non specificato");
+                }
+                $orderId = $_POST["orderId"];
+                $orderDetails = $dbh->getOrderDetails($orderId);
+                if ($orderDetails) {
+                    $response = [
+                        "success" => true,
+                        "orderDetails" => $orderDetails
+                    ];
+                } else {
+                    throw new Exception("Ordine non trovato");
+                }
                 break;
                 
             default:

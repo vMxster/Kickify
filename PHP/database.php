@@ -550,20 +550,10 @@ class DatabaseHelper {
                 ts.Stato as status,
                 ts.Arrivo_Effettivo as actual_arrival,
                 ts.Arrivo_Stimato as estimated_arrival,
-                ts.Timestamp_Aggiornamento as timestamp,
-                p.ID_Prodotto as product_id,
-                p.Nome as name,
-                p.Prezzo as price,
-                po.Prezzo_Acquisto as original_price,
-                po.Colore as color,
-                po.Taglia as size,
-                po.Quantita as quantity,
-                CONCAT(p.Nome, '_', '1') as image
-            FROM ORDINE o
-            LEFT JOIN Tracking_Spedizione ts ON o.ID_Ordine = ts.ID_Ordine
-            JOIN PRODOTTO_ORDINE po ON o.ID_Ordine = po.ID_Ordine
-            JOIN PRODOTTO p ON po.ID_Prodotto = p.ID_Prodotto
-            WHERE o.ID_Ordine = ?
+                ts.Timestamp_Aggiornamento as timestamp
+            FROM ORDINE o 
+            LEFT JOIN Tracking_Spedizione ts ON o.ID_Ordine = ts.ID_Ordine 
+            WHERE o.ID_Ordine = ? 
             ORDER BY ts.Timestamp_Aggiornamento DESC";
     
             $stmt = $this->db->prepare($query);
@@ -573,8 +563,7 @@ class DatabaseHelper {
             
             $tracking = [
                 'order_info' => null,
-                'tracking_states' => [],
-                'products' => []
+                'tracking_states' => []
             ];
     
             $states = ['Placed', 'In progress', 'Shipped', 'Delivered'];
@@ -586,8 +575,7 @@ class DatabaseHelper {
                     'timestamp' => null,
                     'estimated_arrival' => null,
                     'actual_arrival' => null
-                ]),
-                'products' => []
+                ])
             ];
 
             while ($row = $result->fetch_assoc()) {
@@ -612,25 +600,10 @@ class DatabaseHelper {
                         'actual_arrival' => $row['actual_arrival']
                     ];
                 }
-
-                // Add product if not already added
-                $productKey = $row['product_id'] . '_' . $row['size'] . '_' . $row['color'];
-                if (!isset($tracking['products'][$productKey])) {
-                    $tracking['products'][$productKey] = [
-                        'image' => $row['image'],
-                        'name' => $row['name'],
-                        'size' => $row['size'],
-                        'quantity' => $row['quantity'],
-                        'color' => $row['color'],
-                        'price' => $row['price'],
-                        'original_price' => $row['original_price']
-                    ];
-                }
             }
 
             // Convert tracking states to indexed array maintaining order
             $tracking['tracking_states'] = array_values($tracking['tracking_states']);
-            $tracking['products'] = array_values($tracking['products']);
 
             return $tracking;
         } catch (Exception $e) {
@@ -1459,8 +1432,20 @@ class DatabaseHelper {
     
     // Get all orders for a user
     public function getOrders($email, $lastAccess) {
-        // Utilizziamo una subquery in SELECT per verificare la consegna
-        // (restituirà 1 se esiste almeno un tracking "Delivered" con data non NULL, altrimenti 0)
+        $query = "SELECT o.* 
+                FROM ORDINE o 
+                WHERE o.Email = ? AND o.Data_Ordine > ? 
+                ORDER BY o.Data_Ordine DESC";
+    
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("ss", $email, $lastAccess);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    // Retrieve order details by order ID
+    public function getOrderDetails($orderId) {
         $query = "SELECT 
                     o.ID_Ordine,
                     o.Data_Ordine,
@@ -1471,8 +1456,6 @@ class DatabaseHelper {
                     o.ID_Sconto,
                     
                     p.ID_Prodotto,
-                    p.Nome,
-                    p.Genere,
     
                     po.Prezzo_Acquisto,
                     po.Quantita,
@@ -1493,15 +1476,15 @@ class DatabaseHelper {
                       ON o.ID_Ordine = po.ID_Ordine
                 JOIN PRODOTTO p 
                       ON po.ID_Prodotto = p.ID_Prodotto
-                WHERE o.Email = ? AND o.Data_Ordine > ?
+                WHERE o.Email = ?
                 -- Esempio: ordina per Data_Ordine (decrescente) e poi per ID_Prodotto
                 ORDER BY o.Data_Ordine DESC, p.ID_Prodotto ASC";
     
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param("ss", $email, $lastAccess);
+        $stmt->bind_param("i", $orderId);
         $stmt->execute();
         $result = $stmt->get_result();
-    
+
         $orders = [];
     
         while ($row = $result->fetch_assoc()) {
@@ -1510,7 +1493,7 @@ class DatabaseHelper {
             // Se l'ordine non è ancora in $orders, inizializzalo
             if (!isset($orders[$orderId])) {
                 $orders[$orderId] = [
-                    'ID_Ordine'       => $row['ID_Ordine'],
+                    'ID_Ordine'       => $orderId,
                     'Data_Ordine'     => $row['Data_Ordine'],
                     'Costo_Totale'    => $row['Costo_Totale'],
                     'Metodo_Pagamento'=> $row['Metodo_Pagamento'],
@@ -1526,8 +1509,7 @@ class DatabaseHelper {
             // Aggiungi le informazioni del prodotto
             $orders[$orderId]['products'][] = [
                 'ID_Prodotto' => $row['ID_Prodotto'],
-                'Nome'        => $row['Nome'],
-                'Genere'      => $row['Genere'],
+                'ID_Ordine'  => $orderId,
                 'Prezzo'      => $row['Prezzo_Acquisto'],
                 'Quantita'    => $row['Quantita'],
                 'Taglia'      => $row['Taglia'],
@@ -1539,7 +1521,9 @@ class DatabaseHelper {
     }
     
     // Add new function to DatabaseHelper class
-    public function placeOrder($email, $total, $paymentMethod, $shippingType, $isGift = false, $giftFirstName = null, $giftLastName = null) {
+    public function placeOrder($email, $total, $paymentMethod, 
+        $shippingType, $isGift = false, $giftFirstName = null, $giftLastName = null,
+        $street, $city, $civic, $cap) {
         try {
             $this->db->begin_transaction();
             
@@ -1547,18 +1531,25 @@ class DatabaseHelper {
             $cart = $this->getCartByEmail($email);
             
             // Create new order
-            $query = "INSERT INTO ORDINE (Data_Ordine, Costo_Totale, Metodo_Pagamento, Tipo_Spedizione, Regalo, NomeDestinatario, CognomeDestinatario, Email) 
-                VALUES (NOW(), ?, ?, ?, ?, ?, ?, ?)";
+            $query = "INSERT INTO ORDINE (Data_Ordine, Costo_Totale, Metodo_Pagamento, 
+                Tipo_Spedizione, Regalo, NomeDestinatario, CognomeDestinatario, 
+                Email, Spe_Email, Spe_Via, Spe_NumeroCivico, Spe_CAP, Spe_Citta) 
+                VALUES (NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             
             $stmt = $this->db->prepare($query);
-            $stmt->bind_param("dssisss", 
+            $stmt->bind_param("dssisssssiis", 
                 $total, 
                 $paymentMethod,
                 $shippingType,
                 $isGift,
                 $giftFirstName,
                 $giftLastName,
-                $email
+                $email,
+                $email,
+                $street,
+                $civic,
+                $cap,
+                $city
             );
             $stmt->execute();
             $orderId = $this->db->insert_id;

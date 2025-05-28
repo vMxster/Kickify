@@ -13,7 +13,7 @@ class ReviewRepository(private val reviewDao: ReviewDao) {
     suspend fun deleteReview(email: String, productId: Int): Int =
         reviewDao.deleteReview(email, productId)
 
-    suspend fun getProductRating(productId: Int): Double? =
+    suspend fun getProductRating(productId: Int): Double =
         reviewDao.getProductRating(productId)
 
     suspend fun canUserReview(email: String, productId: Int): Boolean =

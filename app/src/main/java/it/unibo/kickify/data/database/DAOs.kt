@@ -147,7 +147,7 @@ interface UserDao {
     """)
     suspend fun getUserProfile(email: String): User?
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun registerUser(user: User): Long
 
     @Query("""
@@ -182,6 +182,12 @@ interface CartDao {
     """)
     suspend fun updateCartTotal(cartId: Int): Int
 
+    @Query("""
+        UPDATE CARRELLO SET Valore_Totale = 0 
+        WHERE ID_Carrello = :cartId
+    """)
+    suspend fun clearCart(cartId: Int)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCart(cart: Cart)
 }
@@ -189,7 +195,7 @@ interface CartDao {
 @Dao
 interface ProductCartDao {
     @Query("""
-        SELECT c.*, p.Nome, p.Prezzo, p.Genere 
+        SELECT c.*, p.Nome, p.Prezzo, p.Genere  
         FROM comprendere c JOIN PRODOTTO p ON c.ID_Prodotto = p.ID_Prodotto 
         WHERE c.ID_Carrello = :cartId
     """)
@@ -234,27 +240,39 @@ interface ProductCartDao {
         AND Colore = :color AND Taglia = :size
     """)
     suspend fun removeFromCart(cartId: Int, productId: Int, color: String, size: Double): Int
+
+    @Query("""
+        DELETE FROM comprendere 
+        WHERE ID_Carrello = :cartId
+    """)
+    suspend fun clearCart(cartId: Int): Any
 }
 
 @Dao
 interface OrderDao {
-    @Transaction
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrder(order: Order): Long
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrderProduct(orderProduct: OrderProduct): Long
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTrackingInfo(trackingShipping: TrackingShipping): Long
 
-    @Transaction
     @Query("""
         SELECT * FROM ORDINE o 
         WHERE o.Email = :email 
         ORDER BY o.Data_Ordine DESC
     """)
     suspend fun getOrders(email: String): List<Order>
+
+    @Query("""
+        SELECT o.Spe_Via, o.Spe_NumeroCivico, o.Spe_CAP, o.Spe_Citta 
+        FROM ORDINE o 
+        WHERE o.ID_Ordine = :orderId 
+        ORDER BY o.Data_Ordine DESC
+    """)
+    suspend fun getOrderAddress(orderId: Int): OrderAddress
 
     @Query("""
         SELECT 
@@ -382,7 +400,7 @@ interface WishlistDao {
     """)
     suspend fun getWishlistItems(email: String): List<Product>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addToWishlist(wishlistProduct: WishlistProduct): Long
 
     @Query("""
@@ -436,7 +454,7 @@ interface ReviewDao {
         SELECT AVG(Voto) FROM RECENSIONE 
         WHERE ID_Prodotto = :productId
     """)
-    suspend fun getProductRating(productId: Int): Double?
+    suspend fun getProductRating(productId: Int): Double
 
     @Query("""
         SELECT COUNT(*) FROM ORDINE o 
@@ -451,12 +469,10 @@ interface NotificationDao {
     suspend fun createNotification(notification: Notification): Long
 
     @Query("""
-        SELECT n.*, m.Corpo as MessaggioCompleto 
-        FROM NOTIFICA n LEFT JOIN MESSAGGIO m ON n.Timestamp_Invio = m.Timestamp_Invio 
-        AND n.TipoNotifica = 'Admin Message' WHERE n.Email = :email 
+        SELECT n.* FROM NOTIFICA n WHERE n.Email = :email 
         ORDER BY n.Timestamp_Invio DESC
     """)
-    suspend fun getUserNotifications(email: String): List<NotificationWithMessage>
+    suspend fun getUserNotifications(email: String): List<Notification>
 
     @Query("""
         UPDATE NOTIFICA SET Tipo = 'Read' WHERE Email = :email
@@ -474,4 +490,7 @@ interface NotificationDao {
         WHERE Email = :email AND Tipo = 'Unread'
     """)
     suspend fun getUnreadNotificationsCount(email: String): Int
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addNotification(notification: Notification): Long
 }
