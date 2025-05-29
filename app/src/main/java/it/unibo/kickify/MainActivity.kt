@@ -1,23 +1,27 @@
 package it.unibo.kickify
 
+import android.app.LocaleManager
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.os.LocaleList
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import it.unibo.kickify.data.models.Theme
 import it.unibo.kickify.ui.KickifyNavGraph
-import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.theme.KickifyTheme
 import org.koin.androidx.compose.koinViewModel
+import java.util.Locale
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -25,7 +29,14 @@ class MainActivity : ComponentActivity() {
             Log.d("MainActivity", "onCreate: inizializzazione")
             setContent {
                 val settingsViewModel: SettingsViewModel = koinViewModel<SettingsViewModel>()
-                val themeState by settingsViewModel.theme.collectAsStateWithLifecycle(initialValue = Theme.System)
+                val themeState by settingsViewModel.theme.collectAsStateWithLifecycle()
+                val appLanguageId by settingsViewModel.appLanguage.collectAsStateWithLifecycle()
+
+                LaunchedEffect(appLanguageId){
+                    if(appLanguageId.isNotEmpty()){
+                        setAppLocale(this@MainActivity, appLanguageId)
+                    }
+                }
 
                 KickifyTheme(
                     darkTheme = when(themeState){
@@ -35,15 +46,6 @@ class MainActivity : ComponentActivity() {
                     }
                 ) {
                     val navController = rememberNavController()
-                    val value = intent.getBooleanExtra("AUTH_SUCCESS", false)
-                    LaunchedEffect(value) {
-                        if (value) {
-                            navController.navigate(KickifyRoute.Home) {
-                                popUpTo(KickifyRoute.Home) { inclusive = true }
-                            }
-                        }
-                    }
-
                     KickifyNavGraph(
                         navController = navController,
                         activity = this,
@@ -53,6 +55,22 @@ class MainActivity : ComponentActivity() {
             }
         } catch (e: Exception) {
             Log.e("MainActivity", "Errore fatale", e)
+        }
+    }
+
+    // Function to set app locale
+    private fun setAppLocale(context: Context, languageCode: String) {
+        if (languageCode.isEmpty()) return
+
+        val locale = Locale(languageCode)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.getSystemService(LocaleManager::class.java).applicationLocales =
+                LocaleList(locale)
+        } else {
+            val config = context.resources.configuration
+            config.setLocale(locale)
+            @Suppress("DEPRECATION")
+            context.resources.updateConfiguration(config, context.resources.displayMetrics)
         }
     }
 }
