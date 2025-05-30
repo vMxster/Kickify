@@ -245,7 +245,7 @@ interface ProductCartDao {
         DELETE FROM comprendere 
         WHERE ID_Carrello = :cartId
     """)
-    suspend fun clearCart(cartId: Int): Any
+    suspend fun clearCart(cartId: Int)
 }
 
 @Dao

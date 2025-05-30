@@ -198,8 +198,8 @@ data class CartProduct(
         ),
         ForeignKey(
             entity = Address::class,
-            parentColumns = ["Email, Via, NumeroCivico, CAP, Citta"],
-            childColumns = ["Spe_Email, Spe_Via, Spe_NumeroCivico, Spe_CAP, Spe_Citta"],
+            parentColumns = ["Email", "Via", "NumeroCivico", "CAP", "Citta"],
+            childColumns = ["Spe_Email", "Spe_Via", "Spe_NumeroCivico", "Spe_CAP", "Spe_Citta"],
             onDelete = ForeignKey.NO_ACTION,
             onUpdate = ForeignKey.NO_ACTION
         )
@@ -360,10 +360,10 @@ data class NotificationState(
             onUpdate = ForeignKey.NO_ACTION
         )
     ],
+    primaryKeys = ["Email", "Via", "NumeroCivico", "CAP", "Citta"],
     indices = [Index(value = ["Email"], unique = true)]
 )
 data class Address(
-    @PrimaryKey
     @ColumnInfo(name = "Email")
     val email: String,
 

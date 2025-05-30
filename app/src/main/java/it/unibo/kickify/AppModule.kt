@@ -67,7 +67,7 @@ val appModule = module {
     single { ProductRepository(productDao = get<KickifyDatabase>().productDao()) }
     single { UserRepository(userDao = get<KickifyDatabase>().userDao()) }
     single { CartRepository(cartDao = get<KickifyDatabase>().cartDao()) }
-    single { OrderRepository(orderDao = get<KickifyDatabase>().orderDao(), database = get()) }
+    single { OrderRepository(orderDao = get<KickifyDatabase>().orderDao()) }
     single { WishlistRepository(wishlistDao = get<KickifyDatabase>().wishlistDao()) }
     single { ReviewRepository(reviewDao = get<KickifyDatabase>().reviewDao()) }
     single { NotificationRepository(notificationDao = get<KickifyDatabase>().notificationDao()) }
