@@ -119,6 +119,11 @@ class RemoteResponseParser {
                     discountId = orderJson.optInt("ID_Sconto", 0),
                     nomeDestinatario = orderJson.optString("Nome_Destinatario", ""),
                     cognomeDestinatario = orderJson.optString("Cognome_Destinatario", ""),
+                    shippingEmail = orderJson.optString("Spe_Email", ""),
+                    shippingStreet = orderJson.optString("Spe_Via", ""),
+                    shippingCivic = orderJson.optInt("Spe_NumeroCivico", 0),
+                    shippingCap = orderJson.optInt("Spe_CAP", 0),
+                    shippingCity = orderJson.optString("Spe_Citta", "")
                 )
                 val isDelivered = orderJson.optBoolean("tracking_delivered", false)
 
@@ -157,6 +162,11 @@ class RemoteResponseParser {
                         discountId = orderJson.optInt("ID_Sconto", 0),
                         nomeDestinatario = orderJson.optString("Nome_Destinatario", ""),
                         cognomeDestinatario = orderJson.optString("Cognome_Destinatario", ""),
+                        shippingEmail = orderJson.optString("Spe_Email", ""),
+                        shippingStreet = orderJson.optString("Spe_Via", ""),
+                        shippingCivic = orderJson.optInt("Spe_NumeroCivico", 0),
+                        shippingCap = orderJson.optInt("Spe_CAP", 0),
+                        shippingCity = orderJson.optString("Spe_Citta", "")
                     )
                 )
             }
@@ -262,10 +272,10 @@ class RemoteResponseParser {
                 email = json.getString("Email"),
                 name = json.getString("Nome"),
                 surname = json.getString("Cognome"),
-                password = json.getString("Password"),
+                password = json.optString("Password", ""),
                 phone = json.optString("Telefono", ""),
-                registrationDate = json.getString("Data_Registrazione"),
-                newsletterPreferences = json.getBoolean("Preferenze_Newsletter"),
+                registrationDate = json.optString("Data_Registrazione", ""),
+                newsletterPreferences = json.optBoolean("Preferenze_Newsletter", false),
                 urlPhoto = json.optString("URL_Foto", ""),
                 role = json.getString("Ruolo")
             )
