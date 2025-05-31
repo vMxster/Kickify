@@ -2,7 +2,7 @@ package it.unibo.kickify.ui.screens.wishlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import it.unibo.kickify.data.database.ProductDetails
+import it.unibo.kickify.data.database.Product
 import it.unibo.kickify.data.repositories.AppRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,20 +13,37 @@ class WishlistViewModel(
     private val repository: AppRepository
 ) : ViewModel() {
 
-    private val _wishlistState = MutableStateFlow<Result<List<ProductDetails>>>(Result.success(emptyList()))
-    val wishlistState : StateFlow<Result<List<ProductDetails>>> = _wishlistState.asStateFlow()
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+
+    private val _wishlistState = MutableStateFlow<List<Product>>(emptyList())
+    val wishlistState : StateFlow<List<Product>> = _wishlistState.asStateFlow()
 
     fun fetchWishlist(email: String) {
+        _errorMessage.value = null
+        _isLoading.value = true
+
         viewModelScope.launch {
-            val result = repository.getWishlistItems(email)
-            if(result.isSuccess){
-                val prodIds = result.getOrNull() ?: emptyList()
-                val detailedProducts = prodIds.mapNotNull { wishlistItem ->
-                    repository.getProductData(wishlistItem.productId, email).getOrNull()
+            try{
+                val result = repository.getWishlistItems(email)
+                result.onSuccess { list ->
+                    _wishlistState.value = list
+                    _errorMessage.value = null
+
+                }.onFailure { exception ->
+                    _wishlistState.value = emptyList()
+                    _errorMessage.value = exception.message
                 }
-                _wishlistState.value = Result.success(detailedProducts)
-            } else {
-                _wishlistState.value = Result.failure(result.exceptionOrNull() ?: Exception("Unknown error"))
+
+            } catch (e: Exception) {
+                _wishlistState.value = emptyList()
+                _errorMessage.value = e.message ?: "Unexpected error."
+
+            } finally {
+                _isLoading.value = false
             }
         }
     }

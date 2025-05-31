@@ -27,6 +27,8 @@ fun WishlistScreen(
     navController: NavController,
     wishlistViewModel: WishlistViewModel
 ){
+    val isLoading by wishlistViewModel.isLoading.collectAsStateWithLifecycle()
+    val errorMessage by wishlistViewModel.errorMessage.collectAsStateWithLifecycle()
     val wishlistState by wishlistViewModel.wishlistState.collectAsStateWithLifecycle()
     val email = "test@email.com"
 
@@ -39,7 +41,8 @@ fun WishlistScreen(
         navController = navController,
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
-        showModalDrawer = true
+        showModalDrawer = true,
+        showLoadingOverlay = isLoading
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -47,10 +50,8 @@ fun WishlistScreen(
             modifier = Modifier.fillMaxSize()
                 .padding(horizontal = 16.dp)
         ){
-            if (wishlistState.isSuccess) {
-                val products = wishlistState.getOrNull() ?: emptyList()
-
-                if(products.isEmpty()){
+            if(errorMessage != null){
+                if(wishlistState.isEmpty()){
                     Text(stringResource(R.string.emptyWishlist))
                 } else {
                     LazyVerticalGrid(
@@ -58,8 +59,8 @@ fun WishlistScreen(
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         horizontalArrangement = Arrangement.spacedBy(20.dp)
                     ) {
-                        items(products.size) { index ->
-                            val prodInfo = products[index].product
+                        items(wishlistState.size) { index ->
+                            val prodInfo = wishlistState[index]
                             ProductCardWishlistPage(
                                 mainImgUrl = "",
                                 productName = "${prodInfo.brand} ${prodInfo.name}",
