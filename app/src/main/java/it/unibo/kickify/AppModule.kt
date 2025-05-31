@@ -28,6 +28,7 @@ import it.unibo.kickify.data.repositories.local.NotificationRepository
 import it.unibo.kickify.data.repositories.local.ProductCartRepository
 import it.unibo.kickify.data.repositories.local.ReviewRepository
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
+import it.unibo.kickify.ui.screens.login.LoginViewModel
 import it.unibo.kickify.ui.screens.productList.ProductsViewModel
 import it.unibo.kickify.ui.screens.wishlist.WishlistViewModel
 import kotlinx.serialization.json.Json
@@ -84,4 +85,5 @@ val appModule = module {
     viewModel { WishlistViewModel(get()) }
     viewModel { ProductsViewModel(get()) }
     viewModel { AchievementsViewModel(get()) }
+    viewModel { LoginViewModel(get()) }
 }

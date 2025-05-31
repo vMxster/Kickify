@@ -1,7 +1,5 @@
 package it.unibo.kickify.ui.screens.login
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,9 +23,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,9 +54,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
-import it.unibo.kickify.data.repositories.RemoteRepository
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.screens.register.LoginRegisterMethodDividerRow
@@ -63,16 +64,23 @@ import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.theme.MediumGray
 import it.unibo.kickify.utils.LoginRegisterUtils
 import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
 
 @Composable
 fun LoginScreen(
     navController: NavController,
-    settingsViewModel: SettingsViewModel
+    settingsViewModel: SettingsViewModel,
+    loginViewModel: LoginViewModel,
+    onLoginSuccess: () -> Unit
 ) {
-    val remoteRepo = koinInject<RemoteRepository>()
+    val snackBarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val ctx = LocalContext.current
+    val focusManager = LocalFocusManager.current
+
+    val isLoading by loginViewModel.isLoading.collectAsStateWithLifecycle()
+    val isLoggedIn by loginViewModel.isLoggedIn.collectAsStateWithLifecycle()
+    val errorMessage by loginViewModel.errorMessage.collectAsStateWithLifecycle()
+    val loggedInUser by loginViewModel.loggedInUser.collectAsStateWithLifecycle()
 
     var email by rememberSaveable { mutableStateOf("") }
     var emailError by remember { mutableStateOf("") }
@@ -82,11 +90,22 @@ fun LoginScreen(
     var passwordVisibility by remember { mutableStateOf(false) }
     val passwordFocusRequester = remember { FocusRequester() }
 
-    val focusManager = LocalFocusManager.current
+    // if logged in successfully, execute login action
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn && loggedInUser != null) {
+            settingsViewModel.setUserAccount(
+                userid = email,
+                username = "${loggedInUser?.name} ${loggedInUser?.surname}"
+            )
+            onLoginSuccess()
+        }
+    }
 
-    val loginAction: () -> Unit = {
-        navController.navigate(KickifyRoute.Home) {
-            popUpTo(KickifyRoute.Login) { inclusive = true }
+    // show error if present
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let { message ->
+            snackBarHostState.showSnackbar(message = message, actionLabel = "OK")
+            loginViewModel.dismissError()
         }
     }
 
@@ -95,14 +114,15 @@ fun LoginScreen(
         navController = navController,
         showTopAppBar = true,
         bottomAppBarContent = { },
-        showModalDrawer = false
-    ) { contentPadding ->
+        showModalDrawer = false,
+        snackBarHostState = snackBarHostState,
+        showLoadingOverlay = isLoading
+    ) {
         val loginScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)
 
         Column(
             modifier = Modifier.fillMaxSize()
-                .padding(contentPadding)
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -211,24 +231,14 @@ fun LoginScreen(
                     coroutineScope.launch {
                         if(LoginRegisterUtils.isValidEmail(email)
                             && password.isNotEmpty()){
-                            val loginRes = remoteRepo.login(email, password)
-                            val user = loginRes.getOrNull()
-                            Log.i("RemoteRepo", "loginRes: ${loginRes.isSuccess} - loginRes: ${loginRes.getOrNull()}")
+                           loginViewModel.login(email, password)
 
-                            if(loginRes.isSuccess && user != null){
-                                Toast.makeText(ctx, "Login successful", Toast.LENGTH_LONG).show()
-                                settingsViewModel.setUserAccount(
-                                    userid = email,
-                                    username = "${user.name} ${user.surname}"
-                                )
-                                Log.i("LOGIN", "userid: ${settingsViewModel.userId} - username ${settingsViewModel.userName}")
-                                loginAction()
 
-                            } else if(loginRes.isFailure){
-                                Toast.makeText(ctx, "Login ERROR", Toast.LENGTH_LONG).show()
-                            }
+
                         } else {
-                            Toast.makeText(ctx, "Check all fields are valid", Toast.LENGTH_LONG).show()
+                            snackBarHostState.showSnackbar(
+                                message = ctx.getString(R.string.signin_errorsInEmailOrPassword),
+                                duration = SnackbarDuration.Long)
                         }
                     }
                 },

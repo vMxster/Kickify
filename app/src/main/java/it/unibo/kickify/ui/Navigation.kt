@@ -1,6 +1,7 @@
 package it.unibo.kickify.ui
 
 import androidx.activity.ComponentActivity
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,6 +35,7 @@ import it.unibo.kickify.ui.screens.profile.TakePhotoScreen
 import it.unibo.kickify.ui.screens.register.RegisterScreen
 import it.unibo.kickify.ui.screens.achievements.AchievementsScreen
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
+import it.unibo.kickify.ui.screens.login.LoginViewModel
 import it.unibo.kickify.ui.screens.settings.EditProfileScreen
 import it.unibo.kickify.ui.screens.settings.EditProfileSections
 import it.unibo.kickify.ui.screens.settings.SettingsScreen
@@ -83,17 +85,21 @@ fun KickifyNavGraph(
     val wishlistViewModel = koinViewModel<WishlistViewModel>()
     val productsViewModel = koinViewModel<ProductsViewModel>()
     val achievementsViewModel = koinViewModel<AchievementsViewModel>()
+    val loginViewModel = koinViewModel<LoginViewModel>()
 
     val ctx = LocalContext.current
-    val isUserLoggedin = settingsViewModel.isUserLoggedIn()
+    val userid by settingsViewModel.userId.collectAsStateWithLifecycle()
+    val username by settingsViewModel.userName.collectAsStateWithLifecycle()
+    val isUserLoggedIn = settingsViewModel.isUserLoggedIn(userid, username)
+
     val biometricLoginEnabled by settingsViewModel.biometricLogin.collectAsStateWithLifecycle()
 
     var startDestinationState by remember { mutableStateOf<StartDestinationResult>(StartDestinationResult.Loading) }
 
-    LaunchedEffect(isUserLoggedin, biometricLoginEnabled, startDestinationState) {
+    LaunchedEffect(isUserLoggedIn, biometricLoginEnabled, startDestinationState) {
         val canUseBiometricsOnDevice = BiometricAuthManager.canAuthenticate(ctx)
 
-        val destination: Any = if (isUserLoggedin) {
+        val destination: Any = if (isUserLoggedIn) {
             if (biometricLoginEnabled && canUseBiometricsOnDevice) {
                 KickifyRoute.BiometricLogin
             } else {
@@ -107,6 +113,7 @@ fun KickifyNavGraph(
 
     when (val result = startDestinationState) {
         is StartDestinationResult.Loading -> {
+            CircularProgressIndicator()
         }
 
         is StartDestinationResult.Loaded -> {
@@ -127,7 +134,17 @@ fun KickifyNavGraph(
                 }
 
                 composable<KickifyRoute.Login> {
-                    LoginScreen(navController, settingsViewModel)
+                    LoginScreen(
+                        navController = navController,
+                        settingsViewModel = settingsViewModel,
+                        loginViewModel = loginViewModel,
+                        onLoginSuccess = {
+                            achievementsViewModel.achieveAchievement(1)
+                            navController.navigate(KickifyRoute.Home) {
+                                popUpTo(KickifyRoute.Login) { inclusive = true }
+                            }
+                        }
+                    )
                 }
 
                 composable<KickifyRoute.ForgotPassword> {
@@ -139,7 +156,7 @@ fun KickifyNavGraph(
                 }
 
                 composable<KickifyRoute.Notifications> {
-                    NotificationScreen(navController)
+                    NotificationScreen(navController, settingsViewModel)
                 }
 
                 composable<KickifyRoute.Onboard> {
