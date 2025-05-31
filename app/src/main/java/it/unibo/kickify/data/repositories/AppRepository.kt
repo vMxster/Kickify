@@ -24,16 +24,6 @@ class AppRepository(
 ) {
     private val tag = "AppRepository"
 
-    // get last access
-    //val lastAccess: Flow<String> = dataStore.data.map { preferences ->
-    //    preferences[stringPreferencesKey("last_access")] ?: "0"
-    //}
-
-    // set last access
-    //suspend fun setLastAccess(timestamp: String) = dataStore.edit { preferences ->
-    //    preferences[stringPreferencesKey("last_access")] = timestamp
-    //}
-
     // PRODOTTI
     suspend fun getProducts(lastAccess: String): Result<Map<Product, Image>> = withContext(Dispatchers.IO) {
         try {
@@ -473,7 +463,15 @@ class AppRepository(
         }
     }
 
-    suspend fun isUserRegistered(email: String): Result<Boolean> {
-        return remoteRepository.isUserRegistered(email)
+    suspend fun isUserRegistered(email: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        remoteRepository.isUserRegistered(email)
+    }
+
+    suspend fun sendMailWithOTP(email: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        remoteRepository.sendMailWithOTP(email)
+    }
+
+    suspend fun verifyOTP(email: String, otp: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        remoteRepository.verifyOTP(email, otp)
     }
 }

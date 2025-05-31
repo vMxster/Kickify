@@ -87,6 +87,16 @@ class SettingsRepository(
         it[ENABLED_PUSH_NOTIFICATION] = enabled
     }
 
+    // get last access
+    val lastAccess: Flow<String> = dataStore.data.map { preferences ->
+        preferences[stringPreferencesKey("last_access")] ?: "0"
+    }
+
+    // set last access
+    suspend fun setLastAccess(timestamp: String) = dataStore.edit { preferences ->
+        preferences[stringPreferencesKey("last_access")] = timestamp
+    }
+
     // get app language
     val appLanguage = dataStore.data.map { it[APP_LANG] ?: "en" }
 

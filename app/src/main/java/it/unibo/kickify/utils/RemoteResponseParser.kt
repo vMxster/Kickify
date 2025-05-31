@@ -287,7 +287,7 @@ class RemoteResponseParser {
         }
 
         fun parseError(json: JSONObject): String {
-            return json.optString("error", "Errore sconosciuto")
+            return json.optString("message", "Errore Sconosciuto")
         }
     }
 }

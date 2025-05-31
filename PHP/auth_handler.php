@@ -81,6 +81,64 @@ try {
                     "isRegistered" => $isRegistered
                 ];
                 break;
+
+            case "sendOTP":
+                $email = $_POST["email"];
+        
+                $otp = sprintf("%06d", mt_rand(0, 999999));
+                $_SESSION['recovery_otp'] = $otp;
+                $_SESSION['recovery_email'] = $email;
+                $_SESSION['recovery_expires'] = time() + 900; // 15 minutes
+
+                $mail = new PHPMailer(true);
+
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'urbankicks77@gmail.com';
+                $mail->Password = 'xhztmkdkigqlumwo';
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+                $mail->Port = 465;
+                $mail->CharSet = 'UTF-8';
+
+                $mail->setFrom('urbankicks77@gmail.com', 'Kickify');
+                $mail->addAddress($email);
+
+                $mail->isHTML(true);
+                $mail->Subject = 'Password Recovery OTP - Kickify';
+                $mail->Body = "Your OTP for password recovery is: <b>$otp</b><br>This code will expire in 15 minutes.";
+                $mail->AltBody = "Your OTP for password recovery is: $otp\nThis code will expire in 15 minutes.";
+
+                $mail->send();
+                $response = [
+                    "success" => true, 
+                    "message" => "OTP sent successfully"
+                ];
+                break;
+
+            case "verifyOTP":
+                $email = $_POST["email"];
+                $otp = $_POST["otp"];
+                
+                if (!isset($_SESSION['recovery_otp']) || 
+                    !isset($_SESSION['recovery_email']) || 
+                    $_SESSION['recovery_email'] !== $email) {
+                    throw new Exception("Invalid recovery session");
+                }
+                
+                if ($_SESSION['recovery_expires'] <= time()) {
+                    throw new Exception("OTP has expired");
+                }
+                
+                if ($_SESSION['recovery_otp'] !== $otp) {
+                    throw new Exception("Invalid OTP");
+                }
+                
+                $response = [
+                    "success" => true, 
+                    "message" => "OTP verified"
+                ];
+                break;
                 
             default:
                 throw new Exception("Azione non valida");

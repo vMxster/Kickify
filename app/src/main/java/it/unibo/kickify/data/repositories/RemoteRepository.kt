@@ -92,6 +92,9 @@ class RemoteRepository(
             )
             val response = makeRequest("product_handler.php", params)
             val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
             val productData = jsonObject.getJSONObject("productData")
             val product = RemoteResponseParser.parseProductDetails(productData)
             Result.success(product)
@@ -127,6 +130,9 @@ class RemoteRepository(
             )
             val response = makeRequest("cart_handler.php", params)
             val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
             val cart = RemoteResponseParser.parseCart(jsonObject)
             Result.success(cart)
         } catch (e: Exception) {
@@ -164,6 +170,9 @@ class RemoteRepository(
                 )
                 val response = makeRequest("product_handler.php", params)
                 val jsonObject = JSONObject(response)
+                if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                    return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+                }
                 val success = RemoteResponseParser.parseSuccess(jsonObject)
                 Result.success(success)
             } catch (e: Exception) {
@@ -184,6 +193,9 @@ class RemoteRepository(
                 )
                 val response = makeRequest("product_handler.php", params)
                 val jsonObject = JSONObject(response)
+                if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                    return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+                }
                 val success = RemoteResponseParser.parseSuccess(jsonObject)
                 Result.success(success)
             } catch (e: Exception) {
@@ -201,6 +213,9 @@ class RemoteRepository(
             )
             val response = makeRequest("wishlist_handler.php", params)
             val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
             val jsonArray = jsonObject.getJSONArray("items")
             val items = RemoteResponseParser.parseWishlistItems(jsonArray)
             Result.success(items)
@@ -219,6 +234,9 @@ class RemoteRepository(
             )
             val response = makeRequest("wishlist_handler.php", params)
             val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
             val success = RemoteResponseParser.parseSuccess(jsonObject)
             Result.success(success)
         } catch (e: Exception) {
@@ -236,6 +254,9 @@ class RemoteRepository(
             )
             val response = makeRequest("wishlist_handler.php", params)
             val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
             val success = RemoteResponseParser.parseSuccess(jsonObject)
             Result.success(success)
         } catch (e: Exception) {
@@ -252,6 +273,9 @@ class RemoteRepository(
             )
             val response = makeRequest("wishlist_handler.php", params)
             val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
             val success = RemoteResponseParser.parseSuccess(jsonObject)
             Result.success(success)
         } catch (e: Exception) {
@@ -292,6 +316,9 @@ class RemoteRepository(
             )
             val response = makeRequest("notification_handler.php", params)
             val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
             val success = RemoteResponseParser.parseSuccess(jsonObject)
             Result.success(success)
         } catch (e: Exception) {
@@ -309,6 +336,9 @@ class RemoteRepository(
             )
             val response = makeRequest("notification_handler.php", params)
             val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
             val success = RemoteResponseParser.parseSuccess(jsonObject)
             Result.success(success)
         } catch (e: Exception) {
@@ -387,6 +417,9 @@ class RemoteRepository(
 
             val response = makeRequest("order_handler.php", params)
             val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
             val orderId = jsonObject.optInt("orderId", -1)
             if (orderId > 0) {
                 Result.success(orderId)
@@ -407,6 +440,9 @@ class RemoteRepository(
             )
             val response = makeRequest("tracking_handler.php", params)
             val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
             val tracking = RemoteResponseParser.parseOrderTracking(jsonObject)
             Result.success(tracking)
         } catch (e: Exception) {
@@ -432,6 +468,9 @@ class RemoteRepository(
             )
             val response = makeRequest("review_handler.php", params)
             val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
             val success = RemoteResponseParser.parseSuccess(jsonObject)
             Result.success(success)
         } catch (e: Exception) {
@@ -452,6 +491,9 @@ class RemoteRepository(
             )
             val response = makeRequest("review_handler.php", params)
             val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
             val success = RemoteResponseParser.parseSuccess(jsonObject)
             Result.success(success)
         } catch (e: Exception) {
@@ -487,11 +529,9 @@ class RemoteRepository(
             )
             val response = makeRequest("auth_handler.php", params)
             val jsonObject = JSONObject(response)
-
-            if (jsonObject.has("error")) {
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
                 return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
             }
-
             val userObject = jsonObject.getJSONObject("user")
             val user = RemoteResponseParser.parseUserProfile(userObject)
             Result.success(user)
@@ -523,6 +563,9 @@ class RemoteRepository(
 
             val response = makeRequest("auth_handler.php", params)
             val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
             val success = RemoteResponseParser.parseSuccess(jsonObject)
             Result.success(success)
         } catch (e: Exception) {
@@ -543,6 +586,9 @@ class RemoteRepository(
             )
             val response = makeRequest("auth_handler.php", params)
             val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
             val success = RemoteResponseParser.parseSuccess(jsonObject)
             Result.success(success)
         } catch (e: Exception) {
@@ -559,6 +605,9 @@ class RemoteRepository(
             )
             val response = makeRequest("auth_handler.php", params)
             val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
             val user = RemoteResponseParser.parseUserProfile(jsonObject)
             Result.success(user)
         } catch (e: Exception) {
@@ -575,6 +624,9 @@ class RemoteRepository(
             )
             val response = makeRequest("auth_handler.php", params)
             val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
             val isRegistered = RemoteResponseParser.parseSuccess(jsonObject)
             Result.success(isRegistered)
         } catch (e: Exception) {
@@ -602,7 +654,43 @@ class RemoteRepository(
         }
     }
 
+    suspend fun sendMailWithOTP(email: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val params = mapOf(
+                "action" to "sendOTP",
+                "email" to email
+            )
+            val response = makeRequest("auth_handler.php", params)
 
+            if (!RemoteResponseParser.parseSuccess(JSONObject(response))) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(JSONObject(response))))
+            }
+            Result.success(true);
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante l'invio dell'OTP", e)
+            throw e
+        }
+    }
+
+    suspend fun verifyOTP(email: String, otp: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val params = mapOf(
+                "action" to "verifyOTP",
+                "email" to email,
+                "otp" to otp
+            )
+            val response = makeRequest("auth_handler.php", params)
+            val jsonObject = JSONObject(response)
+
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
+            Result.success(true)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante la verifica dell'OTP", e)
+            Result.failure(e)
+        }
+    }
 
     // Funzione helper per effettuare richieste HTTP
     private suspend fun makeRequest(endpoint: String, params: Map<String, String> = emptyMap()): String {

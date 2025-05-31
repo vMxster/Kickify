@@ -139,7 +139,7 @@ fun KickifyNavGraph(
                 }
 
                 composable<KickifyRoute.Notifications> {
-                    NotificationScreen(navController, settingsViewModel)
+                    NotificationScreen(navController)
                 }
 
                 composable<KickifyRoute.Onboard> {
