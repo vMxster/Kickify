@@ -49,9 +49,8 @@ fun ForgotPasswordScreen(
         showTopAppBar = true,
         bottomAppBarContent = { },
         showModalDrawer = false
-    ) { contentPadding ->
-        val forgotScreenModifier = Modifier
-            .fillMaxWidth()
+    ) {
+        val forgotScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)
             .padding(vertical = 8.dp)
 
@@ -65,7 +64,6 @@ fun ForgotPasswordScreen(
 
         Column(
             modifier = Modifier.fillMaxSize()
-                .padding(contentPadding)
                 .padding(top = 20.dp)
                 .padding(horizontal = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

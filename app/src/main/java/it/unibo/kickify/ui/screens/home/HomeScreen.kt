@@ -39,16 +39,14 @@ fun HomeScreen(
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true
-    ) { contentPadding ->
+    ) {
         val brandIconsScrollState = rememberScrollState()
         val state = rememberScrollState()
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding)
+            modifier = Modifier.fillMaxSize()
                 .verticalScroll(state)
         ){
             SearchRoundedTextField(

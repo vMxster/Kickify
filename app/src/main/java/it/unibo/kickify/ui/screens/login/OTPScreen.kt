@@ -51,7 +51,7 @@ fun OTPScreen(
         showTopAppBar = true,
         bottomAppBarContent = { },
         showModalDrawer = false
-    ) { contentPadding ->
+    ) {
         val forgotScreenModifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
@@ -59,7 +59,6 @@ fun OTPScreen(
 
         Column(
             modifier = Modifier.fillMaxSize()
-                .padding(contentPadding)
                 .padding(top = 20.dp)
                 .padding(horizontal = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

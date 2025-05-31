@@ -46,10 +46,9 @@ fun OnboardingScreen(
         showTopAppBar = true,
         bottomAppBarContent = { },
         showModalDrawer = false
-    ) { contentPadding ->
+    ) {
         Column(
             modifier = Modifier.fillMaxSize()
-                .padding(contentPadding)
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom

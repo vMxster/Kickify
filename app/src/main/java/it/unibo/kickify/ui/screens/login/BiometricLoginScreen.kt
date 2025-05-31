@@ -84,7 +84,7 @@ fun BiometricLoginScreen(navController: NavController) {
         showTopAppBar = true,
         bottomAppBarContent = { },
         showModalDrawer = false,
-    ) { _ ->
+    ) {
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

@@ -78,7 +78,7 @@ fun RegisterScreen(
         showTopAppBar = true,
         bottomAppBarContent = { },
         showModalDrawer = false
-    ) { contentPadding ->
+    ) {
         val registerScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)
 
@@ -115,7 +115,6 @@ fun RegisterScreen(
 
         Column(
             modifier = Modifier.fillMaxSize()
-                .padding(contentPadding)
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,

@@ -6,49 +6,97 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
+import it.unibo.kickify.data.database.Notification
 import it.unibo.kickify.data.models.NotificationType
+import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.NotificationItem
 import it.unibo.kickify.ui.composables.NotificationTitleLine
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.theme.BluePrimary
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @Composable
 fun NotificationScreen(
-    navController: NavController
+    navController: NavController,
+    settingsViewModel: SettingsViewModel
 ){
+    val snackBarHostState = remember { SnackbarHostState() }
+    val appRepo = koinInject<AppRepository>()
+    val userid by settingsViewModel.userId.collectAsStateWithLifecycle()
+    val lastAccess = "2025-05-26" //by settingsViewModel.lastAccess.collectAsStateWithLifecycle()
+    val coroutineScope = rememberCoroutineScope()
+
+    val notificationList = remember { mutableListOf<Notification>() }
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            val res = appRepo.getNotifications(userid, lastAccess)
+            if(res.isSuccess){
+                res.getOrNull()?.let { notificationList.addAll(it) }
+                snackBarHostState.showSnackbar(message = "result success",
+                    duration = SnackbarDuration.Long)
+            } else {
+                snackBarHostState.showSnackbar(
+                    message = "res.failure: $res"
+                )
+            }
+        }
+    }
     ScreenTemplate(
         screenTitle = stringResource(R.string.notificationscreen_title),
         navController = navController,
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
-        showModalDrawer = true
-    ) { contentPadding ->
-        val state = rememberScrollState()
-
+        showModalDrawer = true,
+        snackBarHostState = snackBarHostState
+    ) {
         Column(
             modifier = Modifier.fillMaxSize()
-                .padding(contentPadding)
                 .padding(horizontal = 16.dp)
-                .verticalScroll(state),
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
+            for (n in notificationList){
+                NotificationTitleLine(n.date)
+                NotificationItem(
+                    NotificationType.ProductBackinStock, //n.type
+                    notificationText = "REMOTE:" + n.message,
+                    colorDot = if(n.state == "Unread") BluePrimary else Color.Gray,
+                    onClick = {
+                        coroutineScope.launch {
+                            appRepo.markNotificationsAsRead(
+                                email = "",
+                                notificationIds = listOf(n.notificationId))
+                        }
+                    }
+                )
+            }
 
             NotificationTitleLine("11 April 2025")
             NotificationItem(
                 NotificationType.ProductBackinStock,
                 notificationText = "Great news, Mario: the Converse Chuck 70 High All Star is back in stock!!",
                 colorDot = BluePrimary,
-               // onClick = onClick
+                // onClick = onClick
             ) { }
             NotificationItem(
                 NotificationType.OrderShipped,

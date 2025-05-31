@@ -30,15 +30,13 @@ fun MyOrdersScreen(
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true
-    ) { contentPadding ->
+    ) {
         val scrollState = rememberScrollState()
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding)
+            modifier = Modifier.fillMaxSize()
                 .padding(horizontal = 10.dp)
                 .verticalScroll(scrollState)
         ) {

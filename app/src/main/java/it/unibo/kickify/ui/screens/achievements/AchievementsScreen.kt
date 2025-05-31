@@ -50,7 +50,7 @@ fun AchievementsScreen(
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true
-    ) { contentPadding ->
+    ) {
         Card(
             modifier = Modifier.fillMaxWidth()
                 .padding(horizontal = 8.dp).padding(vertical = 8.dp)
@@ -58,9 +58,7 @@ fun AchievementsScreen(
             LazyColumn(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding)
+                modifier = Modifier.fillMaxSize()
             ) {
                 item {
                     Text(

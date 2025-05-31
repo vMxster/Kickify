@@ -39,7 +39,7 @@ import it.unibo.kickify.R
 import it.unibo.kickify.camerax.CameraXUtils
 import it.unibo.kickify.data.database.User
 import it.unibo.kickify.data.models.Language
-import it.unibo.kickify.data.repositories.RemoteRepository
+import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.PaymentMethodRow
@@ -60,13 +60,13 @@ fun ProfileScreen(
     val userID by settingsViewModel.userId.collectAsStateWithLifecycle()
     val username by settingsViewModel.userName.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
-    val remoteRepo = koinInject<RemoteRepository>()
+    val appRepo = koinInject<AppRepository>()
     var user: User? = null
 
     LaunchedEffect(Unit) {
         delay(500)
         coroutineScope.launch {
-            val res = remoteRepo.getUserProfile(userID)
+            val res = appRepo.getUserProfile(userID)
             val resUser = res.getOrNull()
             if(res.isSuccess && resUser != null){
                 user = resUser
@@ -80,13 +80,11 @@ fun ProfileScreen(
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true
-    ) { contentPadding ->
+    ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding)
+            modifier = Modifier.fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
 

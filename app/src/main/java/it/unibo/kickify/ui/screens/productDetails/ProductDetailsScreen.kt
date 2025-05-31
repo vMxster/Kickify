@@ -64,11 +64,9 @@ fun ProductDetailsScreen(
         showTopAppBar = true,
         bottomAppBarContent = { ProductDetailsFooter(product?.price ?: 0.0) },
         showModalDrawer = true
-    ) { contentPadding ->
+    ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding)
+            modifier = Modifier.fillMaxSize()
                 .padding(horizontal = 16.dp)
                 .padding(vertical = 10.dp)
                 .verticalScroll(rememberScrollState()),

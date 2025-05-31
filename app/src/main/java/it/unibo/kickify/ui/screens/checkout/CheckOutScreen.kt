@@ -43,7 +43,7 @@ fun CheckOutScreen(
         showTopAppBar = true,
         bottomAppBarContent = { },
         showModalDrawer = false
-    ) { contentPadding ->
+    ) {
         var showLoading: Boolean by rememberSaveable { mutableStateOf(false) }
         var showDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -57,9 +57,7 @@ fun CheckOutScreen(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .padding(contentPadding)
-                    .padding(horizontal = 10.dp)
+                modifier = Modifier.padding(horizontal = 10.dp)
                     .padding(vertical = 8.dp)
                     .fillMaxSize()
             ) {

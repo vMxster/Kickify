@@ -62,7 +62,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.camerax.CameraXUtils
-import it.unibo.kickify.data.repositories.RemoteRepository
+import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ScreenTemplate
@@ -93,13 +93,11 @@ fun EditProfileScreen(
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true,
         snackBarHostState = snackBarHostState
-    ) { contentPadding ->
+    ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding)
+            modifier = Modifier.fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
             when(section){
@@ -222,7 +220,7 @@ fun ProfileInfoChangePassword(
     settingsViewModel: SettingsViewModel,
     snackbarHostState: SnackbarHostState
 ){
-    val remoteRepo = koinInject<RemoteRepository>()
+    val appRepo = koinInject<AppRepository>()
     val coroutineScope = rememberCoroutineScope()
     val ctx = LocalContext.current
 
@@ -363,19 +361,19 @@ fun ProfileInfoChangePassword(
                 coroutineScope.launch {
                     if(password == confirmPassword
                         && LoginRegisterUtils.isValidPassword(password)){
-                        val res = remoteRepo.changePassword(
+                        val res = appRepo.changePassword(
                             email = userid,
                             password = password
                         )
                         if(res.isSuccess){
                             snackbarHostState.showSnackbar(
                                 message = ctx.getString(R.string.changedPasswordSuccessfully),
-                                duration = SnackbarDuration.Indefinite
+                                duration = SnackbarDuration.Long
                             )
                         } else {
                             snackbarHostState.showSnackbar(
                                 message = ctx.getString(R.string.changePasswordError),
-                                duration = SnackbarDuration.Indefinite
+                                duration = SnackbarDuration.Long
                             )
                         }
                         password = ""
