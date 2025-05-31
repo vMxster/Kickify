@@ -492,7 +492,8 @@ class RemoteRepository(
                 return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
             }
 
-            val user = RemoteResponseParser.parseUserProfile(jsonObject)
+            val userObject = jsonObject.getJSONObject("user")
+            val user = RemoteResponseParser.parseUserProfile(userObject)
             Result.success(user)
         } catch (e: Exception) {
             Log.e(tag, "Errore durante il login", e)
