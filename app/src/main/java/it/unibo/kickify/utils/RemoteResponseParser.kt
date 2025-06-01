@@ -272,7 +272,7 @@ class RemoteResponseParser {
                 email = json.getString("Email"),
                 name = json.getString("Nome"),
                 surname = json.getString("Cognome"),
-                password = json.optString("Password", ""),
+                password = json.optString("Password"),
                 phone = json.optString("Telefono", ""),
                 registrationDate = json.optString("Data_Registrazione", ""),
                 newsletterPreferences = json.optBoolean("Preferenze_Newsletter", false),

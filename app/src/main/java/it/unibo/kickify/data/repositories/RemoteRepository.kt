@@ -546,9 +546,7 @@ class RemoteRepository(
         email: String,
         firstName: String,
         lastName: String,
-        password: String,
-        newsletter: Boolean,
-        phone: String? = null
+        password: String
     ): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
             val params = mutableMapOf(
@@ -556,11 +554,8 @@ class RemoteRepository(
                 "email" to email,
                 "firstName" to firstName,
                 "lastName" to lastName,
-                "password" to password,
-                "newsletter" to (if (newsletter) "Y" else "N")
+                "password" to password
             )
-
-            phone?.let { params["phone"] = it }
 
             val response = makeRequest("auth_handler.php", params)
             val jsonObject = JSONObject(response)
@@ -626,10 +621,15 @@ class RemoteRepository(
             val response = makeRequest("auth_handler.php", params)
             val jsonObject = JSONObject(response)
             if (!RemoteResponseParser.parseSuccess(jsonObject)) {
-                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+                return@withContext Result.failure(
+                    Exception(
+                        RemoteResponseParser.parseError(
+                            jsonObject
+                        )
+                    )
+                )
             }
-            val isRegistered = RemoteResponseParser.parseSuccess(jsonObject)
-            Result.success(isRegistered)
+            Result.success(true)
         } catch (e: Exception) {
             Log.e(tag, "Errore durante il controllo della registrazione dell'utente", e)
             Result.failure(e)

@@ -29,8 +29,10 @@ try {
                 $wishlistItems = $dbh->getWishlistItems($email);
 
                 if ($wishlistItems) {
-                    $response["success"] = true;
-                    $response["items"] = $wishlistItems;
+                    $response = [
+                        "success" => true,
+                        "items" => $wishlistItems
+                    ];
                 } else {
                     throw new Exception("No items in wishlist");
                 }

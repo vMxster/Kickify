@@ -49,7 +49,6 @@ class AppRepository(
                     productRepository.insertProducts(remoteProducts)
                 }
             }
-
             Result.success(
                 productRepository.getProductsWithImage()
             )
@@ -164,10 +163,12 @@ class AppRepository(
                         wishlistRepository.addToWishlist(email, item.productId)
                     }
                 }
+                Result.success(
+                    wishlistRepository.getWishlistItems(email)
+                )
+            } else {
+                Result.failure(Exception("Nessun Articolo nella wishlist"))
             }
-            Result.success(
-                wishlistRepository.getWishlistItems(email)
-            )
         } catch (e: Exception) {
             Log.e(tag, "Errore in getWishlistItems", e)
             Result.failure(e)
@@ -414,20 +415,34 @@ class AppRepository(
 
     // AUTENTICAZIONE
     suspend fun login(email: String, password: String): Result<User> = withContext(Dispatchers.IO) {
-        remoteRepository.login(email, password)
+        try {
+            val remoteResult = remoteRepository.login(email.lowercase(), password)
+            if (remoteResult.isSuccess) {
+                val userProfile = remoteResult.getOrNull()
+                userProfile?.let {
+                    userRepository.registerUser(it)
+                }
+                Result.success(
+                    userRepository.getUserProfile(email.lowercase()) ?: throw Exception("Profilo utente non trovato")
+                )
+            } else {
+                Result.failure(Exception("Login fallito: credenziali non valide"))
+            }
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in login", e)
+            Result.failure(e)
+        }
     }
 
     suspend fun register(
         email: String,
         firstName: String,
         lastName: String,
-        password: String,
-        newsletter: Boolean,
-        phone: String? = null
+        password: String
     ): Result<Boolean> = withContext(Dispatchers.IO) {
-        remoteRepository.register(email, firstName, lastName, password, newsletter, phone)
+        remoteRepository.register(email.lowercase(), firstName, lastName, password)
             .onSuccess {
-                remoteRepository.getUserProfile(email)
+                remoteRepository.getUserProfile(email.lowercase())
                     .onSuccess { userProfile ->
                         userRepository.registerUser(userProfile)
                     }
@@ -438,16 +453,16 @@ class AppRepository(
     }
 
     suspend fun changePassword(email: String, password: String): Result<Boolean> {
-        val result = remoteRepository.changePassword(email, password)
+        val result = remoteRepository.changePassword(email.lowercase(), password)
         if (result.isSuccess && result.getOrNull() == true) {
-            userRepository.changePassword(email, password)
+            userRepository.changePassword(email.lowercase(), password)
         }
         return result
     }
 
     suspend fun getUserProfile(email: String): Result<User> = withContext(Dispatchers.IO) {
         try {
-            val remoteResult = remoteRepository.getUserProfile(email)
+            val remoteResult = remoteRepository.getUserProfile(email.lowercase())
             if (remoteResult.isSuccess) {
                 val userProfile = remoteResult.getOrNull()
                 userProfile?.let {
@@ -455,7 +470,7 @@ class AppRepository(
                 }
             }
             Result.success(
-                userRepository.getUserProfile(email) ?: throw Exception("Profilo utente non trovato")
+                userRepository.getUserProfile(email.lowercase()) ?: throw Exception("Profilo utente non trovato")
             )
         } catch (e: Exception) {
             Log.e(tag, "Errore in getUserProfile", e)
@@ -464,14 +479,14 @@ class AppRepository(
     }
 
     suspend fun isUserRegistered(email: String): Result<Boolean> = withContext(Dispatchers.IO) {
-        remoteRepository.isUserRegistered(email)
+        remoteRepository.isUserRegistered(email.lowercase())
     }
 
     suspend fun sendMailWithOTP(email: String): Result<Boolean> = withContext(Dispatchers.IO) {
-        remoteRepository.sendMailWithOTP(email)
+        remoteRepository.sendMailWithOTP(email.lowercase())
     }
 
     suspend fun verifyOTP(email: String, otp: String): Result<Boolean> = withContext(Dispatchers.IO) {
-        remoteRepository.verifyOTP(email, otp)
+        remoteRepository.verifyOTP(email.lowercase(), otp)
     }
 }

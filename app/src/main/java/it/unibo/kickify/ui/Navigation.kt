@@ -93,9 +93,7 @@ fun KickifyNavGraph(
     val forgotPasswordOTPViewModel = koinViewModel<ForgotPasswordOTPViewModel>()
 
     val ctx = LocalContext.current
-    val userid by settingsViewModel.userId.collectAsStateWithLifecycle()
-    val username by settingsViewModel.userName.collectAsStateWithLifecycle()
-    val isUserLoggedIn = settingsViewModel.isUserLoggedIn(userid, username)
+    val isUserLoggedIn = settingsViewModel.isUserLoggedIn()
 
     val biometricLoginEnabled by settingsViewModel.biometricLogin.collectAsStateWithLifecycle()
 

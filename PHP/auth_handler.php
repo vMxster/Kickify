@@ -1,5 +1,12 @@
 <?php
 require_once("bootstrap.php");
+require_once("PHPMailer/src/PHPMailer.php");
+require_once("PHPMailer/src/SMTP.php");
+require_once("PHPMailer/src/Exception.php");
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 header("Content-Type: application/json");
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
@@ -75,11 +82,15 @@ try {
                 
             case "isUserRegistered":
                 $email = $_POST["email"];
-                $isRegistered = $dbh->isUserRegistered($email);
-                $response = [
-                    "success" => true,
-                    "isRegistered" => $isRegistered
-                ];
+
+                if ($dbh->isUserRegistered($email)) {
+                    $response = [
+                        "success" => true,
+                        "message" => "Utente registrato"
+                    ];
+                } else {
+                    throw new Exception("Utente non registrato");
+                }
                 break;
 
             case "sendOTP":

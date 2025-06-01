@@ -321,8 +321,7 @@ fun RegisterScreen(
                             && LoginRegisterUtils.isValidNameLastname(lastname)) {
                             val registerRes = appRepo.register(
                                 email = email, firstName = name,
-                                lastName = lastname, password = password,
-                                newsletter = false, phone = null
+                                lastName = lastname, password = password
                             )
                             if (registerRes.isSuccess) {
                                 Toast.makeText(ctx, "Register successful", Toast.LENGTH_LONG).show()

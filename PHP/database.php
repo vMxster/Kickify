@@ -675,14 +675,8 @@ class DatabaseHelper {
     // Get user notifications
     public function getUserNotifications($email, $lastAccess) {
         $query = "SELECT DISTINCT n.*, 
-                  CASE 
-                    WHEN n.TipoNotifica = 'Admin Message' THEN m.Corpo 
-                    ELSE NULL 
-                  END as MessaggioCompleto
                   FROM NOTIFICA n 
-                  LEFT JOIN MESSAGGIO m ON n.Timestamp_Invio = m.Timestamp_Invio 
-                    AND n.TipoNotifica = 'Admin Message'
-                  WHERE n.Email = ? AND n.Timestamp_Invio > ?
+                  WHERE n.Email = ? AND n.Timestamp_Invio > ? 
                   ORDER BY n.Timestamp_Invio DESC";
         
         $stmt = $this->db->prepare($query);
@@ -968,7 +962,7 @@ class DatabaseHelper {
 
     // User login
     public function loginUser($email, $password) {
-        $query = "SELECT Email, Password, Nome, Cognome, Ruolo FROM UTENTE WHERE Email = ?";
+        $query = "SELECT * FROM UTENTE WHERE Email = ?";
         $stmt = $this->db->prepare($query);
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -977,8 +971,6 @@ class DatabaseHelper {
         if ($result->num_rows === 1) {
             $user = $result->fetch_assoc();
             if (password_verify($password, $user['Password'])) {
-                // Remove password from array before returning
-                unset($user['Password']);
                 return $user;
             }
         }
