@@ -1,4 +1,4 @@
-package it.unibo.kickify.ui.screens.login
+package it.unibo.kickify.ui.screens.forgotPassword
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,29 +33,45 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
-import it.unibo.kickify.ui.composables.EmailRoundedTextField
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.utils.LoginRegisterUtils
 
 @Composable
 fun ForgotPasswordScreen(
-    navController: NavController
+    navController: NavController,
+    forgotPasswordOTPViewModel: ForgotPasswordOTPViewModel
 ) {
+    val ctx = LocalContext.current
+
+    val isLoading by forgotPasswordOTPViewModel.isLoading.collectAsStateWithLifecycle()
+    val errorMessage by forgotPasswordOTPViewModel.errorMessage.collectAsStateWithLifecycle()
+    val successMessage by forgotPasswordOTPViewModel.successMessage.collectAsStateWithLifecycle()
+
+    val goToOtpScreen: () -> Unit = {
+        navController.navigate(KickifyRoute.OTPScreen)
+    }
+
+    LaunchedEffect(successMessage) {
+        if(successMessage == "Email valida."){
+            goToOtpScreen()
+        }
+    }
+
     ScreenTemplate(
         screenTitle = stringResource(R.string.signin_forgotPassword),
         navController = navController,
         showTopAppBar = true,
         bottomAppBarContent = { },
-        showModalDrawer = false
+        showModalDrawer = false,
+        showLoadingOverlay = isLoading
     ) {
         val forgotScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)
             .padding(vertical = 8.dp)
-
-        val ctx = LocalContext.current
 
         var email by rememberSaveable { mutableStateOf("") }
         var emailError by remember { mutableStateOf("") }
@@ -118,13 +135,22 @@ fun ForgotPasswordScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { navController.navigate(KickifyRoute.OTPScreen) },
+                onClick = {
+                    if(LoginRegisterUtils.isValidEmail(email)
+                        && forgotPasswordOTPViewModel.isValidEmail(email)){
+                        goToOtpScreen()
+                    } else {
+                        emailError = ctx.getString(R.string.invalidEmailMessage)
+                    }
+                },
                 modifier = forgotScreenModifier
             ) {
                 Text(
                     text = stringResource(R.string.continue_button),
                 )
             }
+            errorMessage?.let { Text(it, modifier = forgotScreenModifier) }
+            successMessage?.let { Text(it, modifier = forgotScreenModifier) }
         }
     }
 }

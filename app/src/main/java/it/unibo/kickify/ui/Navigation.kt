@@ -20,9 +20,9 @@ import it.unibo.kickify.ui.screens.cart.CartScreen
 import it.unibo.kickify.ui.screens.checkout.CheckOutScreen
 import it.unibo.kickify.ui.screens.home.HomeScreen
 import it.unibo.kickify.ui.screens.login.BiometricLoginScreen
-import it.unibo.kickify.ui.screens.login.ForgotPasswordScreen
+import it.unibo.kickify.ui.screens.forgotPassword.ForgotPasswordScreen
 import it.unibo.kickify.ui.screens.login.LoginScreen
-import it.unibo.kickify.ui.screens.login.OTPScreen
+import it.unibo.kickify.ui.screens.forgotPassword.OTPScreen
 import it.unibo.kickify.ui.screens.notifications.NotificationScreen
 import it.unibo.kickify.ui.screens.onboard.OnboardingScreen
 import it.unibo.kickify.ui.screens.orders.MyOrdersScreen
@@ -35,6 +35,7 @@ import it.unibo.kickify.ui.screens.profile.TakePhotoScreen
 import it.unibo.kickify.ui.screens.register.RegisterScreen
 import it.unibo.kickify.ui.screens.achievements.AchievementsScreen
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
+import it.unibo.kickify.ui.screens.forgotPassword.ForgotPasswordOTPViewModel
 import it.unibo.kickify.ui.screens.login.LoginViewModel
 import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
 import it.unibo.kickify.ui.screens.settings.EditProfileScreen
@@ -89,6 +90,7 @@ fun KickifyNavGraph(
     val achievementsViewModel = koinViewModel<AchievementsViewModel>()
     val loginViewModel = koinViewModel<LoginViewModel>()
     val notificationViewModel = koinViewModel<NotificationViewModel>()
+    val forgotPasswordOTPViewModel = koinViewModel<ForgotPasswordOTPViewModel>()
 
     val ctx = LocalContext.current
     val userid by settingsViewModel.userId.collectAsStateWithLifecycle()
@@ -151,11 +153,11 @@ fun KickifyNavGraph(
                 }
 
                 composable<KickifyRoute.ForgotPassword> {
-                    ForgotPasswordScreen(navController)
+                    ForgotPasswordScreen(navController, forgotPasswordOTPViewModel)
                 }
 
                 composable<KickifyRoute.OTPScreen> {
-                    OTPScreen(navController)
+                    OTPScreen(navController, forgotPasswordOTPViewModel)
                 }
 
                 composable<KickifyRoute.Notifications> {
