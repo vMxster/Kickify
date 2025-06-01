@@ -290,10 +290,11 @@ class RemoteRepository(
             val params = mapOf(
                 "action" to "getUserNotifications",
                 "email" to email,
-                "last_access" to lastAccess
+                "lastAccess" to lastAccess
             )
-            val response = makeRequest("notification_handler.php", params)
-            val jsonArray = JSONArray(response)
+            val response = makeRequest("notifications_handler.php", params)
+            val jsonObject = JSONObject(response)
+            val jsonArray = JSONArray(jsonObject.getJSONArray("notifications"))
             val notifications = RemoteResponseParser.parseNotifications(jsonArray)
             Result.success(notifications)
         } catch (e: Exception) {
