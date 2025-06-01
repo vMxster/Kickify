@@ -22,16 +22,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
+import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun BottomBar(
     navController: NavController,
 ){
+    val notificationViewModel = koinViewModel<NotificationViewModel>()
+    val unreadNotifications by notificationViewModel.unreadNotifications.collectAsStateWithLifecycle()
+
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground
@@ -89,13 +95,12 @@ fun BottomBar(
             label = { Text(stringResource(R.string.cart), textAlign = TextAlign.Center) }
         )
 
-        val notificationCount by rememberSaveable { mutableIntStateOf(3) }
         NavigationBarItem(
             selected = isSelectedIcon(KickifyRoute.Notifications),
             icon = {
                 CustomBadge(
-                    badgeCount = notificationCount,
-                    contentDescr = "$notificationCount notifications to read"
+                    badgeCount = unreadNotifications,
+                    contentDescr = "$unreadNotifications notifications to read"
                 ) {
                     Icon(
                         Icons.Outlined.Notifications,

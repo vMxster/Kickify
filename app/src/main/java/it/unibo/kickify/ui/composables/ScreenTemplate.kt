@@ -45,12 +45,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
+import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ScreenTemplate(
@@ -65,6 +68,9 @@ fun ScreenTemplate(
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
+
+    val notificationViewModel = koinViewModel<NotificationViewModel>()
+    val unreadNotifications by notificationViewModel.unreadNotifications.collectAsStateWithLifecycle()
 
     val scaffoldContent: @Composable () -> Unit = {
         Scaffold(
@@ -145,21 +151,21 @@ fun ScreenTemplate(
                             selected = isSelectedIcon(KickifyRoute.Wishlist),
                             onClick = { navController.navigate(KickifyRoute.Wishlist) },
                             icon = { Icon(Icons.Outlined.FavoriteBorder, contentDescription = null) },
-                            badge = { Text("20") }
+                            badge = { SideMenuSimpleCounter(20) }
                         )
                         NavigationDrawerItem(
                             label = { Text(stringResource(R.string.cart)) },
                             selected = isSelectedIcon(KickifyRoute.Cart),
                             onClick = { navController.navigate(KickifyRoute.Cart) },
                             icon = { Icon(Icons.Outlined.ShoppingBag, contentDescription = null) },
-                            badge = { Text("20") }
+                            badge = { SideMenuSimpleCounter(2) }
                         )
                         NavigationDrawerItem(
                             label = { Text(stringResource(R.string.notificationscreen_title)) },
                             selected = isSelectedIcon(KickifyRoute.Notifications),
                             onClick = { navController.navigate(KickifyRoute.Notifications) },
                             icon = { Icon(Icons.Outlined.Notifications, contentDescription = null) },
-                            badge = { Text("20") }
+                            badge = { SideMenuSimpleCounter(unreadNotifications) }
                         )
 
                         HorizontalDivider(Modifier.padding(vertical = 12.dp))
@@ -195,6 +201,13 @@ fun ScreenTemplate(
         )
     } else {
         scaffoldContent()
+    }
+}
+
+@Composable
+fun SideMenuSimpleCounter(count: Int){
+    if(count > 0){
+        Text("$count")
     }
 }
 

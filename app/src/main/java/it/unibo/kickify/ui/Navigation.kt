@@ -36,6 +36,7 @@ import it.unibo.kickify.ui.screens.register.RegisterScreen
 import it.unibo.kickify.ui.screens.achievements.AchievementsScreen
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.login.LoginViewModel
+import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
 import it.unibo.kickify.ui.screens.settings.EditProfileScreen
 import it.unibo.kickify.ui.screens.settings.EditProfileSections
 import it.unibo.kickify.ui.screens.settings.SettingsScreen
@@ -82,10 +83,12 @@ fun KickifyNavGraph(
     settingsViewModel: SettingsViewModel
 ) {
     val cameraXUtils =  koinInject<CameraXUtils>()
+
     val wishlistViewModel = koinViewModel<WishlistViewModel>()
     val productsViewModel = koinViewModel<ProductsViewModel>()
     val achievementsViewModel = koinViewModel<AchievementsViewModel>()
     val loginViewModel = koinViewModel<LoginViewModel>()
+    val notificationViewModel = koinViewModel<NotificationViewModel>()
 
     val ctx = LocalContext.current
     val userid by settingsViewModel.userId.collectAsStateWithLifecycle()
@@ -156,7 +159,7 @@ fun KickifyNavGraph(
                 }
 
                 composable<KickifyRoute.Notifications> {
-                    NotificationScreen(navController, settingsViewModel)
+                    NotificationScreen(navController, notificationViewModel, settingsViewModel)
                 }
 
                 composable<KickifyRoute.Onboard> {
