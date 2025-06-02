@@ -32,16 +32,8 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
-import kotlin.collections.List
-import kotlin.collections.Map
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.emptyMap
-import kotlin.collections.forEach
-import kotlin.collections.joinToString
-import kotlin.collections.map
-import kotlin.collections.mapOf
-import kotlin.collections.mutableMapOf
 import kotlin.collections.set
 
 class RemoteRepository(
@@ -604,7 +596,8 @@ class RemoteRepository(
             if (!RemoteResponseParser.parseSuccess(jsonObject)) {
                 return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
             }
-            val user = RemoteResponseParser.parseUserProfile(jsonObject)
+            val userInfo = jsonObject.getJSONObject("profile")
+            val user = RemoteResponseParser.parseUserProfile(userInfo)
             Result.success(user)
         } catch (e: Exception) {
             Log.e(tag, "Errore durante il recupero del profilo utente", e)
@@ -666,7 +659,7 @@ class RemoteRepository(
             if (!RemoteResponseParser.parseSuccess(JSONObject(response))) {
                 return@withContext Result.failure(Exception(RemoteResponseParser.parseError(JSONObject(response))))
             }
-            Result.success(true);
+            Result.success(true)
         } catch (e: Exception) {
             Log.e(tag, "Errore durante l'invio dell'OTP", e)
             throw e

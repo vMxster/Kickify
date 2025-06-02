@@ -25,10 +25,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -36,7 +39,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import it.unibo.kickify.R
-import it.unibo.kickify.camerax.CameraXUtils
 import it.unibo.kickify.data.database.User
 import it.unibo.kickify.data.models.Language
 import it.unibo.kickify.data.repositories.AppRepository
@@ -53,7 +55,6 @@ import org.koin.compose.koinInject
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    cameraXUtils: CameraXUtils,
     settingsViewModel: SettingsViewModel
 ){
     val appLang by settingsViewModel.appLanguage.collectAsStateWithLifecycle()
@@ -61,15 +62,15 @@ fun ProfileScreen(
     val username by settingsViewModel.userName.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
     val appRepo = koinInject<AppRepository>()
-    var user: User? = null
+    val user = remember { mutableStateOf<User?>(null) }
 
     LaunchedEffect(Unit) {
         delay(500)
         coroutineScope.launch {
             val res = appRepo.getUserProfile(userID)
-            val resUser = res.getOrNull()
-            if(res.isSuccess && resUser != null){
-                user = resUser
+            res.onSuccess { u ->
+                user.value = u
+            }.onFailure {
             }
         }
     }
@@ -95,10 +96,11 @@ fun ProfileScreen(
                     navController.navigate(KickifyRoute.EditProfile(EditProfileSections.USER_INFO))
                 }
             ) {
-                if (user?.urlPhoto != null) {
+                if (user.value?.urlPhoto != "") {
                     AsyncImage(
-                        model = user?.urlPhoto,
+                        model = user.value?.urlPhoto,
                         contentDescription = "",
+                        placeholder = rememberVectorPainter(Icons.Outlined.AccountCircle),
                         modifier = Modifier
                             .clip(RoundedCornerShape(10.dp))
                     )
@@ -111,11 +113,14 @@ fun ProfileScreen(
                     )
                 }
 
-                Text(username, modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
-                    .padding(vertical = 4.dp).padding(start = 10.dp),
-                    style = MaterialTheme.typography.titleMedium)
-                TextInformationRow(userID)
-                TextInformationRow("${stringResource(R.string.phone)}:", user?.phone ?: "-")
+                Text(
+                    text = if(user.value == null) username else "${user.value?.name} ${user.value?.surname}",
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
+                        .padding(vertical = 4.dp).padding(start = 10.dp),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                TextInformationRow(if(user.value == null) userID else "${user.value?.email}")
+                TextInformationRow("${stringResource(R.string.phone)}:", user.value?.phone ?: "-")
                 TextInformationRow("${stringResource(R.string.language)}:",
                     Language.getLanguageStringFromCode(appLang))
             }

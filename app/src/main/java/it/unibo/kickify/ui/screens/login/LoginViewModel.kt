@@ -28,6 +28,7 @@ class LoginViewModel(
     fun login(email: String, password: String) {
         _errorMessage.value = null
         _isLoading.value = true
+        _isLoggedIn.value = false
 
         viewModelScope.launch {
             try {
