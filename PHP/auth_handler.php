@@ -1,12 +1,5 @@
 <?php
 require_once("bootstrap.php");
-require_once("PHPMailer/src/PHPMailer.php");
-require_once("PHPMailer/src/SMTP.php");
-require_once("PHPMailer/src/Exception.php");
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
 header("Content-Type: application/json");
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
@@ -101,30 +94,21 @@ try {
                 $_SESSION['recovery_email'] = $email;
                 $_SESSION['recovery_expires'] = time() + 900; // 15 minutes
 
-                $mail = new PHPMailer(true);
+                $to = $email;
+                $subject = 'Password Recovery OTP - Kickify';
+                $message = "Your OTP for password recovery is: $otp\nThis code will expire in 15 minutes.";
+                $headers = "From: kickify@altervista.org\r\n";
+                $headers .= "Reply-To: kickify@altervista.org\r\n";
+                $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
 
-                $mail->isSMTP();
-                $mail->Host = 'smtp.gmail.com';
-                $mail->SMTPAuth = true;
-                $mail->Username = 'urbankicks77@gmail.com';
-                $mail->Password = 'xhztmkdkigqlumwo';
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-                $mail->Port = 465;
-                $mail->CharSet = 'UTF-8';
-
-                $mail->setFrom('urbankicks77@gmail.com', 'Kickify');
-                $mail->addAddress($email);
-
-                $mail->isHTML(true);
-                $mail->Subject = 'Password Recovery OTP - Kickify';
-                $mail->Body = "Your OTP for password recovery is: <b>$otp</b><br>This code will expire in 15 minutes.";
-                $mail->AltBody = "Your OTP for password recovery is: $otp\nThis code will expire in 15 minutes.";
-
-                $mail->send();
-                $response = [
-                    "success" => true, 
-                    "message" => "OTP sent successfully"
-                ];
+                if (mail($to, $subject, $message, $headers)) {
+                    $response = [
+                        "success" => true, 
+                        "message" => "OTP sent successfully"
+                    ];
+                } else {
+                    throw new Exception("Failed to send OTP email");
+                }
                 break;
 
             case "verifyOTP":
