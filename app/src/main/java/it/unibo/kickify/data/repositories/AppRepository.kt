@@ -20,7 +20,8 @@ class AppRepository(
     private val reviewRepository: ReviewRepository,
     private val notificationRepository: NotificationRepository,
     private val imageRepository: ImageRepository,
-    private val productCartRepository: ProductCartRepository
+    private val productCartRepository: ProductCartRepository,
+    private val versionRepository: VersionRepository
 ) {
     private val tag = "AppRepository"
 
@@ -62,6 +63,15 @@ class AppRepository(
             try {
                 val remoteResult = remoteRepository.getProductData(productId, userEmail)
                 if (remoteResult.isSuccess) {
+                    val remoteProduct = remoteResult.getOrNull()
+                    remoteProduct?.let {
+                        for (variant in it.variants) {
+                            versionRepository.insertProductVariant(variant)
+                        }
+                        for (review in it.reviews) {
+                            reviewRepository.addReview(review)
+                        }
+                    }
                     return@withContext remoteResult
                 }
                 Result.failure(Exception("Prodotto non trovato"))
@@ -90,6 +100,62 @@ class AppRepository(
                 Result.failure(e)
             }
         }
+
+    suspend fun getProductWithVariants(productId: Int): Result<CompleteProduct> = withContext(Dispatchers.IO) {
+        try {
+            val product = productRepository.getProductWithVariants(productId)
+            if (product != null) {
+                Result.success(product)
+            } else {
+                Result.failure(Exception("Prodotto non trovato"))
+            }
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in getProductWithVariants", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getPopularProducts(): Result<List<Product>> = withContext(Dispatchers.IO) {
+        try {
+            val products = productRepository.getPopularProducts()
+            if (products.isNotEmpty()) {
+                Result.success(products)
+            } else {
+                Result.failure(Exception("Nessun prodotto popolare trovato"))
+            }
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in getPopularProducts", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getNewProducts(): Result<List<Product>> = withContext(Dispatchers.IO) {
+        try {
+            val products = productRepository.getNewProducts()
+            if (products.isNotEmpty()) {
+                Result.success(products)
+            } else {
+                Result.failure(Exception("Nessun prodotto nuovo trovato"))
+            }
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in getNewProducts", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getDiscountedProducts(): Result<List<Product>> = withContext(Dispatchers.IO) {
+        try {
+            val products = productRepository.getDiscountedProducts()
+            if (products.isNotEmpty()) {
+                Result.success(products)
+            } else {
+                Result.failure(Exception("Nessun prodotto scontato trovato"))
+            }
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in getDiscountedProducts", e)
+            Result.failure(e)
+        }
+    }
 
     // CARRELLO
     suspend fun getCart(email: String): Result<Cart> {

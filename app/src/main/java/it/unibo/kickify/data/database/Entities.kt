@@ -847,15 +847,9 @@ data class OrderProductDetails(
     val isDelivered: Boolean
 )
 
-data class ProductVariant(
-    val color: String,
-    val size: String,
-    val quantity: Int
-)
-
 data class ProductDetails(
     val product: Product,
-    val variants: List<ProductVariant>,
+    val variants: List<Version>,
     val reviews: List<Review>,
     val inWishlist: Boolean,
     val inCart: Boolean,

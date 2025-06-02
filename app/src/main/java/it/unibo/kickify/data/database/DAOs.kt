@@ -66,6 +66,12 @@ interface ProductDao {
     """)
     suspend fun getProductsWithImage(): Map<Product, Image>
 
+    @Query("""
+        SELECT * FROM VARIANTE
+        WHERE ID_Prodotto = :productId
+    """)
+    suspend fun getProductVariants(productId: Int): List<Version>
+
     @Transaction
     suspend fun getProductData(productId: Int, userEmail: String): ProductDetail? {
         val product = getProductBase(productId) ?: return null
@@ -89,12 +95,6 @@ interface ProductDao {
         WHERE ID_Prodotto = :productId
     """)
     suspend fun getProductBase(productId: Int): Product?
-
-    @Query("""
-        SELECT * FROM VARIANTE
-        WHERE ID_Prodotto = :productId
-    """)
-    suspend fun getProductVariants(productId: Int): List<Version>
 
     @Query("""
         SELECT r.*, u.Nome, u.Cognome 
@@ -132,6 +132,39 @@ interface ProductDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProductHistory(remoteHistory: List<HistoryProduct>)
+
+    @Query("""
+        SELECT * FROM PRODOTTO 
+        WHERE ID_Prodotto IN (
+            SELECT ID_Prodotto FROM PRODOTTO_ORDINE 
+            GROUP BY ID_Prodotto
+            ORDER BY SUM(Quantita) DESC
+        )
+    """)
+    suspend fun getPopularProducts(): List<Product>
+
+    @Query("""
+        SELECT * FROM PRODOTTO 
+        WHERE ID_Prodotto IN (
+            SELECT ID_Prodotto FROM PRODOTTO 
+            ORDER BY Data_Aggiunta DESC
+        )
+    """)
+    suspend fun getNewProducts(): List<Product>
+
+    @Query("""
+        SELECT * FROM PRODOTTO 
+        WHERE ID_Prodotto IN (
+            SELECT ID_Prodotto FROM PRODOTTO_STORICO
+        )
+    """)
+    suspend fun getDiscountedProducts(): List<Product>
+}
+
+@Dao
+interface VersionDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertProductVariant(variant: Version)
 }
 
 @Dao

@@ -27,6 +27,7 @@ import it.unibo.kickify.data.repositories.local.WishlistRepository
 import it.unibo.kickify.data.repositories.local.NotificationRepository
 import it.unibo.kickify.data.repositories.local.ProductCartRepository
 import it.unibo.kickify.data.repositories.local.ReviewRepository
+import it.unibo.kickify.data.repositories.local.VersionRepository
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.forgotPassword.ForgotPasswordOTPViewModel
 import it.unibo.kickify.ui.screens.login.LoginViewModel
@@ -74,6 +75,7 @@ val appModule = module {
     single { WishlistRepository(wishlistDao = get<KickifyDatabase>().wishlistDao()) }
     single { ReviewRepository(reviewDao = get<KickifyDatabase>().reviewDao()) }
     single { NotificationRepository(notificationDao = get<KickifyDatabase>().notificationDao()) }
+    single { VersionRepository(versionDao = get<KickifyDatabase>().versionDao()) }
     single { SettingsRepository(dataStore = get()) }
     single { AchievementsRepository(dataStore = get()) }
     single { RemoteRepository(httpClient = get()) }
@@ -81,7 +83,7 @@ val appModule = module {
         get(), get(), get(),
         get(), get(), get(),
         get(), get(), get(),
-        get(), get()) }
+        get(), get(), get()) }
 
     viewModel { SettingsViewModel(get()) }
     viewModel { WishlistViewModel(get()) }

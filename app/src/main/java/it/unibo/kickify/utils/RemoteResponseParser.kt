@@ -34,16 +34,18 @@ class RemoteResponseParser {
         fun parseProductDetails(json: JSONObject): ProductDetails {
             val product = parseProduct(json.getJSONObject("product"))
 
-            val variants = mutableListOf<ProductVariant>()
+            val variants = mutableListOf<Version>()
+            val productId = product.productId
             val variantsJson = json.getJSONObject("variants")
             val keys = variantsJson.keys()
             while (keys.hasNext()) {
                 val key = keys.next()
                 val variantJson = variantsJson.getJSONObject(key)
                 variants.add(
-                    ProductVariant(
+                    Version(
+                        productId = productId,
                         color = variantJson.getString("Colore"),
-                        size = variantJson.getString("Taglia"),
+                        size = variantJson.getDouble("Taglia"),
                         quantity = variantJson.getInt("Quantita")
                     )
                 )

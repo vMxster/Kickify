@@ -37,4 +37,5 @@ abstract class KickifyDatabase : RoomDatabase() {
     abstract fun notificationDao(): NotificationDao
     abstract fun imageDao(): ImageDao
     abstract fun productCartDao(): ProductCartDao
+    abstract fun versionDao(): VersionDao
 }

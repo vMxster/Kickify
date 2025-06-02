@@ -38,4 +38,13 @@ class ProductRepository(private val productDao: ProductDao) {
     suspend fun insertProductHistory(remoteHistory: List<HistoryProduct>) {
         productDao.insertProductHistory(remoteHistory)
     }
+
+    suspend fun getPopularProducts(): List<Product> =
+        productDao.getPopularProducts()
+
+    suspend fun getNewProducts(): List<Product> =
+        productDao.getNewProducts()
+
+    suspend fun getDiscountedProducts(): List<Product> =
+        productDao.getDiscountedProducts()
 }
