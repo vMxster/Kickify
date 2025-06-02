@@ -4,7 +4,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import it.unibo.kickify.data.models.Theme
 import kotlinx.coroutines.flow.Flow
@@ -18,10 +17,11 @@ class SettingsRepository(
         private val USER_NAME = stringPreferencesKey("username")
         private val USER_IMG = stringPreferencesKey("userImgFilename")
         private val THEME = stringPreferencesKey("theme")
-        private val BIOMETRIC_LOGIN = booleanPreferencesKey("biometric_login")
+        private val ENABLED_BIOMETRIC_LOGIN = booleanPreferencesKey("biometric_login")
         private val ENABLED_LOCATION = booleanPreferencesKey("enabled_location")
         private val ENABLED_PUSH_NOTIFICATION = booleanPreferencesKey("enabled_pushNotification")
         private val APP_LANG = stringPreferencesKey("app_lang")
+        private val ONBOARDING_COMPLETED = booleanPreferencesKey("completed_onboarding")
     }
 
     // get userid
@@ -59,12 +59,12 @@ class SettingsRepository(
 
     // get biometric login
     val biometricLogin : Flow<Boolean> = dataStore.data.map {
-        it[BIOMETRIC_LOGIN] ?: false
+        it[ENABLED_BIOMETRIC_LOGIN] ?: false
     }
 
     // set biometric login
     suspend fun setBiometricLogin(enabled: Boolean) = dataStore.edit {
-        it[BIOMETRIC_LOGIN] = enabled
+        it[ENABLED_BIOMETRIC_LOGIN] = enabled
     }
 
     // get enabled location
@@ -102,4 +102,14 @@ class SettingsRepository(
 
     // set app language id
     suspend fun setAppLanguage(appLanguageId: String) = dataStore.edit { it[APP_LANG] = appLanguageId }
+
+    // get completed onboarding
+    val onboardingCompleted : Flow<Boolean> = dataStore.data.map {
+        it[ONBOARDING_COMPLETED] ?: false
+    }
+
+    // set completed onboarding
+    suspend fun setOnboardingCompleted(completed: Boolean) = dataStore.edit {
+        it[ONBOARDING_COMPLETED] = completed
+    }
 }

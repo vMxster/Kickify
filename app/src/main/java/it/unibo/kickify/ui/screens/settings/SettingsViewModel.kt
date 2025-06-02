@@ -8,16 +8,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.unibo.kickify.data.models.Theme
 import it.unibo.kickify.data.repositories.SettingsRepository
+import it.unibo.kickify.ui.AppStartDestination
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class SettingsViewModel(
     private val repository: SettingsRepository
 ) : ViewModel() {
+
+    private val _startDestination = MutableStateFlow(AppStartDestination.LOADING)
+    val startDestination: StateFlow<AppStartDestination> = _startDestination
+
+    init {
+        determineStartDestination()
+    }
 
     val userId = repository.userID.stateIn(
         scope = viewModelScope,
@@ -49,11 +57,11 @@ class SettingsViewModel(
         initialValue = false
     )
 
-    val lastAccess = repository.lastAccess.stateIn(
+    /*val lastAccess = repository.lastAccess.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
         initialValue = "0"
-    )
+    )*/
 
     val enabledLocation = repository.locationEnabled.stateIn(
         scope = viewModelScope,
@@ -73,6 +81,11 @@ class SettingsViewModel(
         initialValue = ""
     )
 
+    val onboardingCompleted = repository.onboardingCompleted.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = false
+    )
 
     fun setUserId(value: String) = viewModelScope.launch {
         repository.setUserID(value)
@@ -94,15 +107,15 @@ class SettingsViewModel(
         repository.setBiometricLogin(value)
     }
 
-    fun setLastAccess(value: String) = viewModelScope.launch {
+    /*fun setLastAccess(value: String) = viewModelScope.launch {
         repository.setLastAccess(value)
-    }
+    }*/
 
-    fun setLastAccessNow() = viewModelScope.launch {
+    /*fun setLastAccessNow() = viewModelScope.launch {
         val currentTime = Date()
         val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         repository.setLastAccess( formatter.format(currentTime))
-    }
+    }*/
 
     fun setEnabledLocation(value: Boolean) = viewModelScope.launch {
         repository.setLocationEnabled(value)
@@ -116,10 +129,14 @@ class SettingsViewModel(
         repository.setAppLanguage(appLanguageId)
     }
 
+    fun setOnboardingComplete(completed: Boolean) = viewModelScope.launch {
+        repository.setOnboardingCompleted(completed)
+    }
+
     fun setUserAccount(userid: String, username: String) = viewModelScope.launch {
         this@SettingsViewModel.setUserId(userid)
         this@SettingsViewModel.setUserName(username)
-        this@SettingsViewModel.setLastAccessNow()
+        //this@SettingsViewModel.setLastAccessNow()
     }
 
     fun removeUserAccount() = viewModelScope.launch {
@@ -128,7 +145,7 @@ class SettingsViewModel(
         this@SettingsViewModel.setUserImg("")
         this@SettingsViewModel.setTheme(Theme.System)
         this@SettingsViewModel.setBiometricLogin(false)
-        this@SettingsViewModel.setLastAccess("")
+        //this@SettingsViewModel.setLastAccess("")
         this@SettingsViewModel.setEnabledLocation(false)
         this@SettingsViewModel.setEnabledPushNotification(false)
         this@SettingsViewModel.setAppLanguage("en")
@@ -147,6 +164,31 @@ class SettingsViewModel(
     }
 
     fun isUserLoggedIn(): Boolean{
-        return this.userId.value != "" && this.userName.value != ""
+        return userId.value.isNotEmpty() && userName.value.isNotEmpty()
+    }
+
+    private fun determineStartDestination() {
+        viewModelScope.launch {
+            val userId = repository.userID.first()
+            val onboardingComplete = repository.onboardingCompleted.first()
+            val biometricLoginEnabled = repository.biometricLogin.first()
+
+            // first app start, user not logged in and onboarding not completed
+            if (userId.isEmpty() && !onboardingComplete) {
+                _startDestination.value = AppStartDestination.ONBOARDING
+
+            // user not logged in and onboarding completed
+            } else if(userId.isEmpty() && onboardingComplete){
+                _startDestination.value = AppStartDestination.LOGIN
+
+            } else {
+                // user logged in
+                if (biometricLoginEnabled) {
+                    _startDestination.value = AppStartDestination.BIOMETRIC_AUTH
+                } else {
+                    _startDestination.value = AppStartDestination.HOME
+                }
+            }
+        }
     }
 }

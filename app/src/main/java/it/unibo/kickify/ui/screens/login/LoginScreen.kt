@@ -87,8 +87,12 @@ fun LoginScreen(
     val emailFocusRequester = remember { FocusRequester() }
 
     var password by rememberSaveable { mutableStateOf("") }
+    var passwordError by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
     val passwordFocusRequester = remember { FocusRequester() }
+
+    // set onboarding completed
+    settingsViewModel.setOnboardingComplete(true)
 
     // if logged in successfully, execute login action
     LaunchedEffect(isLoggedIn) {
@@ -104,7 +108,10 @@ fun LoginScreen(
     // show error if present
     LaunchedEffect(errorMessage) {
         errorMessage?.let { message ->
-            snackBarHostState.showSnackbar(message = message, actionLabel = "OK")
+            snackBarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Long,
+                actionLabel = ctx.getString(R.string.ok))
             loginViewModel.dismissError()
         }
     }
@@ -186,7 +193,10 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(12.dp))
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = {
+                    password = it
+                    passwordError = ""
+                },
                 placeholder = { Text(stringResource(R.string.password))},
                 shape = RoundedCornerShape(16.dp),
                 visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
@@ -198,9 +208,17 @@ fun LoginScreen(
                     onDone = {
                         if (password.isNotEmpty()) {
                             focusManager.clearFocus()
+                        } else if(password.isEmpty()){
+                            passwordError = ctx.getString(R.string.passwordEmptyError)
                         }
                     }
                 ),
+                isError = passwordError != "",
+                supportingText = {
+                    if (passwordError != "") {
+                        Text(text = passwordError, color = MaterialTheme.colorScheme.error)
+                    }
+                },
                 trailingIcon = {
                     val image = if (passwordVisibility) Icons.Outlined.Visibility
                     else Icons.Outlined.VisibilityOff
@@ -228,16 +246,15 @@ fun LoginScreen(
 
             Button(
                 onClick = {
-                    coroutineScope.launch {
-                        if(LoginRegisterUtils.isValidEmail(email)
-                            && password.isNotEmpty()){
-                           loginViewModel.login(email, password)
+                    if(LoginRegisterUtils.isValidEmail(email)
+                        && password.isNotEmpty()){
+                        loginViewModel.login(email, password)
 
-
-
-                        } else {
+                    } else {
+                        coroutineScope.launch {
                             snackBarHostState.showSnackbar(
                                 message = ctx.getString(R.string.signin_errorsInEmailOrPassword),
+                                actionLabel = ctx.getString(R.string.ok),
                                 duration = SnackbarDuration.Long)
                         }
                     }

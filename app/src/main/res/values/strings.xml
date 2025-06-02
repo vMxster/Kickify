@@ -19,6 +19,7 @@
     <string name="confirmPassword">Confirm password</string>
     <string name="confirmPasswordNoMatch">Password and Confirm Password don\'t match</string>
     <string name="signin_errorsInEmailOrPassword">Check email and password are correct</string>
+    <string name="passwordEmptyError">Type in your password.</string>
     <string name="showHidePsw">Show/Hide Password</string>
     <string name="invalidEmailMessage">Type in a valid email address</string>
     <string name="invalidPswMessage">The password must be at least 10 characters long\n
@@ -42,6 +43,7 @@
     <string name="forgotpsw_text">Enter your email - we\'ll send a secure link to get you back on track.</string>
     <string name="otpScreen_text">Type in the OTP Code we sent you.</string>
     <string name="otpScreen_otp">OTP</string>
+    <string name="ok">OK</string>
     <string name="continue_button">Continue</string>
     <string name="settings_title">Settings</string>
     <string name="settings_accountTitle">Account</string>

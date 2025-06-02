@@ -1,29 +1,34 @@
 package it.unibo.kickify.ui
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import it.unibo.kickify.authentication.BiometricAuthManager
 import it.unibo.kickify.camerax.CameraXUtils
+import it.unibo.kickify.ui.screens.achievements.AchievementsScreen
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.cart.CartScreen
 import it.unibo.kickify.ui.screens.checkout.CheckOutScreen
+import it.unibo.kickify.ui.screens.forgotPassword.ForgotPasswordOTPViewModel
+import it.unibo.kickify.ui.screens.forgotPassword.ForgotPasswordScreen
+import it.unibo.kickify.ui.screens.forgotPassword.OTPScreen
 import it.unibo.kickify.ui.screens.home.HomeScreen
 import it.unibo.kickify.ui.screens.login.BiometricLoginScreen
-import it.unibo.kickify.ui.screens.forgotPassword.ForgotPasswordScreen
 import it.unibo.kickify.ui.screens.login.LoginScreen
-import it.unibo.kickify.ui.screens.forgotPassword.OTPScreen
+import it.unibo.kickify.ui.screens.login.LoginViewModel
 import it.unibo.kickify.ui.screens.notifications.NotificationScreen
+import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
 import it.unibo.kickify.ui.screens.onboard.OnboardingScreen
 import it.unibo.kickify.ui.screens.orders.MyOrdersScreen
 import it.unibo.kickify.ui.screens.orders.OrderDetailsScreen
@@ -33,11 +38,6 @@ import it.unibo.kickify.ui.screens.productList.ProductsViewModel
 import it.unibo.kickify.ui.screens.profile.ProfileScreen
 import it.unibo.kickify.ui.screens.profile.TakePhotoScreen
 import it.unibo.kickify.ui.screens.register.RegisterScreen
-import it.unibo.kickify.ui.screens.achievements.AchievementsScreen
-import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
-import it.unibo.kickify.ui.screens.forgotPassword.ForgotPasswordOTPViewModel
-import it.unibo.kickify.ui.screens.login.LoginViewModel
-import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
 import it.unibo.kickify.ui.screens.settings.EditProfileScreen
 import it.unibo.kickify.ui.screens.settings.EditProfileSections
 import it.unibo.kickify.ui.screens.settings.SettingsScreen
@@ -47,6 +47,14 @@ import it.unibo.kickify.ui.screens.wishlist.WishlistViewModel
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
+
+enum class AppStartDestination  {
+    LOADING,        // wait when loading settings
+    ONBOARDING,     // first time app start
+    LOGIN,          // user can log in
+    BIOMETRIC_AUTH, // user can authenticate using biometry
+    HOME            // user is logged in and can go to home screen
+}
 
 sealed interface KickifyRoute {
     @Serializable data object Home : KickifyRoute
@@ -72,11 +80,6 @@ sealed interface KickifyRoute {
     @Serializable data object BiometricLogin: KickifyRoute
 }
 
-sealed class StartDestinationResult {
-    data object Loading : StartDestinationResult()
-    data class Loaded(val destination: Any) : StartDestinationResult()
-}
-
 @Composable
 fun KickifyNavGraph(
     navController: NavHostController,
@@ -92,143 +95,131 @@ fun KickifyNavGraph(
     val notificationViewModel = koinViewModel<NotificationViewModel>()
     val forgotPasswordOTPViewModel = koinViewModel<ForgotPasswordOTPViewModel>()
 
-    val ctx = LocalContext.current
-    val isUserLoggedIn = settingsViewModel.isUserLoggedIn()
+    val startDestination by settingsViewModel.startDestination.collectAsStateWithLifecycle()
 
-    val biometricLoginEnabled by settingsViewModel.biometricLogin.collectAsStateWithLifecycle()
-
-    var startDestinationState by remember { mutableStateOf<StartDestinationResult>(StartDestinationResult.Loading) }
-
-    LaunchedEffect(isUserLoggedIn, biometricLoginEnabled, startDestinationState) {
-        val canUseBiometricsOnDevice = BiometricAuthManager.canAuthenticate(ctx)
-
-        val destination: Any = if (isUserLoggedIn) {
-            if (biometricLoginEnabled && canUseBiometricsOnDevice) {
-                KickifyRoute.BiometricLogin
-            } else {
-                KickifyRoute.Home
-            }
-        } else {
-            KickifyRoute.Onboard
-        }
-        startDestinationState = StartDestinationResult.Loaded(destination)
-    }
-
-    when (val result = startDestinationState) {
-        is StartDestinationResult.Loading -> {
+    if (startDestination == AppStartDestination.LOADING) {
+        Box(modifier = Modifier.fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.Center
+        ) {
             CircularProgressIndicator()
         }
+        return
+    }
 
-        is StartDestinationResult.Loaded -> {
-            NavHost(
+    NavHost(
+        navController = navController,
+        startDestination = when (startDestination) {
+            AppStartDestination.ONBOARDING -> KickifyRoute.Onboard
+            AppStartDestination.LOGIN -> KickifyRoute.Login
+            AppStartDestination.BIOMETRIC_AUTH -> KickifyRoute.BiometricLogin
+            AppStartDestination.HOME -> KickifyRoute.Home
+            else -> KickifyRoute.Onboard
+        }
+    ) {
+        composable<KickifyRoute.Home> {
+            HomeScreen(navController)
+        }
+
+        composable<KickifyRoute.Cart> {
+            CartScreen(navController)
+        }
+
+        composable<KickifyRoute.Checkout> {
+            CheckOutScreen(navController)
+        }
+
+        composable<KickifyRoute.Login> {
+            LoginScreen(
                 navController = navController,
-                startDestination = result.destination
-            ) {
-                composable<KickifyRoute.Home> {
-                    HomeScreen(navController)
+                settingsViewModel = settingsViewModel,
+                loginViewModel = loginViewModel,
+                onLoginSuccess = {
+                    achievementsViewModel.achieveAchievement(1)
+                    navController.navigate(KickifyRoute.Home) {
+                        popUpTo(KickifyRoute.Login) { inclusive = true }
+                    }
                 }
+            )
+        }
 
-                composable<KickifyRoute.Cart> {
-                    CartScreen(navController)
-                }
+        composable<KickifyRoute.ForgotPassword> {
+            ForgotPasswordScreen(navController, forgotPasswordOTPViewModel)
+        }
 
-                composable<KickifyRoute.Checkout> {
-                    CheckOutScreen(navController)
-                }
+        composable<KickifyRoute.OTPScreen> {
+            OTPScreen(navController, forgotPasswordOTPViewModel)
+        }
 
-                composable<KickifyRoute.Login> {
-                    LoginScreen(
-                        navController = navController,
-                        settingsViewModel = settingsViewModel,
-                        loginViewModel = loginViewModel,
-                        onLoginSuccess = {
-                            achievementsViewModel.achieveAchievement(1)
-                            navController.navigate(KickifyRoute.Home) {
-                                popUpTo(KickifyRoute.Login) { inclusive = true }
-                            }
-                        }
-                    )
-                }
+        composable<KickifyRoute.Notifications> {
+            NotificationScreen(navController, notificationViewModel, settingsViewModel)
+        }
 
-                composable<KickifyRoute.ForgotPassword> {
-                    ForgotPasswordScreen(navController, forgotPasswordOTPViewModel)
+        composable<KickifyRoute.Onboard> {
+            OnboardingScreen(
+                navController,
+                onReachedLastPage = {
+                    navController.navigate(KickifyRoute.Login) {
+                        popUpTo(KickifyRoute.Onboard) { inclusive = true }
+                    }
                 }
+            )
+        }
 
-                composable<KickifyRoute.OTPScreen> {
-                    OTPScreen(navController, forgotPasswordOTPViewModel)
-                }
+        composable<KickifyRoute.ProductDetails> { backStackEntry ->
+            val route = backStackEntry.toRoute<KickifyRoute.ProductDetails>()
+            ProductDetailsScreen(navController, productsViewModel, route.productId)
+        }
 
-                composable<KickifyRoute.Notifications> {
-                    NotificationScreen(navController, notificationViewModel, settingsViewModel)
-                }
+        composable<KickifyRoute.ProductList> {
+            ProductListScreen(navController, productsViewModel)
+        }
 
-                composable<KickifyRoute.Onboard> {
-                    OnboardingScreen(
-                        navController,
-                        onReachedLastPage = {
-                            navController.navigate(KickifyRoute.Login) {
-                                popUpTo(KickifyRoute.Onboard) { inclusive = true }
-                            }
-                        }
-                    )
-                }
+        composable<KickifyRoute.ProductListWithCategory> { backStackEntry ->
+            val route = backStackEntry.toRoute<KickifyRoute.ProductListWithCategory>()
+            ProductListScreen(navController, productsViewModel, route.category)
+        }
 
-                composable<KickifyRoute.ProductDetails> { backStackEntry ->
-                    val route = backStackEntry.toRoute<KickifyRoute.ProductDetails>()
-                    ProductDetailsScreen(navController, productsViewModel, route.productId)
-                }
+        composable<KickifyRoute.Profile> {
+            ProfileScreen(navController, cameraXUtils, settingsViewModel)
+        }
 
-                composable<KickifyRoute.ProductList> {
-                    ProductListScreen(navController, productsViewModel)
-                }
+        composable<KickifyRoute.Register> {
+            RegisterScreen(navController, settingsViewModel)
+        }
 
-                composable<KickifyRoute.ProductListWithCategory> { backStackEntry ->
-                    val route = backStackEntry.toRoute<KickifyRoute.ProductListWithCategory>()
-                    ProductListScreen(navController, productsViewModel, route.category)
-                }
+        composable<KickifyRoute.Settings> {
+            SettingsScreen(navController, settingsViewModel)
+        }
 
-                composable<KickifyRoute.Profile> {
-                    ProfileScreen(navController, cameraXUtils, settingsViewModel)
-                }
+        composable<KickifyRoute.Wishlist> {
+            WishlistScreen(navController, wishlistViewModel)
+        }
 
-                composable<KickifyRoute.Register> {
-                    RegisterScreen(navController, settingsViewModel)
-                }
+        composable<KickifyRoute.MyOrders> {
+            MyOrdersScreen(navController)
+        }
 
-                composable<KickifyRoute.Settings> {
-                    SettingsScreen(navController, settingsViewModel)
-                }
+        composable<KickifyRoute.OrderDetails> { backStackEntry ->
+            val route = backStackEntry.toRoute<KickifyRoute.OrderDetails>()
+            OrderDetailsScreen(navController, route.orderID)
+        }
 
-                composable<KickifyRoute.Wishlist> {
-                    WishlistScreen(navController, wishlistViewModel)
-                }
+        composable<KickifyRoute.TakeProfilePhoto> {
+            TakePhotoScreen(navController, activity, cameraXUtils, settingsViewModel)
+        }
 
-                composable<KickifyRoute.MyOrders> {
-                    MyOrdersScreen(navController)
-                }
+        composable<KickifyRoute.Achievements> {
+            AchievementsScreen(navController, achievementsViewModel)
+        }
 
-                composable<KickifyRoute.OrderDetails> { backStackEntry ->
-                    val route = backStackEntry.toRoute<KickifyRoute.OrderDetails>()
-                    OrderDetailsScreen(navController, route.orderID)
-                }
+        composable<KickifyRoute.EditProfile> { backStackEntry ->
+            val route = backStackEntry.toRoute<KickifyRoute.EditProfile>()
+            EditProfileScreen(navController, route.section, cameraXUtils, settingsViewModel)
+        }
 
-                composable<KickifyRoute.TakeProfilePhoto> {
-                    TakePhotoScreen(navController, activity, cameraXUtils, settingsViewModel)
-                }
-
-                composable<KickifyRoute.Achievements> {
-                    AchievementsScreen(navController, achievementsViewModel)
-                }
-
-                composable<KickifyRoute.EditProfile> { backStackEntry ->
-                    val route = backStackEntry.toRoute<KickifyRoute.EditProfile>()
-                    EditProfileScreen(navController, route.section, cameraXUtils, settingsViewModel)
-                }
-
-                composable<KickifyRoute.BiometricLogin> {
-                    BiometricLoginScreen(navController)
-                }
-            }
+        composable<KickifyRoute.BiometricLogin> {
+            BiometricLoginScreen(navController)
         }
     }
 }
