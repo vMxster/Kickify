@@ -21,18 +21,23 @@ import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ProductCardWishlistPage
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.settings.SettingsViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun WishlistScreen(
     navController: NavController,
+    settingsViewModel: SettingsViewModel,
     wishlistViewModel: WishlistViewModel
 ){
     val isLoading by wishlistViewModel.isLoading.collectAsStateWithLifecycle()
     val errorMessage by wishlistViewModel.errorMessage.collectAsStateWithLifecycle()
     val wishlistState by wishlistViewModel.wishlistState.collectAsStateWithLifecycle()
-    val email = "test@email.com"
+
+    val email by settingsViewModel.userId.collectAsStateWithLifecycle()
 
     LaunchedEffect(wishlistState) {
+        delay(500)
         wishlistViewModel.fetchWishlist(email)
     }
 

@@ -181,7 +181,7 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.Profile> {
-            ProfileScreen(navController, cameraXUtils, settingsViewModel)
+            ProfileScreen(navController, settingsViewModel)
         }
 
         composable<KickifyRoute.Register> {
@@ -193,7 +193,7 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.Wishlist> {
-            WishlistScreen(navController, wishlistViewModel)
+            WishlistScreen(navController, settingsViewModel, wishlistViewModel)
         }
 
         composable<KickifyRoute.MyOrders> {
