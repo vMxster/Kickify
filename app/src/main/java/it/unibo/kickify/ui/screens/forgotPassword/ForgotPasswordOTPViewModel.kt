@@ -92,4 +92,9 @@ class ForgotPasswordOTPViewModel(
         }
         _isLoading.value = false
     }
+
+    fun dismissMessages(){
+        _errorMessage.value = null
+        _successMessage.value = null
+    }
 }

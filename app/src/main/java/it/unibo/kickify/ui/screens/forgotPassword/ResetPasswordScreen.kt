@@ -79,6 +79,11 @@ fun ResetPasswordScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        delay(5000)
+        forgotPasswordOTPViewModel.dismissMessages()
+    }
+
     LaunchedEffect(successMessage) {
         if(successMessage == "Password cambiata con successo. Effettua il login."){
             delay(5000)
@@ -162,7 +167,7 @@ fun ResetPasswordScreen(
                 },
                 modifier = resetScreenModifier.focusRequester(passwordFocusRequester)
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             Text(
                 text = stringResource(R.string.confirmPassword),
@@ -224,6 +229,13 @@ fun ResetPasswordScreen(
                 Text(
                     text = stringResource(R.string.continue_button),
                 )
+            }
+
+            errorMessage?.let {
+                Text(it, modifier = resetScreenModifier, textAlign = TextAlign.Center)
+            }
+            successMessage?.let {
+                Text(it, modifier = resetScreenModifier, textAlign = TextAlign.Center)
             }
         }
     }

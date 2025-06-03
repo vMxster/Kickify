@@ -40,6 +40,7 @@ import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import kotlinx.coroutines.delay
 
 @Composable
 fun OTPScreen(
@@ -68,6 +69,8 @@ fun OTPScreen(
 
     LaunchedEffect(Unit) {
         focusRequesters[0].requestFocus()
+        delay(5000)
+        forgotPasswordOTPViewModel.dismissMessages()
     }
 
     LaunchedEffect(successMessage) {
@@ -111,16 +114,15 @@ fun OTPScreen(
                 text = stringResource(R.string.otpScreen_otp),
                 modifier = otpScreenModifier.padding(top = 16.dp)
             )
-            errorMessage?.let { Text(it) }
-            successMessage?.let { Text(it) }
             Row(
-                modifier = Modifier.padding(top = 16.dp),
+                modifier = otpScreenModifier,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 otpValues.forEachIndexed { index, value ->
                     OutlinedTextField(
                         value = value,
                         onValueChange = { newValue ->
+                            showOTPSupportText = false
                             if (newValue.length <= 1) {
                                 otpValues[index] = newValue
 
@@ -172,8 +174,12 @@ fun OTPScreen(
                 )
             }
 
-            Button(onClick = { goToResetPswScreen() }
-            ) { Text("DEBUG BTN") }
+            errorMessage?.let {
+                Text(it, modifier = otpScreenModifier, textAlign = TextAlign.Center)
+            }
+            successMessage?.let {
+                Text(it, modifier = otpScreenModifier, textAlign = TextAlign.Center)
+            }
 
             if(showOTPSupportText) {
                 Text(

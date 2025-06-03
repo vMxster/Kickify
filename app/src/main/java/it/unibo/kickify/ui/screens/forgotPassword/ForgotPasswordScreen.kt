@@ -2,10 +2,8 @@ package it.unibo.kickify.ui.screens.forgotPassword
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -140,7 +138,6 @@ fun ForgotPasswordScreen(
                 },
                 modifier = forgotScreenModifier.focusRequester(emailFocusRequester)
             )
-            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
@@ -157,8 +154,13 @@ fun ForgotPasswordScreen(
                     text = stringResource(R.string.continue_button),
                 )
             }
-            errorMessage?.let { Text(it, modifier = forgotScreenModifier) }
-            successMessage?.let { Text(it, modifier = forgotScreenModifier) }
+
+            errorMessage?.let {
+                Text(it, modifier = forgotScreenModifier, textAlign = TextAlign.Center)
+            }
+            successMessage?.let {
+                Text(it, modifier = forgotScreenModifier, textAlign = TextAlign.Center)
+            }
         }
     }
 }
