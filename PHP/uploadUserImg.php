@@ -54,7 +54,7 @@ try {
             "success" => true,
             "message" => "Immagine utente aggiornata con successo.",
             "user_email" => $email,
-            "image_path" => $userimgPath;
+            "image_path" => $userimgPath
         ];
     } else {
         throw new Exception("Errore nel cambio password");
