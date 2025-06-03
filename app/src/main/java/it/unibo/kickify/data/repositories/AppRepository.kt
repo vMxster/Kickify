@@ -2,11 +2,34 @@ package it.unibo.kickify.data.repositories
 
 import android.content.Context
 import android.util.Log
-import it.unibo.kickify.data.database.*
-import it.unibo.kickify.data.repositories.local.*
+import it.unibo.kickify.data.database.Cart
+import it.unibo.kickify.data.database.CartWithProductInfo
+import it.unibo.kickify.data.database.CompleteProduct
+import it.unibo.kickify.data.database.HistoryProduct
+import it.unibo.kickify.data.database.Image
+import it.unibo.kickify.data.database.Notification
+import it.unibo.kickify.data.database.Order
+import it.unibo.kickify.data.database.OrderDetailedTracking
+import it.unibo.kickify.data.database.OrderProduct
+import it.unibo.kickify.data.database.OrderProductDetails
+import it.unibo.kickify.data.database.Product
+import it.unibo.kickify.data.database.ProductDetails
+import it.unibo.kickify.data.database.Review
+import it.unibo.kickify.data.database.ReviewWithUserInfo
+import it.unibo.kickify.data.database.User
+import it.unibo.kickify.data.repositories.local.CartRepository
+import it.unibo.kickify.data.repositories.local.ImageRepository
+import it.unibo.kickify.data.repositories.local.NotificationRepository
+import it.unibo.kickify.data.repositories.local.OrderRepository
+import it.unibo.kickify.data.repositories.local.ProductCartRepository
+import it.unibo.kickify.data.repositories.local.ProductRepository
+import it.unibo.kickify.data.repositories.local.ReviewRepository
+import it.unibo.kickify.data.repositories.local.UserRepository
+import it.unibo.kickify.data.repositories.local.VersionRepository
+import it.unibo.kickify.data.repositories.local.WishlistRepository
 import it.unibo.kickify.utils.ImageStorageManager
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 
 class AppRepository(
@@ -21,9 +44,16 @@ class AppRepository(
     private val notificationRepository: NotificationRepository,
     private val imageRepository: ImageRepository,
     private val productCartRepository: ProductCartRepository,
-    private val versionRepository: VersionRepository
+    private val versionRepository: VersionRepository,
+    private val settingsRepository: SettingsRepository
 ) {
     private val tag = "AppRepository"
+
+   val lastAccess = settingsRepository.lastAccess
+
+    suspend fun setLastAccessNow() = withContext(Dispatchers.IO) {
+        settingsRepository.setLastAccess()
+    }
 
     // PRODOTTI
     suspend fun getProducts(lastAccess: String): Result<Map<Product, Image>> = withContext(Dispatchers.IO) {

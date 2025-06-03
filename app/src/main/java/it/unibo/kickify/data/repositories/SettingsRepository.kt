@@ -8,6 +8,9 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import it.unibo.kickify.data.models.Theme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class SettingsRepository(
     private val dataStore: DataStore<Preferences>
@@ -22,6 +25,7 @@ class SettingsRepository(
         private val ENABLED_PUSH_NOTIFICATION = booleanPreferencesKey("enabled_pushNotification")
         private val APP_LANG = stringPreferencesKey("app_lang")
         private val ONBOARDING_COMPLETED = booleanPreferencesKey("completed_onboarding")
+        private val LAST_ACCESS = stringPreferencesKey("last_access")
     }
 
     // get userid
@@ -89,12 +93,14 @@ class SettingsRepository(
 
     // get last access
     val lastAccess: Flow<String> = dataStore.data.map { preferences ->
-        preferences[stringPreferencesKey("last_access")] ?: "0"
+        preferences[LAST_ACCESS] ?: "0"
     }
 
     // set last access
-    suspend fun setLastAccess(timestamp: String) = dataStore.edit { preferences ->
-        preferences[stringPreferencesKey("last_access")] = timestamp
+    suspend fun setLastAccess() = dataStore.edit { preferences ->
+        val currentTime = Date()
+        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        preferences[LAST_ACCESS] = formatter.format(currentTime)
     }
 
     // get app language
