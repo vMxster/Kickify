@@ -39,7 +39,7 @@ class DatabaseHelper {
     // Get all products
     public function getProducts($lastAccess) {
         $query = "SELECT p.* 
-                  FROM PRODOTTO p 
+                  FROM PRODOTTO p, IMMAGINE i 
                   WHERE p.ID_Prodotto = i.ID_Prodotto 
                   AND p.Data_Aggiunta > ? 
                   ORDER BY p.Data_Aggiunta DESC";

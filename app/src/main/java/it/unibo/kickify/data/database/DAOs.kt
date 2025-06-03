@@ -498,8 +498,8 @@ interface ReviewDao {
 
 @Dao
 interface NotificationDao {
-    @Insert
-    suspend fun createNotification(notification: Notification): Long
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun createNotification(notification: Notification)
 
     @Query("""
         SELECT n.* FROM NOTIFICA n WHERE n.Email = :email 
@@ -525,5 +525,12 @@ interface NotificationDao {
     suspend fun getUnreadNotificationsCount(email: String): Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addNotification(notification: Notification): Long
+    suspend fun addNotification(notification: Notification)
+
+    @Query("""
+        INSERT INTO STATO_NOTIFICA (Tipo, Descrizione) VALUES
+    	('Read', 'The notification has been read!'),
+    	('Unread', 'The notification was not read!');
+    """)
+    suspend fun initNotificationStates()
 }

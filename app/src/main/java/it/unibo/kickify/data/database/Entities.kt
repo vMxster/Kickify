@@ -783,12 +783,6 @@ data class OrderTrackingRowData(
     val quantity: Int
 )
 
-data class NotificationWithMessage(
-    @Embedded
-    val notification: Notification,
-    val message: String?
-)
-
 data class ReviewWithUserInfo(
     @Embedded
     val review: Review,

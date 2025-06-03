@@ -4,7 +4,7 @@ import it.unibo.kickify.data.database.*
 
 class NotificationRepository(private val notificationDao: NotificationDao) {
 
-    suspend fun createNotification(notification: Notification): Long =
+    suspend fun createNotification(notification: Notification) =
         notificationDao.createNotification(notification)
 
     suspend fun getUserNotifications(email: String): List<Notification> =
@@ -16,13 +16,9 @@ class NotificationRepository(private val notificationDao: NotificationDao) {
     suspend fun getUnreadNotificationsCount(email: String): Int =
         notificationDao.getUnreadNotificationsCount(email)
 
-    suspend fun addNotification(email: String, message: String, type: String): Long =
-        notificationDao.addNotification(Notification(
-            email = email,
-            message = message,
-            type = type,
-            date = java.time.LocalDateTime.now().toString(),
-            state = "Unread",
-            notificationId = -1
-        ))
+    suspend fun addNotification(notification: Notification) =
+        notificationDao.addNotification(notification)
+
+    suspend fun initNotificationState() =
+        notificationDao.initNotificationStates()
 }

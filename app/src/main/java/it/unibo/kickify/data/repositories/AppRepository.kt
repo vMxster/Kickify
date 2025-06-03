@@ -296,6 +296,16 @@ class AppRepository(
     }
 
     // NOTIFICHE
+    suspend fun initNotificationState() = withContext(Dispatchers.IO) {
+        try {
+            notificationRepository.initNotificationState()
+            Result.success(true)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in initNotificationState", e)
+            Result.failure(e)
+        }
+    }
+
     suspend fun getNotifications(email: String, lastAccess: String): Result<List<Notification>> = withContext(Dispatchers.IO) {
         try {
             val remoteResult = remoteRepository.getNotifications(email, lastAccess)
@@ -303,8 +313,7 @@ class AppRepository(
                 val remoteNotifications = remoteResult.getOrNull() ?: emptyList()
                 if (remoteNotifications.isNotEmpty()) {
                     for (notification in remoteNotifications) {
-                        notificationRepository.addNotification(
-                            notification.email, notification.message, notification.type)
+                        notificationRepository.addNotification(notification)
                     }
                 }
             }
@@ -320,7 +329,14 @@ class AppRepository(
     suspend fun createNotification(email: String, message: String, type: String): Result<Boolean> {
         val result = remoteRepository.createNotification(email, message, type)
         if (result.isSuccess && result.getOrNull() == true) {
-            notificationRepository.addNotification(email, message, type)
+            notificationRepository.createNotification(Notification(
+                email = email,
+                message = message,
+                type = type,
+                date = LocalDateTime.now().toString(),
+                state = "Unread",
+                notificationId = 0
+            ))
         }
         return result
     }
