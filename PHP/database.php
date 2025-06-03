@@ -674,9 +674,9 @@ class DatabaseHelper {
 
     // Get user notifications
     public function getUserNotifications($email, $lastAccess) {
-        $query = "SELECT DISTINCT n.*, 
+        $query = "SELECT DISTINCT n.*
                   FROM NOTIFICA n 
-                  WHERE n.Email = ? AND n.Timestamp_Invio > ? 
+                  WHERE n.Email = ? AND n.Timestamp_Invio > ?
                   ORDER BY n.Timestamp_Invio DESC";
         
         $stmt = $this->db->prepare($query);

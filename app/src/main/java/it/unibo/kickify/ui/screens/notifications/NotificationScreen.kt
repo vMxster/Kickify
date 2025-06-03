@@ -30,6 +30,7 @@ import it.unibo.kickify.ui.composables.NotificationTitleLine
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.theme.BluePrimary
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -44,13 +45,14 @@ fun NotificationScreen(
     val notificationState by notificationViewModel.notificationState.collectAsStateWithLifecycle()
     val unreadNotifications by notificationViewModel.unreadNotifications.collectAsStateWithLifecycle()
 
-    val email = "test@email.com"
+    val email by settingsViewModel.userId.collectAsStateWithLifecycle()
     val lastAccess = "2025-06-01 10:02:41" //by settingsViewModel.lastAccess.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
 
     val notificationList = remember { mutableListOf<Notification>() }
 
     LaunchedEffect(notificationState) {
+        delay(500)
         notificationViewModel.getNotifications(email, lastAccess)
     }
 

@@ -286,7 +286,7 @@ class RemoteRepository(
             )
             val response = makeRequest("notifications_handler.php", params)
             val jsonObject = JSONObject(response)
-            val jsonArray = JSONArray(jsonObject.getJSONArray("notifications"))
+            val jsonArray = jsonObject.getJSONArray("notifications")
             val notifications = RemoteResponseParser.parseNotifications(jsonArray)
             Result.success(notifications)
         } catch (e: Exception) {
