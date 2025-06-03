@@ -8,6 +8,7 @@ import it.unibo.kickify.data.database.CompleteProduct
 import it.unibo.kickify.data.database.HistoryProduct
 import it.unibo.kickify.data.database.Image
 import it.unibo.kickify.data.database.Notification
+import it.unibo.kickify.data.database.NotificationState
 import it.unibo.kickify.data.database.Order
 import it.unibo.kickify.data.database.OrderDetailedTracking
 import it.unibo.kickify.data.database.OrderProduct
@@ -20,6 +21,7 @@ import it.unibo.kickify.data.database.User
 import it.unibo.kickify.data.repositories.local.CartRepository
 import it.unibo.kickify.data.repositories.local.ImageRepository
 import it.unibo.kickify.data.repositories.local.NotificationRepository
+import it.unibo.kickify.data.repositories.local.NotificationStateRepository
 import it.unibo.kickify.data.repositories.local.OrderRepository
 import it.unibo.kickify.data.repositories.local.ProductCartRepository
 import it.unibo.kickify.data.repositories.local.ProductRepository
@@ -45,7 +47,8 @@ class AppRepository(
     private val imageRepository: ImageRepository,
     private val productCartRepository: ProductCartRepository,
     private val versionRepository: VersionRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val notificationStateRepository: NotificationStateRepository
 ) {
     private val tag = "AppRepository"
 
@@ -296,9 +299,19 @@ class AppRepository(
     }
 
     // NOTIFICHE
-    suspend fun initNotificationState() = withContext(Dispatchers.IO) {
+    suspend fun initNotificationState(): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
-            notificationRepository.initNotificationState()
+            val stateList = listOf(
+                NotificationState(
+                    type = "Read",
+                    desc = "The notification was read!"
+                ),
+                NotificationState(
+                    type = "Unread",
+                    desc = "The notification was not read!"
+                )
+            )
+            notificationStateRepository.initNotificationStates(stateList)
             Result.success(true)
         } catch (e: Exception) {
             Log.e(tag, "Errore in initNotificationState", e)

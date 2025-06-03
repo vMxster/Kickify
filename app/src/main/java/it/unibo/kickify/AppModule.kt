@@ -20,6 +20,7 @@ import it.unibo.kickify.data.repositories.SettingsRepository
 import it.unibo.kickify.data.repositories.local.CartRepository
 import it.unibo.kickify.data.repositories.local.ImageRepository
 import it.unibo.kickify.data.repositories.local.NotificationRepository
+import it.unibo.kickify.data.repositories.local.NotificationStateRepository
 import it.unibo.kickify.data.repositories.local.OrderRepository
 import it.unibo.kickify.data.repositories.local.ProductCartRepository
 import it.unibo.kickify.data.repositories.local.ProductRepository
@@ -81,6 +82,7 @@ val appModule = module {
     single { ReviewRepository(reviewDao = get<KickifyDatabase>().reviewDao()) }
     single { NotificationRepository(notificationDao = get<KickifyDatabase>().notificationDao()) }
     single { VersionRepository(versionDao = get<KickifyDatabase>().versionDao()) }
+    single { NotificationStateRepository(notificationStateDao = get<KickifyDatabase>().notificationStateDao()) }
     single { SettingsRepository(dataStore = get()) }
     single { AchievementsRepository(dataStore = get()) }
     single { RemoteRepository(httpClient = get()) }
@@ -88,7 +90,8 @@ val appModule = module {
         get(), get(), get(),
         get(), get(), get(),
         get(), get(), get(),
-        get(), get(), get(), get()) }
+        get(), get(), get(),
+        get(), get()) }
 
     viewModel { SettingsViewModel(get()) }
     viewModel { WishlistViewModel(get()) }

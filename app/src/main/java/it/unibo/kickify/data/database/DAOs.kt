@@ -526,11 +526,10 @@ interface NotificationDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addNotification(notification: Notification)
+}
 
-    @Query("""
-        INSERT INTO STATO_NOTIFICA (Tipo, Descrizione) VALUES
-    	('Read', 'The notification has been read!'),
-    	('Unread', 'The notification was not read!');
-    """)
-    suspend fun initNotificationStates()
+@Dao
+interface NotificationStateDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addNotificationState(notificationState: NotificationState)
 }

@@ -18,7 +18,4 @@ class NotificationRepository(private val notificationDao: NotificationDao) {
 
     suspend fun addNotification(notification: Notification) =
         notificationDao.addNotification(notification)
-
-    suspend fun initNotificationState() =
-        notificationDao.initNotificationStates()
 }
