@@ -21,9 +21,9 @@ INSERT INTO NOTIFICA (ID_Notifica, TipoNotifica, Messaggio, Timestamp_Invio, Tip
 -- Inserimento dati nella tabella PRODOTTO
 INSERT INTO PRODOTTO (Nome, Descrizione, Marca, Tipo, Genere, Prezzo, Data_Aggiunta, Sta_Tipo) VALUES
     ('Ultraboost', 'Scarpa da corsa ad alte prestazioni', 'Adidas', 'Sneakers', 'Man', 180.00, '2025-01-08', 'Available'),
-    ('Cloudfoam Pure', 'Scarpa casual comoda', 'Adidas', 'Sneakers', 'Woman', 70.00, '2025-01-08', 'Available'),
+    ('Gazelle', 'Scarpa casual comoda', 'Adidas', 'Sneakers', 'Woman', 120.00, '2025-01-08', 'Available'),
     ('Adilette Aqua', 'Ciabatte comode e di tendenza', 'Adidas', 'Sliders', 'Kids', 40.00, '2025-01-08', 'Available'),
-    ('Air Max', 'Scarpa sportiva iconica', 'Nike', 'Sneakers', 'Man', 200.00, '2025-01-08', 'Available'),
+    ('Air Max 97', 'Scarpa sportiva iconica', 'Nike', 'Sneakers', 'Man', 200.00, '2025-01-08', 'Available'),
     ('Free RN', 'Scarpa da corsa flessibile', 'Nike', 'Sneakers', 'Woman', 120.00, '2025-01-08', 'Available'),
     ('Sunray Protect 2', 'Sandali per bambini leggeri', 'Nike', 'Sandals', 'Kids', 50.00, '2025-01-08', 'Available'),
     ('RS-X', 'Scarpa dal design futuristico', 'Puma', 'Sneakers', 'Man', 110.00, '2025-01-08', 'Available'),
