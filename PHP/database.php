@@ -998,6 +998,14 @@ class DatabaseHelper {
         return $result->fetch_assoc();
     }
 
+     // Set user image
+    public function updateUserImage($email, $imgUrl) {
+        $query = "UPDATE UTENTE SET URL_Foto = ? WHERE Email = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("ss", $imgUrl, $email);
+        return $stmt->execute();
+    }
+
     /*******************
      * WISHLIST QUERIES *
      *******************/
