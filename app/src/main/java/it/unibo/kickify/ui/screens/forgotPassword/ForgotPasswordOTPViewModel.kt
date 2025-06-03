@@ -23,7 +23,7 @@ class ForgotPasswordOTPViewModel(
 
     private var userEmail: String = ""
 
-    fun isValidEmail(email: String): Boolean{
+    fun isValidEmail(email: String){
         _isLoading.value = true
         _errorMessage.value = null
         _successMessage.value = null
@@ -42,7 +42,6 @@ class ForgotPasswordOTPViewModel(
             }
         }
         _isLoading.value = false
-        return userEmail != ""
     }
 
     fun sendOtp() {
@@ -57,6 +56,7 @@ class ForgotPasswordOTPViewModel(
             }.onFailure{ exception ->
                 _errorMessage.value = exception.message ?: "Errore durante l'invio dell'OTP."
             }
+            println("otp success: ${_successMessage.value} - error: ${_errorMessage.value}")
         }
         _isLoading.value = false
     }

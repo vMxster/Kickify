@@ -51,14 +51,28 @@ fun ForgotPasswordScreen(
     val errorMessage by forgotPasswordOTPViewModel.errorMessage.collectAsStateWithLifecycle()
     val successMessage by forgotPasswordOTPViewModel.successMessage.collectAsStateWithLifecycle()
 
+    var email by rememberSaveable { mutableStateOf("") }
+    var emailError by remember { mutableStateOf("") }
+    val emailFocusRequester = remember { FocusRequester() }
+
+    val focusManager = LocalFocusManager.current
+
     val goToOtpScreen: () -> Unit = {
-        navController.navigate(KickifyRoute.OTPScreen)
+        navController.navigate(KickifyRoute.OTPScreen){
+            popUpTo(navController.graph.startDestinationId){ inclusive = true }
+            launchSingleTop = true
+        }
     }
 
     LaunchedEffect(successMessage) {
         if(successMessage == "Email valida."){
+            forgotPasswordOTPViewModel.sendOtp()
             goToOtpScreen()
         }
+    }
+
+    LaunchedEffect(Unit){
+        emailFocusRequester.requestFocus()
     }
 
     ScreenTemplate(
@@ -72,12 +86,6 @@ fun ForgotPasswordScreen(
         val forgotScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)
             .padding(vertical = 8.dp)
-
-        var email by rememberSaveable { mutableStateOf("") }
-        var emailError by remember { mutableStateOf("") }
-        val emailFocusRequester = remember { FocusRequester() }
-
-        val focusManager = LocalFocusManager.current
 
         Column(
             modifier = Modifier.fillMaxSize()
@@ -113,10 +121,10 @@ fun ForgotPasswordScreen(
                 shape = RoundedCornerShape(16.dp),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next
+                    imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
-                    onNext = {
+                    onDone = {
                         if (LoginRegisterUtils.isValidEmail(email)) {
                             focusManager.clearFocus()
                         } else {
@@ -136,9 +144,9 @@ fun ForgotPasswordScreen(
 
             Button(
                 onClick = {
-                    if(LoginRegisterUtils.isValidEmail(email)
-                        && forgotPasswordOTPViewModel.isValidEmail(email)){
-                        goToOtpScreen()
+                    if(LoginRegisterUtils.isValidEmail(email)){
+                        forgotPasswordOTPViewModel.isValidEmail(email)
+
                     } else {
                         emailError = ctx.getString(R.string.invalidEmailMessage)
                     }

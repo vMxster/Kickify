@@ -23,6 +23,7 @@ import it.unibo.kickify.ui.screens.checkout.CheckOutScreen
 import it.unibo.kickify.ui.screens.forgotPassword.ForgotPasswordOTPViewModel
 import it.unibo.kickify.ui.screens.forgotPassword.ForgotPasswordScreen
 import it.unibo.kickify.ui.screens.forgotPassword.OTPScreen
+import it.unibo.kickify.ui.screens.forgotPassword.ResetPasswordScreen
 import it.unibo.kickify.ui.screens.home.HomeScreen
 import it.unibo.kickify.ui.screens.login.BiometricLoginScreen
 import it.unibo.kickify.ui.screens.login.LoginScreen
@@ -63,6 +64,7 @@ sealed interface KickifyRoute {
     @Serializable data object Login : KickifyRoute
     @Serializable data object ForgotPassword : KickifyRoute
     @Serializable data object OTPScreen : KickifyRoute
+    @Serializable data object ResetPasswordScreen: KickifyRoute
     @Serializable data object Notifications : KickifyRoute
     @Serializable data object Onboard : KickifyRoute
     @Serializable data class ProductDetails(val productId: Int) : KickifyRoute
@@ -149,6 +151,10 @@ fun KickifyNavGraph(
 
         composable<KickifyRoute.OTPScreen> {
             OTPScreen(navController, forgotPasswordOTPViewModel)
+        }
+
+        composable<KickifyRoute.ResetPasswordScreen> {
+            ResetPasswordScreen(navController, forgotPasswordOTPViewModel)
         }
 
         composable<KickifyRoute.Notifications> {
