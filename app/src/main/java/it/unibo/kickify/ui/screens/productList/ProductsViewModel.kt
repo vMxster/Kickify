@@ -49,10 +49,8 @@ class ProductsViewModel(
     fun loadProducts() {
         viewModelScope.launch {
             _isLoading.value = true
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-            val lastAccess = dateFormat.format(Date())
 
-            val result = repository.getProducts(lastAccess)
+            val result = repository.getProducts()
             if (result.isSuccess) {
                 val mapValues = result.getOrNull() ?: emptyMap()
                 val listValues = mapValues.map { (product, image) -> Pair(product, image) }

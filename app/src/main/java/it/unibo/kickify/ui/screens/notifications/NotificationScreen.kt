@@ -53,7 +53,7 @@ fun NotificationScreen(
 
     LaunchedEffect(notificationState) {
         delay(500)
-        notificationViewModel.getNotifications(email, lastAccess)
+        notificationViewModel.getNotifications(email)
     }
 
     ScreenTemplate(
@@ -85,9 +85,7 @@ fun NotificationScreen(
                                     email = email,
                                     notificationIds = listOf(n.notificationId)
                                 )
-                                notificationViewModel.getNotifications(
-                                    email, lastAccess
-                                )
+                                notificationViewModel.getNotifications(email)
                             }
                         }
                     )

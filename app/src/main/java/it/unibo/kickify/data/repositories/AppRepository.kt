@@ -31,6 +31,7 @@ import it.unibo.kickify.data.repositories.local.VersionRepository
 import it.unibo.kickify.data.repositories.local.WishlistRepository
 import it.unibo.kickify.utils.ImageStorageManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 
@@ -59,9 +60,9 @@ class AppRepository(
     }
 
     // PRODOTTI
-    suspend fun getProducts(lastAccess: String): Result<Map<Product, Image>> = withContext(Dispatchers.IO) {
+    suspend fun getProducts(): Result<Map<Product, Image>> = withContext(Dispatchers.IO) {
         try {
-            val remoteResult = remoteRepository.getProducts(lastAccess)
+            val remoteResult = remoteRepository.getProducts(lastAccess.first())
 
             if (remoteResult.isSuccess) {
                 val remoteProducts = remoteResult.getOrNull() ?: emptyList()
@@ -114,10 +115,10 @@ class AppRepository(
             }
         }
 
-    suspend fun getProductHistory(productId: Int, lastAccess: String): Result<List<HistoryProduct>> =
+    suspend fun getProductHistory(productId: Int): Result<List<HistoryProduct>> =
         withContext(Dispatchers.IO) {
             try {
-                val remoteResult = remoteRepository.getProductHistory(productId, lastAccess)
+                val remoteResult = remoteRepository.getProductHistory(productId, lastAccess.first())
                 if (remoteResult.isSuccess) {
                     val remoteHistory = remoteResult.getOrNull() ?: emptyList()
 
@@ -319,9 +320,9 @@ class AppRepository(
         }
     }
 
-    suspend fun getNotifications(email: String, lastAccess: String): Result<List<Notification>> = withContext(Dispatchers.IO) {
+    suspend fun getNotifications(email: String): Result<List<Notification>> = withContext(Dispatchers.IO) {
         try {
-            val remoteResult = remoteRepository.getNotifications(email, lastAccess)
+            val remoteResult = remoteRepository.getNotifications(email, lastAccess.first())
             if (remoteResult.isSuccess) {
                 val remoteNotifications = remoteResult.getOrNull() ?: emptyList()
                 if (remoteNotifications.isNotEmpty()) {
@@ -367,9 +368,9 @@ class AppRepository(
     }
 
     // ORDINI
-    suspend fun getOrders(email: String, lastAccess: String): Result<List<Order>> = withContext(Dispatchers.IO) {
+    suspend fun getOrders(email: String): Result<List<Order>> = withContext(Dispatchers.IO) {
         try {
-            val remoteResult = remoteRepository.getOrders(email, lastAccess)
+            val remoteResult = remoteRepository.getOrders(email, lastAccess.first())
             if (remoteResult.isSuccess) {
                 val remoteOrders = remoteResult.getOrNull() ?: emptyList()
                 if (remoteOrders.isNotEmpty()) {
@@ -504,9 +505,9 @@ class AppRepository(
         return result
     }
 
-    suspend fun getReviews(productId: Int, lastAccess: String): Result<List<ReviewWithUserInfo>> = withContext(Dispatchers.IO) {
+    suspend fun getReviews(productId: Int): Result<List<ReviewWithUserInfo>> = withContext(Dispatchers.IO) {
         try {
-            val remoteResult = remoteRepository.getReviews(productId, lastAccess)
+            val remoteResult = remoteRepository.getReviews(productId, lastAccess.first())
             if (remoteResult.isSuccess) {
                 val remoteReviews = remoteResult.getOrNull() ?: emptyList()
                 if (remoteReviews.isNotEmpty()) {
@@ -516,7 +517,7 @@ class AppRepository(
                 }
             }
             Result.success(
-                reviewRepository.getProductReviews(productId, lastAccess)
+                reviewRepository.getProductReviews(productId, lastAccess.first())
             )
         } catch (e: Exception) {
             Log.e(tag, "Errore in getReviews", e)

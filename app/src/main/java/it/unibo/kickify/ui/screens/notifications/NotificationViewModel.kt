@@ -25,13 +25,13 @@ class NotificationViewModel (
     private val _unreadNotifications = MutableStateFlow(0)
     val unreadNotifications: StateFlow<Int> = _unreadNotifications.asStateFlow()
 
-    fun getNotifications(email: String, lastAccess: String) {
+    fun getNotifications(email: String) {
         dismissError()
         _isLoading.value = true
 
         viewModelScope.launch {
             try {
-                val result = repository.getNotifications(email, lastAccess)
+                val result = repository.getNotifications(email)
                 result.onSuccess { list ->
                     _notificationState.value = list
                     dismissError()

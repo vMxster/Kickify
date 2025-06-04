@@ -93,7 +93,7 @@ class SettingsRepository(
 
     // get last access
     val lastAccess: Flow<String> = dataStore.data.map { preferences ->
-        preferences[LAST_ACCESS] ?: "0"
+        preferences[LAST_ACCESS] ?: "1970-01-01 00:00:00"
     }
 
     // set last access
