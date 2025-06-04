@@ -603,6 +603,10 @@ class AppRepository(
         }
     }
 
+    suspend fun updateUserImage(email: String, imgFile: ByteArray, mimeType: String): Result<String> {
+        return remoteRepository.updateUserImage(email.lowercase(), imgFile, mimeType)
+    }
+
     suspend fun isUserRegistered(email: String): Result<Boolean> = withContext(Dispatchers.IO) {
         remoteRepository.isUserRegistered(email.lowercase())
     }

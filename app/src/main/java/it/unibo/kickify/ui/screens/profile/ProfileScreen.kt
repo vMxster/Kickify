@@ -60,6 +60,8 @@ fun ProfileScreen(
     val appLang by settingsViewModel.appLanguage.collectAsStateWithLifecycle()
     val userID by settingsViewModel.userId.collectAsStateWithLifecycle()
     val username by settingsViewModel.userName.collectAsStateWithLifecycle()
+    val userImg by settingsViewModel.userImg.collectAsStateWithLifecycle()
+
     val coroutineScope = rememberCoroutineScope()
     val appRepo = koinInject<AppRepository>()
     val user = remember { mutableStateOf<User?>(null) }
@@ -73,6 +75,7 @@ fun ProfileScreen(
             }.onFailure {
             }
         }
+        println("userimg: $userImg")
     }
 
     ScreenTemplate(
@@ -96,22 +99,13 @@ fun ProfileScreen(
                     navController.navigate(KickifyRoute.EditProfile(EditProfileSections.USER_INFO))
                 }
             ) {
-                if (user.value?.urlPhoto != "") {
-                    AsyncImage(
-                        model = user.value?.urlPhoto,
-                        contentDescription = "",
-                        placeholder = rememberVectorPainter(Icons.Outlined.AccountCircle),
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp))
-                    )
-                } else { // otherwise use default user profile icon
-                    Icon(
-                        imageVector = Icons.Outlined.AccountCircle,
-                        contentDescription = "",
-                        modifier = Modifier.size(120.dp).clip(CircleShape)
-                            .align(Alignment.CenterHorizontally)
-                    )
-                }
+                UserProfileIcon(userImg,
+                    userImgModifier = Modifier.size(120.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .align(Alignment.CenterHorizontally),
+                    accountIconModifier = Modifier.size(120.dp).clip(CircleShape)
+                        .align(Alignment.CenterHorizontally)
+                )
 
                 Text(
                     text = if(user.value == null) username else "${user.value?.name} ${user.value?.surname}",
@@ -173,6 +167,28 @@ fun ProfileScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun UserProfileIcon(
+    userImg: String,
+    userImgModifier: Modifier,
+    accountIconModifier: Modifier
+){
+    if (userImg != "") {
+        AsyncImage(
+            model = userImg,
+            contentDescription = "",
+            placeholder = rememberVectorPainter(Icons.Outlined.AccountCircle),
+            modifier = userImgModifier
+        )
+    } else { // otherwise use default user profile icon
+        Icon(
+            imageVector = Icons.Outlined.AccountCircle,
+            contentDescription = "",
+            modifier = accountIconModifier
+        )
     }
 }
 
