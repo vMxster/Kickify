@@ -16,7 +16,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.AlertDialog
@@ -84,7 +83,6 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.Top
         ) {
             var showDialogLogout by rememberSaveable { mutableStateOf(false) }
-            var showDialogDeleteAccount by rememberSaveable { mutableStateOf(false) }
 
             SettingsTitleLine(stringResource(R.string.settings_accountTitle))
             SettingsItemWithLeadingIcon(
@@ -107,11 +105,6 @@ fun SettingsScreen(
                 text = stringResource(R.string.logout),
                 onClick = { showDialogLogout = true }
             )
-            SettingsItemWithLeadingIcon(
-                icon = Icons.Outlined.Delete,
-                text = stringResource(R.string.settings_deleteAccount),
-                onClick = { showDialogDeleteAccount = true }
-            )
             MessageDialog(
                 showDialog = showDialogLogout,
                 title = stringResource(R.string.logout),
@@ -129,24 +122,6 @@ fun SettingsScreen(
                     }
                 },
                 onDismiss = { showDialogLogout = false}
-            )
-            MessageDialog(
-                showDialog = showDialogDeleteAccount,
-                title = stringResource(R.string.caution),
-                titleColor = Color.Red,
-                text = stringResource(R.string.settings_deleteAccountConfirmMessage),
-                cancelText = stringResource(R.string.settings_cancel),
-                confirmText = stringResource(R.string.settings_deleteAccount),
-                onConfirm = {
-                    showDialogDeleteAccount = false
-                    settingsViewModel.removeUserAccount()
-
-                    navController.navigate(KickifyRoute.Login){
-                        launchSingleTop = true
-                        popUpTo(KickifyRoute.Home){ inclusive = true }
-                    }
-                },
-                onDismiss = { showDialogDeleteAccount = false}
             )
 
             Spacer(Modifier.height(15.dp))

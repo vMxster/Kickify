@@ -4,11 +4,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -97,7 +97,6 @@ fun AppBar(
                 || title.contains(stringResource(R.string.shopCategory_women))
                 || title.contains(stringResource(R.string.shopCategory_kids))
                 || title.startsWith(stringResource(R.string.brand))
-                || title == stringResource(R.string.app_name)
             ){
                 IconButton(
                     onClick = {
