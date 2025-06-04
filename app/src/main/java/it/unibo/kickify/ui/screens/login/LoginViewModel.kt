@@ -57,4 +57,11 @@ class LoginViewModel(
     fun dismissError() {
         _errorMessage.value = null
     }
+
+    fun clearData(){
+        _isLoading.value = false
+        _isLoggedIn.value = false
+        _errorMessage.value = null
+        _loggedInUser.value = null
+    }
 }

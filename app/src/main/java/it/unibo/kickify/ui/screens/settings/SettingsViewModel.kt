@@ -57,12 +57,6 @@ class SettingsViewModel(
         initialValue = false
     )
 
-    /*val lastAccess = repository.lastAccess.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
-        initialValue = "0"
-    )*/
-
     val enabledLocation = repository.locationEnabled.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
@@ -87,11 +81,11 @@ class SettingsViewModel(
         initialValue = false
     )
 
-    fun setUserId(value: String) = viewModelScope.launch {
+    private fun setUserId(value: String) = viewModelScope.launch {
         repository.setUserID(value)
     }
 
-    fun setUserName(value: String) = viewModelScope.launch {
+    private fun setUserName(value: String) = viewModelScope.launch {
         repository.setUserName(value)
     }
 
@@ -106,16 +100,6 @@ class SettingsViewModel(
     fun setBiometricLogin(value: Boolean) = viewModelScope.launch {
         repository.setBiometricLogin(value)
     }
-
-    /*fun setLastAccess(value: String) = viewModelScope.launch {
-        repository.setLastAccess(value)
-    }*/
-
-    /*fun setLastAccessNow() = viewModelScope.launch {
-        val currentTime = Date()
-        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        repository.setLastAccess( formatter.format(currentTime))
-    }*/
 
     fun setEnabledLocation(value: Boolean) = viewModelScope.launch {
         repository.setLocationEnabled(value)
@@ -141,7 +125,6 @@ class SettingsViewModel(
 
     fun removeUserAccount() = viewModelScope.launch {
        repository.removeUserAccount()
-        _startDestination.value = AppStartDestination.LOGIN
     }
 
 
@@ -156,9 +139,6 @@ class SettingsViewModel(
         }
     }
 
-    fun isUserLoggedIn(): Boolean{
-        return userId.value.isNotEmpty() && userName.value.isNotEmpty()
-    }
 
     private fun determineStartDestination() {
         viewModelScope.launch {

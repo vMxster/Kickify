@@ -101,6 +101,7 @@ fun LoginScreen(
                 userid = email,
                 username = "${loggedInUser?.name} ${loggedInUser?.surname}"
             )
+            loginViewModel.clearData()
             onLoginSuccess()
         }
     }

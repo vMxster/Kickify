@@ -121,6 +121,5 @@ class SettingsRepository(
 
     suspend fun removeUserAccount() {
         dataStore.edit { it.clear() }
-        setOnboardingCompleted(true)
     }
 }

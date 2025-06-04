@@ -47,7 +47,6 @@ import it.unibo.kickify.PushNotificationManager
 import it.unibo.kickify.R
 import it.unibo.kickify.authentication.BiometricAuthManager
 import it.unibo.kickify.data.models.Language
-import it.unibo.kickify.ui.AppStartDestination
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ScreenTemplate
@@ -68,12 +67,14 @@ fun SettingsScreen(
     val pushNotificationState by settingsViewModel.enabledPushNotification.collectAsStateWithLifecycle()
     val pushNotificationManager = koinInject<PushNotificationManager>()
     val languageState by settingsViewModel.appLanguage.collectAsStateWithLifecycle()
-    val startDest by settingsViewModel.startDestination.collectAsStateWithLifecycle()
+    val userid by settingsViewModel.userId.collectAsStateWithLifecycle()
+    val username by settingsViewModel.userName.collectAsStateWithLifecycle()
 
-    LaunchedEffect(startDest) {
-        if(startDest == AppStartDestination.LOGIN){
+    LaunchedEffect(userid, username) {
+        if(userid == "" && username == ""){
             navController.navigate(KickifyRoute.Login){
-                popUpTo(KickifyRoute.Home){ inclusive = true }
+                popUpTo(navController.graph.id){ inclusive = true }
+                launchSingleTop = true
             }
         }
     }
