@@ -140,15 +140,8 @@ class SettingsViewModel(
     }
 
     fun removeUserAccount() = viewModelScope.launch {
-        this@SettingsViewModel.setUserId("")
-        this@SettingsViewModel.setUserName("")
-        this@SettingsViewModel.setUserImg("")
-        this@SettingsViewModel.setTheme(Theme.System)
-        this@SettingsViewModel.setBiometricLogin(false)
-        //this@SettingsViewModel.setLastAccess("")
-        this@SettingsViewModel.setEnabledLocation(false)
-        this@SettingsViewModel.setEnabledPushNotification(false)
-        this@SettingsViewModel.setAppLanguage("en")
+       repository.removeUserAccount()
+        _startDestination.value = AppStartDestination.LOGIN
     }
 
 

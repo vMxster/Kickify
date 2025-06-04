@@ -47,6 +47,7 @@ import it.unibo.kickify.PushNotificationManager
 import it.unibo.kickify.R
 import it.unibo.kickify.authentication.BiometricAuthManager
 import it.unibo.kickify.data.models.Language
+import it.unibo.kickify.ui.AppStartDestination
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ScreenTemplate
@@ -67,6 +68,15 @@ fun SettingsScreen(
     val pushNotificationState by settingsViewModel.enabledPushNotification.collectAsStateWithLifecycle()
     val pushNotificationManager = koinInject<PushNotificationManager>()
     val languageState by settingsViewModel.appLanguage.collectAsStateWithLifecycle()
+    val startDest by settingsViewModel.startDestination.collectAsStateWithLifecycle()
+
+    LaunchedEffect(startDest) {
+        if(startDest == AppStartDestination.LOGIN){
+            navController.navigate(KickifyRoute.Login){
+                popUpTo(KickifyRoute.Home){ inclusive = true }
+            }
+        }
+    }
 
     ScreenTemplate(
         screenTitle = stringResource(R.string.settings_title),
@@ -115,11 +125,6 @@ fun SettingsScreen(
                 onConfirm = {
                     showDialogLogout = false
                     settingsViewModel.removeUserAccount()
-
-                    navController.navigate(KickifyRoute.Login){
-                        launchSingleTop = true
-                        popUpTo(KickifyRoute.Home){ inclusive = true }
-                    }
                 },
                 onDismiss = { showDialogLogout = false}
             )

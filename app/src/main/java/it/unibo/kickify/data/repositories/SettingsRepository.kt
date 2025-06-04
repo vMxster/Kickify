@@ -118,4 +118,9 @@ class SettingsRepository(
     suspend fun setOnboardingCompleted(completed: Boolean) = dataStore.edit {
         it[ONBOARDING_COMPLETED] = completed
     }
+
+    suspend fun removeUserAccount() {
+        dataStore.edit { it.clear() }
+        setOnboardingCompleted(true)
+    }
 }
