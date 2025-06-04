@@ -18,6 +18,7 @@ import it.unibo.kickify.data.models.Theme
 import it.unibo.kickify.ui.KickifyNavGraph
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.theme.KickifyTheme
+import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.androidx.compose.koinViewModel
 import java.util.Locale
 
@@ -28,29 +29,31 @@ class MainActivity : FragmentActivity() {
         try {
             Log.d("MainActivity", "onCreate: inizializzazione")
             setContent {
-                val settingsViewModel: SettingsViewModel = koinViewModel<SettingsViewModel>()
-                val themeState by settingsViewModel.theme.collectAsStateWithLifecycle()
-                val appLanguageId by settingsViewModel.appLanguage.collectAsStateWithLifecycle()
+                KoinAndroidContext {
+                    val settingsViewModel: SettingsViewModel = koinViewModel<SettingsViewModel>()
+                    val themeState by settingsViewModel.theme.collectAsStateWithLifecycle()
+                    val appLanguageId by settingsViewModel.appLanguage.collectAsStateWithLifecycle()
 
-                LaunchedEffect(appLanguageId){
-                    if(appLanguageId.isNotEmpty()){
-                        setAppLocale(this@MainActivity, appLanguageId)
+                    LaunchedEffect(appLanguageId) {
+                        if (appLanguageId.isNotEmpty()) {
+                            setAppLocale(this@MainActivity, appLanguageId)
+                        }
                     }
-                }
 
-                KickifyTheme(
-                    darkTheme = when(themeState){
-                        Theme.Light -> false
-                        Theme.Dark -> true
-                        Theme.System -> isSystemInDarkTheme()
+                    KickifyTheme(
+                        darkTheme = when (themeState) {
+                            Theme.Light -> false
+                            Theme.Dark -> true
+                            Theme.System -> isSystemInDarkTheme()
+                        }
+                    ) {
+                        val navController = rememberNavController()
+                        KickifyNavGraph(
+                            navController = navController,
+                            activity = this,
+                            settingsViewModel = settingsViewModel
+                        )
                     }
-                ) {
-                    val navController = rememberNavController()
-                    KickifyNavGraph(
-                        navController = navController,
-                        activity = this,
-                        settingsViewModel = settingsViewModel
-                    )
                 }
             }
         } catch (e: Exception) {
