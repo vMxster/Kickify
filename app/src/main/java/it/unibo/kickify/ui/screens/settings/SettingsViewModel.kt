@@ -23,6 +23,12 @@ class SettingsViewModel(
     private val _startDestination = MutableStateFlow(AppStartDestination.LOADING)
     val startDestination: StateFlow<AppStartDestination> = _startDestination
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
+
     init {
         determineStartDestination()
     }
@@ -91,6 +97,19 @@ class SettingsViewModel(
 
     fun setUserImg(value: String) = viewModelScope.launch {
         repository.setUserImgFilename(value)
+    }
+
+    fun prepareToSetUserImage() = viewModelScope.launch {
+        _errorMessage.value = null
+        _isLoading.value = true
+    }
+
+    fun dismissMessage() = viewModelScope.launch {
+        _errorMessage.value = null
+    }
+
+    fun completeSetUserImage() = viewModelScope.launch {
+        _isLoading.value = false
     }
 
     fun setTheme(theme: Theme) = viewModelScope.launch {

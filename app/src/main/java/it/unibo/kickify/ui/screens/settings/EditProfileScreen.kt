@@ -2,6 +2,7 @@ package it.unibo.kickify.ui.screens.settings
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,7 +20,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
@@ -66,6 +66,7 @@ import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.profile.UserProfileIcon
 import it.unibo.kickify.ui.theme.BluePrimary
 import it.unibo.kickify.ui.theme.GhostWhite
 import it.unibo.kickify.ui.theme.LightGray
@@ -85,6 +86,7 @@ fun EditProfileScreen(
     settingsViewModel: SettingsViewModel
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
+    val isLoading by settingsViewModel.isLoading.collectAsStateWithLifecycle()
 
     ScreenTemplate(
         screenTitle = stringResource(R.string.editProfile_title),
@@ -92,7 +94,8 @@ fun EditProfileScreen(
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true,
-        snackBarHostState = snackBarHostState
+        snackBarHostState = snackBarHostState,
+        showLoadingOverlay = isLoading
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -129,36 +132,59 @@ fun ProfileImageWithChangeButton(
 
     val userImgState by settingsViewModel.userImg.collectAsStateWithLifecycle()
     var imageUri by remember { mutableStateOf(userImgState.toUri()) }
+    val userEmail by settingsViewModel.userId.collectAsStateWithLifecycle()
+    val userImg by settingsViewModel.userImg.collectAsStateWithLifecycle()
+
+    val ctx = LocalContext.current
+    val appRepository = koinInject<AppRepository>()
 
     val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+        contract = ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
+
+        settingsViewModel.prepareToSetUserImage() // enable isLoading animation
+        println("settingsviewmodel PRIMA: imageuri: $imageUri - uri: $uri")
         imageUri = uri ?: Uri.EMPTY
-        settingsViewModel.setUserImg(uri.toString())
+
+        println("settingsviewmodel DOPO: imageuri: $imageUri - uri: $uri")
+        val bitmapImg = cameraXUtils.getBitmapFromUri(ctx, imageUri)
+        val mimeType = ctx.contentResolver.getType(imageUri) ?: "application/octet-stream"
+
+        if(bitmapImg != null){
+            println("settingsviewmodel: bitmap img NON null")
+
+            val byteArray = cameraXUtils.bitmapToByteArray(bitmapImg)
+            if(byteArray != null) {
+                println("settingsviewmodel: byte array NON null")
+
+                scope.launch {
+                    val result = appRepository.updateUserImage(userEmail, byteArray, mimeType)
+                    result.onSuccess { res ->
+                        if(res != ""){ // result successful -> get image url on server
+                            settingsViewModel.setUserImg(res)
+                        } else {
+                            println("failure setting user img settings vm: result = empty")
+                        }
+                    }.onFailure { e ->
+                        println("failure setting user img settings vm:\n$e")
+                    }
+                }
+            }
+        }
+        settingsViewModel.completeSetUserImage()
     }
 
     Box(
         contentAlignment = Alignment.BottomCenter,
         modifier = Modifier.size(150.dp)
     ) {
-        //val userBitmap = cameraXUtils.getBitmapFromUri(LocalContext.current, imageUri)
-
-        // if found user image saved in app cache
-        /*if(userBitmap != null) {
-            Image(
-                bitmap = userBitmap.asImageBitmap(),
-                contentDescription = "",
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-            )
-        } else { */ // otherwise use user profile icon
-        Icon(
-            imageVector = Icons.Outlined.AccountCircle,
-            contentDescription = "",
-            modifier = Modifier.size(140.dp) .clip(CircleShape)
-                .align(Alignment.TopCenter)
+        UserProfileIcon(userImg,
+            userImgModifier = Modifier.size(120.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .align(Alignment.Center),
+            accountIconModifier = Modifier.size(120.dp).clip(CircleShape)
+                .align(Alignment.Center)
         )
-        // }
 
         IconButton(
             onClick = { showBottomSheet = true },
@@ -196,7 +222,11 @@ fun ProfileImageWithChangeButton(
                     TextButton(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            scope.launch { launcher.launch("image/*") }
+                            scope.launch {
+                                launcher.launch(PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                )
+                            }
                         }
                     ) {
                         Text(stringResource(R.string.profileScreen_choosePhotoFromGallery),
@@ -284,7 +314,7 @@ fun ProfileInfoChangePassword(
             keyboardActions = KeyboardActions(
                 onNext = {
                     if (LoginRegisterUtils.isValidPassword(password)) {
-                       confirmPswFocusRequester.requestFocus()
+                        confirmPswFocusRequester.requestFocus()
                     } else {
                         pswError = ctx.getString(R.string.invalidPswMessage)
                     }

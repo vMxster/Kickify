@@ -3,6 +3,8 @@ package it.unibo.kickify.data.repositories
 import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.request.forms.FormDataContent
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -10,6 +12,8 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.readBytes
 import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import io.ktor.http.Parameters
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
@@ -390,7 +394,7 @@ class RemoteRepository(
         city: String,
         civic: Int,
         cap: Int,
-        ): Result<Int> = withContext(Dispatchers.IO) {
+    ): Result<Int> = withContext(Dispatchers.IO) {
         try {
             val params = mutableMapOf(
                 "action" to "placeOrder",
@@ -605,6 +609,35 @@ class RemoteRepository(
             Result.success(user)
         } catch (e: Exception) {
             Log.e(tag, "Errore durante il recupero del profilo utente", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateUserImage(email: String, imgFile: ByteArray, mimeType: String): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val url = "$baseUrl/uploadUserImg.php"
+            val response = httpClient.post(url) {
+                setBody(
+                    MultiPartFormDataContent(
+                        formData {
+                            append("img", imgFile, Headers.build {
+                                append(HttpHeaders.ContentType, mimeType)
+                                append(HttpHeaders.ContentDisposition, "filename=\"img.png\"")
+                            })
+                            append("email", email)
+                        }
+                    )
+                )
+            }.bodyAsText()
+            val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
+            // result = /userImg/user_<uniqueid>.png
+            val result = jsonObject.optString("image_path", "")
+            Result.success("$baseUrl$result")
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante upload immagine utente", e)
             Result.failure(e)
         }
     }
