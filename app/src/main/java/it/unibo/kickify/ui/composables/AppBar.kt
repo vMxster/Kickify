@@ -8,6 +8,7 @@ import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -45,7 +46,8 @@ import kotlinx.coroutines.launch
 fun AppBar(
     navController: NavController,
     title: String = "",
-    onNavigationClick: () -> Unit = {}
+    onNavigationMenuClick: () -> Unit,
+    unreadNotifications: Int,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
@@ -68,18 +70,36 @@ fun AppBar(
                 )
             }
         },
+
         navigationIcon = {
             if (navController.previousBackStackEntry != null) {
                 IconButton(onClick = { navController.navigateUp() }) {
                     Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Go Back")
                 }
             } else if(title != ""){
-                IconButton(onClick = { onNavigationClick() }) {
+                IconButton(onClick = { onNavigationMenuClick() }) {
                     Icon(Icons.Outlined.Menu, "Menu")
                 }
             }
         },
+
         actions = {
+            if(title == stringResource(R.string.app_name)){
+                IconButton(
+                    onClick = { navController.navigate(KickifyRoute.Notifications){ launchSingleTop = true } }
+                ) {
+                    CustomBadge(
+                        badgeCount = unreadNotifications,
+                        contentDescr = "$unreadNotifications notifications to read"
+                    ) {
+                        Icon(
+                            Icons.Outlined.Notifications,
+                            contentDescription = stringResource(R.string.notificationscreen_title)
+                        )
+                    }
+                }
+            }
+
             if(title == stringResource(R.string.notificationscreen_title)){
                 TextButton(onClick = { /*TODO*/ }) {
                     Text(

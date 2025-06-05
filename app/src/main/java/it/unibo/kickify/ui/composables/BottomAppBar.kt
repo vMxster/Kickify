@@ -3,7 +3,6 @@ package it.unibo.kickify.ui.composables
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.ShoppingBag
 import androidx.compose.material3.Badge
@@ -22,22 +21,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
-import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun BottomBar(
     navController: NavController,
 ){
-    val notificationViewModel = koinViewModel<NotificationViewModel>()
-    val unreadNotifications by notificationViewModel.unreadNotifications.collectAsStateWithLifecycle()
-
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground
@@ -93,27 +86,6 @@ fun BottomBar(
                 }
             },
             label = { Text(stringResource(R.string.cart), textAlign = TextAlign.Center) }
-        )
-
-        NavigationBarItem(
-            selected = isSelectedIcon(KickifyRoute.Notifications),
-            icon = {
-                CustomBadge(
-                    badgeCount = unreadNotifications,
-                    contentDescr = "$unreadNotifications notifications to read"
-                ) {
-                    Icon(
-                        Icons.Outlined.Notifications,
-                        contentDescription = stringResource(R.string.notificationscreen_title)
-                    )
-                }
-            },
-            onClick = {
-                if(!isSelectedIcon(KickifyRoute.Notifications)){
-                    navController.navigate(KickifyRoute.Notifications)
-                }
-            },
-            label = { Text(stringResource(R.string.notificationscreen_title), textAlign = TextAlign.Center) }
         )
 
         NavigationBarItem(

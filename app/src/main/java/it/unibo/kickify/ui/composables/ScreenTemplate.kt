@@ -79,13 +79,14 @@ fun ScreenTemplate(
                     AppBar(
                         navController,
                         title = screenTitle,
-                        onNavigationClick = {
+                        onNavigationMenuClick = {
                             if (navController.previousBackStackEntry != null) {
                                 navController.popBackStack()
                             } else {
                                 coroutineScope.launch { drawerState.open() }
                             }
-                        }
+                        },
+                        unreadNotifications
                     )
                 }
             },
