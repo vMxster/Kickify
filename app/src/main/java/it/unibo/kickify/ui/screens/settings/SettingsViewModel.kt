@@ -7,6 +7,7 @@ import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.unibo.kickify.data.models.Theme
+import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.data.repositories.SettingsRepository
 import it.unibo.kickify.ui.AppStartDestination
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +18,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
-    private val repository: SettingsRepository
+    private val repository: SettingsRepository,
+    private val appRepository: AppRepository,
 ) : ViewModel() {
 
     private val _startDestination = MutableStateFlow(AppStartDestination.LOADING)
@@ -28,6 +30,9 @@ class SettingsViewModel(
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
+
+    private val _successMessage = MutableStateFlow<String?>(null)
+    val successMessage: StateFlow<String?> = _successMessage
 
     init {
         determineStartDestination()
@@ -95,21 +100,36 @@ class SettingsViewModel(
         repository.setUserName(value)
     }
 
-    fun setUserImg(value: String) = viewModelScope.launch {
-        repository.setUserImgFilename(value)
-    }
-
-    fun prepareToSetUserImage() = viewModelScope.launch {
+    fun setUserImg(email: String, imgFile: ByteArray, mimeType: String){
         _errorMessage.value = null
+        _successMessage.value = null
         _isLoading.value = true
+
+        viewModelScope.launch {
+            try {
+                val result = appRepository.updateUserImage(email, imgFile, mimeType)
+                result.onSuccess { res ->
+                    if (res != "") { // result successful -> get image url on server
+                        repository.setUserImgFilename(res)
+                        _successMessage.value = "Profile photo set successfully."
+                    } else {
+                        _errorMessage.value = "Failed setting user img: result is empty"
+                    }
+                }.onFailure { e ->
+                    _errorMessage.value = "Failed setting user img :\n$e"
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = e.message ?: "Unexpected error."
+
+            } finally {
+                _isLoading.value = false
+            }
+        }
     }
 
-    fun dismissMessage() = viewModelScope.launch {
+    fun dismissMessage() {
         _errorMessage.value = null
-    }
-
-    fun completeSetUserImage() = viewModelScope.launch {
-        _isLoading.value = false
+        _successMessage.value = null
     }
 
     fun setTheme(theme: Theme) = viewModelScope.launch {
@@ -143,7 +163,7 @@ class SettingsViewModel(
     }
 
     fun removeUserAccount() = viewModelScope.launch {
-       repository.removeUserAccount()
+        repository.removeUserAccount()
     }
 
 
@@ -169,7 +189,7 @@ class SettingsViewModel(
             if (userId.isEmpty() && !onboardingComplete) {
                 _startDestination.value = AppStartDestination.ONBOARDING
 
-            // user not logged in and onboarding completed
+                // user not logged in and onboarding completed
             } else if(userId.isEmpty() && onboardingComplete){
                 _startDestination.value = AppStartDestination.LOGIN
 

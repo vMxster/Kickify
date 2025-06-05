@@ -37,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -105,7 +106,7 @@ fun EditProfileScreen(
         ) {
             when(section){
                 EditProfileSections.USER_INFO -> {
-                    ProfileImageWithChangeButton(navController, cameraXUtils, settingsViewModel)
+                    ProfileImageWithChangeButton(navController, cameraXUtils, settingsViewModel, snackBarHostState)
                     ProfileInfoChangePassword(settingsViewModel, snackBarHostState)
                 }
                 EditProfileSections.ADDRESS -> {
@@ -124,54 +125,60 @@ fun EditProfileScreen(
 fun ProfileImageWithChangeButton(
     navController: NavController,
     cameraXUtils: CameraXUtils,
-    settingsViewModel: SettingsViewModel
+    settingsViewModel: SettingsViewModel,
+    snackbarHostState: SnackbarHostState
 ) {
+    val ctx = LocalContext.current
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
 
-    val userImgState by settingsViewModel.userImg.collectAsStateWithLifecycle()
-    var imageUri by remember { mutableStateOf(userImgState.toUri()) }
-    val userEmail by settingsViewModel.userId.collectAsStateWithLifecycle()
+    val errorMessage by settingsViewModel.errorMessage.collectAsStateWithLifecycle()
+    val successMessage by settingsViewModel.successMessage.collectAsStateWithLifecycle()
     val userImg by settingsViewModel.userImg.collectAsStateWithLifecycle()
+    var imageUri by remember { mutableStateOf(userImg.toUri()) }
+    val userEmail by settingsViewModel.userId.collectAsStateWithLifecycle()
 
-    val ctx = LocalContext.current
-    val appRepository = koinInject<AppRepository>()
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            snackbarHostState.showSnackbar(
+                message = it,
+                actionLabel = ctx.getString(R.string.ok),
+                duration = SnackbarDuration.Long)
+        }
+        settingsViewModel.dismissMessage()
+    }
+
+    LaunchedEffect(successMessage) {
+        successMessage?.let {
+            snackbarHostState.showSnackbar(
+                message = it,
+                actionLabel = ctx.getString(R.string.ok),
+                duration = SnackbarDuration.Long)
+        }
+        settingsViewModel.dismissMessage()
+    }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
-
-        settingsViewModel.prepareToSetUserImage() // enable isLoading animation
-        println("settingsviewmodel PRIMA: imageuri: $imageUri - uri: $uri")
         imageUri = uri ?: Uri.EMPTY
-
-        println("settingsviewmodel DOPO: imageuri: $imageUri - uri: $uri")
-        val bitmapImg = cameraXUtils.getBitmapFromUri(ctx, imageUri)
-        val mimeType = ctx.contentResolver.getType(imageUri) ?: "application/octet-stream"
+        val bitmapImg = cameraXUtils.getBitmapFromSelector(imageUri)
+        val mimeType = cameraXUtils.getImageMimeType(imageUri)
 
         if(bitmapImg != null){
-            println("settingsviewmodel: bitmap img NON null")
-
             val byteArray = cameraXUtils.bitmapToByteArray(bitmapImg)
             if(byteArray != null) {
-                println("settingsviewmodel: byte array NON null")
-
-                scope.launch {
-                    val result = appRepository.updateUserImage(userEmail, byteArray, mimeType)
-                    result.onSuccess { res ->
-                        if(res != ""){ // result successful -> get image url on server
-                            settingsViewModel.setUserImg(res)
-                        } else {
-                            println("failure setting user img settings vm: result = empty")
-                        }
-                    }.onFailure { e ->
-                        println("failure setting user img settings vm:\n$e")
-                    }
-                }
+                settingsViewModel.setUserImg(userEmail, byteArray, mimeType)
+            }
+        } else {
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = ctx.getString(R.string.choosePhotoFromGalleryError),
+                    actionLabel = ctx.getString(R.string.ok),
+                    duration = SnackbarDuration.Long)
             }
         }
-        settingsViewModel.completeSetUserImage()
     }
 
     Box(
@@ -222,7 +229,18 @@ fun ProfileImageWithChangeButton(
                     TextButton(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
+                            showBottomSheet = false
+                            navController.navigate(KickifyRoute.TakeProfilePhoto)
+                        }
+                    ) {
+                        Text(stringResource(R.string.takePhoto),
+                            color = MaterialTheme.colorScheme.onBackground)
+                    }
+                    TextButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
                             scope.launch {
+                                showBottomSheet = false
                                 launcher.launch(PickVisualMediaRequest(
                                     ActivityResultContracts.PickVisualMedia.ImageOnly)
                                 )
@@ -230,13 +248,6 @@ fun ProfileImageWithChangeButton(
                         }
                     ) {
                         Text(stringResource(R.string.profileScreen_choosePhotoFromGallery),
-                            color = MaterialTheme.colorScheme.onBackground)
-                    }
-                    TextButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = { navController.navigate(KickifyRoute.TakeProfilePhoto) }
-                    ) {
-                        Text(stringResource(R.string.takePhoto),
                             color = MaterialTheme.colorScheme.onBackground)
                     }
                 }

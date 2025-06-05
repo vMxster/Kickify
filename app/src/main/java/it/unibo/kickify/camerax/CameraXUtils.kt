@@ -7,11 +7,20 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.webkit.MimeTypeMap
 import androidx.core.content.ContextCompat
+import coil.imageLoader
+import coil.request.ErrorResult
+import coil.request.ImageRequest
+import coil.request.ImageResult
+import coil.request.SuccessResult
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -32,8 +41,8 @@ class CameraXUtils(private val ctx: Context) {
         }
     }
 
-    fun savePhotoInGallery(context: Context, uri: Uri) {
-        val resolver = context.contentResolver
+    fun savePhotoInGallery(uri: Uri) {
+        val resolver = ctx.contentResolver
         val formatter = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
         val timestamp = formatter.format(Date())
         val fileName = "photo_$timestamp.jpg"
@@ -52,12 +61,33 @@ class CameraXUtils(private val ctx: Context) {
         }
     }
 
-    fun getBitmapFromUri(context: Context, uri: Uri): Bitmap? {
+    suspend fun getBitmapFromCapture(uri: Uri): Bitmap? {
+        val imageLoader = ctx.imageLoader
+        val request = ImageRequest.Builder(ctx)
+            .data(uri)
+            .allowHardware(false)
+            .build()
+
+        val result: ImageResult = withContext(Dispatchers.IO) {
+            imageLoader.execute(request)
+        }
+        return when (result) {
+            is SuccessResult -> {
+                (result.drawable as? BitmapDrawable)?.bitmap
+            }
+            is ErrorResult -> {
+                result.throwable.printStackTrace()
+                null
+            }
+        }
+    }
+
+    fun getBitmapFromSelector(uri: Uri): Bitmap? {
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri))
+                ImageDecoder.decodeBitmap(ImageDecoder.createSource(ctx.contentResolver, uri))
             } else {
-                context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                ctx.contentResolver.openInputStream(uri)?.use { inputStream ->
                     BitmapFactory.decodeStream(inputStream)
                 }
             }
@@ -77,58 +107,13 @@ class CameraXUtils(private val ctx: Context) {
         return null
     }
 
-    /***** OLD UNUSED  ******
-
-    private val defaultUserProfileImageFilename = "userImg.png"
-
-    val cameraSelector = CameraSelector.Builder()
-    .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
-    .build()
-
-    private val resolutionSelector = ResolutionSelector.Builder()
-    .setAspectRatioStrategy(AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
-    .build()
-
-    val cameraPreview = Preview.Builder()
-    .setResolutionSelector(resolutionSelector)
-    .build()
-
-    val imageCapture = ImageCapture.Builder()
-    .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-    .setResolutionSelector(resolutionSelector)
-    .setPostviewEnabled(true)
-    .setPostviewResolutionSelector(resolutionSelector)
-    .build()
-
-    fun saveBitmapToFile(
-    context: Context, bitmap: Bitmap,
-    fileName: String = defaultUserProfileImageFilename
-    ):Uri {
-    val file = File(context.filesDir, fileName)
-    val outputStream = FileOutputStream(file)
-    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-    outputStream.flush()
-    outputStream.close()
-    return Uri.fromFile(file)
+    fun getImageMimeType(imageUri: Uri): String {
+        val mimeType: String? = if (imageUri.scheme == "content") {
+            ctx.contentResolver.getType(imageUri)
+        } else {
+            val fileExtension = MimeTypeMap.getFileExtensionFromUrl(imageUri.toString())
+            MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension.lowercase())
+        }
+        return mimeType ?: "application/octet-stream"
     }
-
-    private fun getBitmapFromFile(
-    context: Context,
-    fileName: String = defaultUserProfileImageFilename
-    ): Bitmap? {
-    val file = File(context.filesDir, fileName)
-    return if (file.exists()) {
-    BitmapFactory.decodeFile(file.absolutePath)
-    } else {
-    null
-    }
-    }
-
-    val cameraProvider = ProcessCameraProvider.getInstance(ctx).get()
-
-    val extensionsManager = ExtensionsManager.getInstanceAsync(
-    ctx, cameraProvider
-    ).get()
-
-     ********************************************/
 }

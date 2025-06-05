@@ -43,7 +43,7 @@
     <string name="forgotpsw_text">Enter your email - we\'ll send a secure link to get you back on track.</string>
     <string name="otpScreen_text">Type in the OTP Code we sent you.</string>
     <string name="otpScreen_otp">OTP</string>
-    <string name="otp_missing_digits">Type in your OTP.</string>
+    <string name="otp_missing_digits">Type in the received OTP code.</string>
     <string name="resetpsw_setNewPassword">Set your new password.</string>
     <string name="ok">OK</string>
     <string name="continue_button">Continue</string>
@@ -158,6 +158,8 @@
     <string name="close">Close</string>
     <string name="profileScreen_choosePhotoFromGallery">Choose Profile Photo From Gallery</string>
     <string name="takePhoto">Take a photo</string>
+    <string name="profileImageSetSuccessfully">Profile photo set successfully.</string>
+    <string name="choosePhotoFromGalleryError">Error: cannot set user profile image. Choose another one.</string>
     <string name="userProfile">User Profile</string>
     <string name="editProfile_title">Edit Profile</string>
     <string name="view">View</string>

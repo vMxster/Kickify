@@ -46,6 +46,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,10 +59,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
+import kotlinx.coroutines.launch
 import java.io.File
 
 @Composable
@@ -76,6 +79,9 @@ fun TakePhotoCameraScreen(
     var isFlashOn by remember { mutableStateOf(false) }
     var selectedEffect by remember { mutableIntStateOf(NONE) }
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    val userEmail by settingsViewModel.userId.collectAsStateWithLifecycle()
 
     if (cameraMode == CameraMode.CAPTURE) {
         CameraCaptureScreen(
@@ -101,11 +107,23 @@ fun TakePhotoCameraScreen(
                 capturedImageUri = null
                 cameraMode = CameraMode.CAPTURE
             },
-            onSavePhoto = {
-                // if captureimageuri != null, then save photo
+            onSavePhoto = { // if captureimageuri != null
                 capturedImageUri?.let {
-                    cameraXUtils.savePhotoInGallery(context, it)
-                    /* TODO save this image in remote server, in app cache and in settings repo */
+                    cameraXUtils.savePhotoInGallery(it)
+                    println("captured img uri: $it")
+
+                    // save image in remote server and set as user image
+                    scope.launch {
+                        val bitmapImg = cameraXUtils.getBitmapFromCapture(it)
+                        val mimeType = cameraXUtils.getImageMimeType(it)
+
+                        if (bitmapImg != null) {
+                            val byteArray = cameraXUtils.bitmapToByteArray(bitmapImg)
+                            if (byteArray != null) {
+                                settingsViewModel.setUserImg(userEmail, byteArray, mimeType)
+                            }
+                        }
+                    }
                 }
                 navController.popBackStack()
             }
