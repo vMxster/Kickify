@@ -1006,6 +1006,32 @@ class DatabaseHelper {
         return $stmt->execute();
     }
 
+    // Get user address
+    public function getUserAddress($email){
+        $query = "SELECT * FROM INDIRIZZO WHERE Email = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+    
+    // Update user address
+    public function updateUserAddress($email, $via, $civico, $cap, $citta, $provincia, $nazione, $predefinito){
+        $query = "UPDATE INDIRIZZO SET Via= ?, NumeroCivico= ?, CAP= ?, Citta= ?, Provincia= ?, Nazione= ?, Predefinito = ? WHERE Email = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("siisssss", $via, $civico, $cap, $citta, $provincia, $nazione, $predefinito, $email);
+        return $stmt->execute();
+    }
+    
+    // Remove user address
+    public function removeUserAddress($email, $via, $civico, $cap, $citta){
+        $query = "DELETE FROM INDIRIZZO WHERE Email = ? AND Via= ? AND NumeroCivico= ? AND CAP= ? AND Citta= ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("ssiis", $email, $via, $civico, $cap, $citta);
+        return $stmt->execute();
+    }
+
     /*******************
      * WISHLIST QUERIES *
      *******************/
