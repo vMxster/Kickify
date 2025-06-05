@@ -20,7 +20,6 @@ import it.unibo.kickify.data.repositories.SettingsRepository
 import it.unibo.kickify.data.repositories.local.CartRepository
 import it.unibo.kickify.data.repositories.local.ImageRepository
 import it.unibo.kickify.data.repositories.local.NotificationRepository
-import it.unibo.kickify.data.repositories.local.NotificationStateRepository
 import it.unibo.kickify.data.repositories.local.OrderRepository
 import it.unibo.kickify.data.repositories.local.ProductCartRepository
 import it.unibo.kickify.data.repositories.local.ProductRepository
@@ -45,12 +44,8 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 val appModule = module {
     single { get<Context>().dataStore }
 
-    single {
-        Room.databaseBuilder(
-            androidContext(),
-            KickifyDatabase::class.java,
-            "kickify"
-        ).fallbackToDestructiveMigration(false).build()
+    single(createdAtStart = true) {
+        KickifyDatabase.getInstance(androidContext())
     }
 
     single {
@@ -82,22 +77,23 @@ val appModule = module {
     single { ReviewRepository(reviewDao = get<KickifyDatabase>().reviewDao()) }
     single { NotificationRepository(notificationDao = get<KickifyDatabase>().notificationDao()) }
     single { VersionRepository(versionDao = get<KickifyDatabase>().versionDao()) }
-    single { NotificationStateRepository(notificationStateDao = get<KickifyDatabase>().notificationStateDao()) }
     single { SettingsRepository(dataStore = get()) }
     single { AchievementsRepository(dataStore = get()) }
     single { RemoteRepository(httpClient = get()) }
-    single { AppRepository(
-        get(), get(), get(),
-        get(), get(), get(),
-        get(), get(), get(),
-        get(), get(), get(),
-        get(), get()) }
+    single {
+        AppRepository(
+            get(), get(), get(),
+            get(), get(), get(),
+            get(), get(), get(),
+            get(), get(), get(),
+            get())
+    }
 
     viewModel { SettingsViewModel(get(), get()) }
-    viewModel { WishlistViewModel(get()) }
-    viewModel { ProductsViewModel(get()) }
     viewModel { AchievementsViewModel(get()) }
     viewModel { LoginViewModel(get()) }
+    viewModel { ProductsViewModel(get()) }
+    viewModel { WishlistViewModel(get()) }
     viewModel { NotificationViewModel(get()) }
     viewModel { ForgotPasswordOTPViewModel(get()) }
 }

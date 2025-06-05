@@ -166,8 +166,6 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.Onboard> {
-            val coroutineScope = rememberCoroutineScope()
-            coroutineScope.launch { appRepository.initNotificationState() }
             OnboardingScreen(
                 navController,
                 onReachedLastPage = {

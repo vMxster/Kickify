@@ -128,7 +128,7 @@ interface ProductDao {
     suspend fun getProductHistory(productId: Int): List<HistoryProduct>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertProducts(remoteProducts: List<Product>)
+    suspend fun insertProduct(product: Product)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProductHistory(remoteHistory: List<HistoryProduct>)
@@ -162,6 +162,12 @@ interface ProductDao {
 }
 
 @Dao
+interface ProductStateDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addProductState(productState: ProductState)
+}
+
+@Dao
 interface VersionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProductVariant(variant: Version)
@@ -170,7 +176,7 @@ interface VersionDao {
 @Dao
 interface ImageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertImages(images: List<Image>)
+    suspend fun insertImage(image: Image)
 }
 
 @Dao

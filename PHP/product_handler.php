@@ -195,7 +195,21 @@ try {
             if (!isset($_POST["productIds"])) {
                 throw new Exception("Missing required fields");
             }
-            $productsImages = $dbh->getProductsImages($_POST["productIds"]);
+            
+            // Convert comma-separated string to array of integers
+            $productIdsString = $_POST["productIds"];
+            $productIds = array_map('intval', explode(',', $productIdsString));
+            
+            // Remove any empty values
+            $productIds = array_filter($productIds, function($id) {
+                return $id > 0;
+            });
+            
+            if (empty($productIds)) {
+                throw new Exception("No valid product IDs provided");
+            }
+            
+            $productsImages = $dbh->getProductsImages($productIds);
             
             $response = [
                 "success" => true,

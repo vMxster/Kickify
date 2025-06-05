@@ -39,9 +39,8 @@ class DatabaseHelper {
     // Get all products
     public function getProducts($lastAccess) {
         $query = "SELECT p.* 
-                  FROM PRODOTTO p, IMMAGINE i 
-                  WHERE p.ID_Prodotto = i.ID_Prodotto 
-                  AND p.Data_Aggiunta > ? 
+                  FROM PRODOTTO p 
+                  WHERE p.Data_Aggiunta > ? 
                   ORDER BY p.Data_Aggiunta DESC";
         $stmt = $this->db->prepare($query);
         $stmt->bind_param("s", $lastAccess);
@@ -54,7 +53,8 @@ class DatabaseHelper {
         $placeholders = implode(',', array_fill(0, count($productIds), '?'));
         $query = "SELECT i.* 
                   FROM IMMAGINE i 
-                  WHERE ID_Prodotto IN ($placeholders)";
+                  WHERE i.ID_Prodotto IN ($placeholders) 
+                  ORDER BY i.ID_Prodotto, i.Numero";
         
         $stmt = $this->db->prepare($query);
         $stmt->bind_param(str_repeat('i', count($productIds)), ...$productIds);

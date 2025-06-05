@@ -254,17 +254,22 @@ class RemoteResponseParser {
             return jsonObject.getDouble("rating")
         }
 
-        fun parseProductsWithImages(jsonArray: JSONArray): List<Image> {
+        fun parseProductsWithImages(jsonObject: JSONObject): List<Image> {
             val images = mutableListOf<Image>()
-            for (i in 0 until jsonArray.length()) {
-                val itemJson = jsonArray.getJSONObject(i)
-                val image = Image(
-                    productId = itemJson.getInt("ID_Prodotto"),
-                    url = itemJson.getString("URL"),
-                    number = itemJson.getInt("Numero")
-                )
-                images.add(image)
+            if (jsonObject.has("productsImages")) {
+                val imagesArray = jsonObject.getJSONArray("productsImages")
+
+                for (i in 0 until imagesArray.length()) {
+                    val itemJson = imagesArray.getJSONObject(i)
+                    val image = Image(
+                        productId = itemJson.getInt("ID_Prodotto"),
+                        url = itemJson.getString("URL"),
+                        number = itemJson.getInt("Numero")
+                    )
+                    images.add(image)
+                }
             }
+
             return images
         }
 

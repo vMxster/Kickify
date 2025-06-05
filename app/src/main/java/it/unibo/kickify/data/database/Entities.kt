@@ -643,7 +643,7 @@ data class WishlistProduct(
             onUpdate = ForeignKey.NO_ACTION
         )
     ],
-    indices = [Index("ID_Prodotto", unique = true)],
+    indices = [Index(value = ["ID_Prodotto", "Numero"], unique = true)],
     primaryKeys = ["ID_Prodotto", "Numero"]
 )
 data class Image(

@@ -74,8 +74,8 @@ class RemoteRepository(
                 "productIds" to productIds.joinToString(",")
             )
             val response = makeRequest("product_handler.php", params)
-            val jsonArray = JSONArray(response)
-            val images = RemoteResponseParser.parseProductsWithImages(jsonArray)
+            val jsonResponse = JSONObject(response)
+            val images = RemoteResponseParser.parseProductsWithImages(jsonResponse)
             Result.success(images)
         } catch (e: Exception) {
             Log.e(tag, "Errore durante il recupero delle immagini dei prodotti", e)

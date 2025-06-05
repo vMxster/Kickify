@@ -28,8 +28,8 @@ class ProductRepository(private val productDao: ProductDao) {
     suspend fun getProductData(productId: Int, userEmail: String): ProductDetail? =
         productDao.getProductData(productId, userEmail)
 
-    suspend fun insertProducts(remoteProducts: List<Product>) {
-        productDao.insertProducts(remoteProducts)
+    suspend fun insertProduct(product: Product) {
+        productDao.insertProduct(product)
     }
 
     suspend fun getProductHistory(productId: Int): List<HistoryProduct> =

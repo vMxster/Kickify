@@ -1,5 +1,6 @@
 package it.unibo.kickify.ui.screens.login
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -56,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.google.firebase.auth.GoogleAuthProvider
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.ScreenTemplate
@@ -64,6 +66,16 @@ import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.theme.MediumGray
 import it.unibo.kickify.utils.LoginRegisterUtils
 import kotlinx.coroutines.launch
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.GetCredentialResponse
+import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.exceptions.NoCredentialException
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 
 @Composable
 fun LoginScreen(
@@ -90,6 +102,80 @@ fun LoginScreen(
     var passwordError by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
     val passwordFocusRequester = remember { FocusRequester() }
+
+    // Inizializza il CredentialManager
+    val credentialManager = remember { CredentialManager.create(ctx) }
+
+    // Funzione per gestire l'accesso con Google
+    fun signInWithGoogle() {
+        val googleIdOption = GetGoogleIdOption.Builder()
+            .setServerClientId("897714702292-ngm2eni5m4c06j32u3uu68ggifm10oj6.apps.googleusercontent.com")
+            .setFilterByAuthorizedAccounts(false)
+            .build()
+
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+
+        coroutineScope.launch {
+            try {
+                val response: GetCredentialResponse = credentialManager.getCredential(
+                    request = request,
+                    context = ctx
+                )
+
+                // Estrattore per ottenere il token indipendentemente dal tipo di credenziale
+                val idToken = when (val credential = response.credential) {
+                    is GoogleIdTokenCredential -> {
+                        credential.idToken
+                    }
+                    else -> {
+                        try {
+                            val credentialBundle = credential.data
+
+                            credentialBundle.getString("com.google.android.libraries.identity.googleid.BUNDLE_KEY_ID_TOKEN")
+                                ?: throw Exception("Token non trovato nel bundle")
+                        } catch (e: Exception) {
+                            val errorMsg = "Impossibile estrarre il token: ${e.message}"
+                            Toast.makeText(ctx, errorMsg, Toast.LENGTH_LONG).show()
+                            null
+                        }
+                    }
+                }
+
+                // Continua solo se abbiamo ottenuto un token
+                if (idToken != null) {
+                    val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
+                    Firebase.auth.signInWithCredential(firebaseCredential)
+                        .addOnCompleteListener { authTask ->
+                            if (authTask.isSuccessful) {
+                                val user = Firebase.auth.currentUser
+                                if (user != null) {
+                                    email = user.email ?: ""
+                                    password = ""
+                                    loginViewModel.login(email, password)
+                                } else {
+                                    Toast.makeText(ctx, "Nessun utente trovato", Toast.LENGTH_SHORT).show()
+                                }
+                            } else {
+                                Toast.makeText(ctx, "Login fallito", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                } else {
+                    Toast.makeText(ctx, "Token non disponibile", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: GetCredentialException) {
+                when (e) {
+                    is NoCredentialException ->
+                        Toast.makeText(ctx, "Nessuna credenziale disponibile", Toast.LENGTH_SHORT).show()
+                    is GetCredentialCancellationException ->
+                        Toast.makeText(ctx, "Autenticazione annullata", Toast.LENGTH_SHORT).show()
+                    else -> Toast.makeText(ctx, "Autenticazione annullata", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        }
+    }
 
     // set onboarding completed
     settingsViewModel.setOnboardingComplete(true)
@@ -273,7 +359,7 @@ fun LoginScreen(
 
             LoginRegisterMethodDividerRow()
             Button(
-                onClick = { /* google oauth */ },
+                onClick = { signInWithGoogle() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp),

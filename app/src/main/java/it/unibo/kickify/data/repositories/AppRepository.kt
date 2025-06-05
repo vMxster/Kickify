@@ -15,13 +15,13 @@ import it.unibo.kickify.data.database.OrderProduct
 import it.unibo.kickify.data.database.OrderProductDetails
 import it.unibo.kickify.data.database.Product
 import it.unibo.kickify.data.database.ProductDetails
+import it.unibo.kickify.data.database.ProductState
 import it.unibo.kickify.data.database.Review
 import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.data.database.User
 import it.unibo.kickify.data.repositories.local.CartRepository
 import it.unibo.kickify.data.repositories.local.ImageRepository
 import it.unibo.kickify.data.repositories.local.NotificationRepository
-import it.unibo.kickify.data.repositories.local.NotificationStateRepository
 import it.unibo.kickify.data.repositories.local.OrderRepository
 import it.unibo.kickify.data.repositories.local.ProductCartRepository
 import it.unibo.kickify.data.repositories.local.ProductRepository
@@ -48,8 +48,7 @@ class AppRepository(
     private val imageRepository: ImageRepository,
     private val productCartRepository: ProductCartRepository,
     private val versionRepository: VersionRepository,
-    private val settingsRepository: SettingsRepository,
-    private val notificationStateRepository: NotificationStateRepository
+    private val settingsRepository: SettingsRepository
 ) {
     private val tag = "AppRepository"
 
@@ -68,25 +67,34 @@ class AppRepository(
                 val remoteProducts = remoteResult.getOrNull() ?: emptyList()
 
                 if (remoteProducts.isNotEmpty()) {
-                    val images = remoteRepository.getProductsImages(remoteProducts.map { it.productId })
-                        .getOrNull() ?: emptyList()
+                    remoteProducts.forEach { product ->
+                        try {
+                            productRepository.insertProduct(product)
+                        } catch (e: Exception) {
+                            Log.e(tag, "Errore inserimento prodotto ${product.productId}: ${e.message}")
+                        }
+                    }
+                    val imagesResult = remoteRepository.getProductsImages(remoteProducts.map { it.productId })
+                    val images = imagesResult.getOrNull() ?: emptyList()
                     if (images.isNotEmpty()) {
-                        val remoteImages = remoteRepository.downloadImagesFromUrls(images.map { it.url })
-                            .getOrNull() ?: emptyList()
+                        val remoteImagesResult = remoteRepository.downloadImagesFromUrls(images.map { it.url })
+                        val remoteImages = remoteImagesResult.getOrNull() ?: emptyList()
                         if (remoteImages.isNotEmpty()) {
                             val savedImages = ImageStorageManager(context).saveAll(remoteImages)
                             images.forEachIndexed { index, image ->
                                 image.url = savedImages[index].second
+                                try {
+                                    imageRepository.insertImage(image)
+                                } catch (e: Exception) {
+                                    Log.e(tag, "Errore inserimento immagine per prodotto ${image.productId}: ${e.message}")
+                                }
                             }
-                            imageRepository.insertImages(images)
                         }
                     }
-                    productRepository.insertProducts(remoteProducts)
                 }
             }
-            Result.success(
-                productRepository.getProductsWithImage()
-            )
+            val productsWithImages = productRepository.getProductsWithImage()
+            Result.success(productsWithImages)
         } catch (e: Exception) {
             Log.e(tag, "Errore in getProducts", e)
             Result.failure(e)
@@ -300,26 +308,6 @@ class AppRepository(
     }
 
     // NOTIFICHE
-    suspend fun initNotificationState(): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val stateList = listOf(
-                NotificationState(
-                    type = "Read",
-                    desc = "The notification was read!"
-                ),
-                NotificationState(
-                    type = "Unread",
-                    desc = "The notification was not read!"
-                )
-            )
-            notificationStateRepository.initNotificationStates(stateList)
-            Result.success(true)
-        } catch (e: Exception) {
-            Log.e(tag, "Errore in initNotificationState", e)
-            Result.failure(e)
-        }
-    }
-
     suspend fun getNotifications(email: String): Result<List<Notification>> = withContext(Dispatchers.IO) {
         try {
             val remoteResult = remoteRepository.getNotifications(email, lastAccess.first())
