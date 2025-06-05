@@ -72,7 +72,57 @@ try {
                     throw new Exception("Profilo non trovato");
                 }
                 break;
-                
+            
+            case "getUserAddress":
+                $email = $_POST["email"];
+                $addresses = $dbh->getUserAddress($email);
+                if($addresses) {
+                    $response = [
+                        "success" => true,
+                        "address" => $addresses
+                    ];
+                } else {
+                    throw new Exception("Indirizzo non trovato");
+                }
+                break;
+            
+            case "updateUserAddress":
+                $email = $_POST["email"];
+                $via = $_POST["via"];
+                $civico = $_POST["civico"];
+                $cap = $_POST["cap"];
+                $citta = $_POST["citta"];
+                $provincia = $_POST["provincia"];
+                $nazione = $_POST["nazione"];
+                $predefinito = $_POST["predefinito"];
+                if ($dbh->updateUserAddress($email, $via, $civico, $cap, $citta, $provincia, $nazione, $predefinito)) {
+                    $response = [
+                        "success" => true,
+                        "message" => "Indirizzo aggiornato"
+                    ];
+                } else {
+                    throw new Exception("Indirizzo non aggiornato");
+                }
+
+                break;
+
+            case "removeUserAddress":
+                $email = $_POST["email"];
+                $via = $_POST["via"];
+                $civico = $_POST["civico"];
+                $cap = $_POST["cap"];
+                $citta = $_POST["citta"];
+                if ($dbh->removeUserAddress($email, $via, $civico, $cap, $citta)) {
+                    $response = [
+                        "success" => true,
+                        "message" => "Indirizzo rimosso"
+                    ];
+                } else {
+                    throw new Exception("Indirizzo non rimosso");
+                }
+
+                break;
+
             case "isUserRegistered":
                 $email = $_POST["email"];
 

@@ -87,7 +87,7 @@ fun InformationCard(
             CheckOutInformationRow(
                 leadingIcon = null,
                 primaryText = shippingAddress,
-                secondaryText = stringResource(R.string.checkoutScreen_address),
+                secondaryText = stringResource(R.string.address),
                 showEditButton = true,
                 onEditInformation = {}
             )

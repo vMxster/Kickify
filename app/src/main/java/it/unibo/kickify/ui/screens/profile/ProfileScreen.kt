@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -25,12 +26,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -39,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import it.unibo.kickify.R
+import it.unibo.kickify.data.database.Address
 import it.unibo.kickify.data.database.User
 import it.unibo.kickify.data.models.Language
 import it.unibo.kickify.data.repositories.AppRepository
@@ -46,6 +50,7 @@ import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.PaymentMethodRow
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.settings.AddressContainer
 import it.unibo.kickify.ui.screens.settings.EditProfileSections
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import kotlinx.coroutines.delay
@@ -58,24 +63,30 @@ fun ProfileScreen(
     settingsViewModel: SettingsViewModel
 ){
     val appLang by settingsViewModel.appLanguage.collectAsStateWithLifecycle()
-    val userID by settingsViewModel.userId.collectAsStateWithLifecycle()
+    val userEmail by settingsViewModel.userId.collectAsStateWithLifecycle()
     val username by settingsViewModel.userName.collectAsStateWithLifecycle()
     val userImg by settingsViewModel.userImg.collectAsStateWithLifecycle()
 
-    val coroutineScope = rememberCoroutineScope()
     val appRepo = koinInject<AppRepository>()
     val user = remember { mutableStateOf<User?>(null) }
+    val addrList = remember { mutableStateListOf<Address>() }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         delay(500)
-        coroutineScope.launch {
-            val res = appRepo.getUserProfile(userID)
-            res.onSuccess { u ->
-                user.value = u
-            }.onFailure {
-            }
+        val result = appRepo.getUserAddress(userEmail)
+        result.onSuccess { list ->
+            addrList.clear()
+            addrList.addAll(list)
+            println("address success: $list")
+        }.onFailure { e ->
+            print("failure get user addr: $e")
         }
-        println("userimg: $userImg")
+        val res = appRepo.getUserProfile(userEmail)
+        res.onSuccess { u ->
+            user.value = u
+        }.onFailure {
+        }
     }
 
     ScreenTemplate(
@@ -94,8 +105,8 @@ fun ProfileScreen(
 
             ProfileCardContainer(
                 cardTitle = stringResource(R.string.userProfile),
-                showEditIcon = true,
-                editAction = {
+                actionIcon = Icons.Outlined.Edit,
+                action = {
                     navController.navigate(KickifyRoute.EditProfile(EditProfileSections.USER_INFO))
                 }
             ) {
@@ -113,7 +124,7 @@ fun ProfileScreen(
                         .padding(vertical = 4.dp).padding(start = 10.dp),
                     style = MaterialTheme.typography.titleMedium
                 )
-                TextInformationRow(if(user.value == null) userID else "${user.value?.email}")
+                TextInformationRow(if(user.value == null) userEmail else "${user.value?.email}")
                 TextInformationRow("${stringResource(R.string.phone)}:", user.value?.phone ?: "-")
                 TextInformationRow("${stringResource(R.string.language)}:",
                     Language.getLanguageStringFromCode(appLang))
@@ -131,24 +142,32 @@ fun ProfileScreen(
             )
 
             ProfileCardContainer(
-                cardTitle = stringResource(R.string.checkoutScreen_address),
-                showEditIcon = false,
-                editAction = { }
+                cardTitle = stringResource(R.string.address),
+                actionIcon = Icons.Outlined.Add,
+                action = { navController.navigate(KickifyRoute.EditProfile(EditProfileSections.ADDRESS)) }
             ) {
-                val addressList = listOf(
-                    listOf("Address 1", "Via Roma", "100", "Cesena", "Forli-Cesena", "Emilia Romagna", "47521", "Italia"),
-                    listOf("Address 2", "Via della vittoria", "421", "Forlì", "Forlì-Cesena", "Emilia Romagna", "47121", "Italia")
-                )
-                for(addr in addressList){
+                addrList.forEachIndexed { index, addr ->
                     AddressContainer(
-                        addressDescription = addr[0],
-                        address = addr[1],
-                        number = addr[2],
-                        city = addr[3],
-                        province = addr[4],
-                        region = addr[5],
-                        postCode = addr[6],
-                        country = addr[7]
+                        index = index,
+                        address = addr.street,
+                        number = addr.civic,
+                        city = addr.city,
+                        province = addr.province,
+                        postCode = addr.cap,
+                        country = addr.nation,
+                        defaultAddress = addr.default,
+                        deleteAction = {
+                            coroutineScope.launch {
+                                val result = appRepo.deleteUserAddress(
+                                    userEmail, addr.street, addr.civic, addr.cap, addr.city
+                                )
+                                result.onSuccess {
+                                    println("address deleted successfully: $it")
+                                }.onFailure {
+                                    println("error deleting address: $it")
+                                }
+                            }
+                        }
                     )
                 }
             }
@@ -157,8 +176,8 @@ fun ProfileScreen(
             val cardInfo = listOf(listOf("", "", "email@example.com"), listOf("1234", "01/29", ""))
             ProfileCardContainer(
                 cardTitle = stringResource(R.string.paymentMethod),
-                showEditIcon = false,
-                editAction = {
+                actionIcon = Icons.Outlined.Add,
+                action = {
                     navController.navigate(KickifyRoute.EditProfile(EditProfileSections.PAYMENT_METHOD))
                 }
             ) {
@@ -224,40 +243,6 @@ fun ProfileActionRow(
 }
 
 @Composable
-fun AddressContainer(
-    addressDescription: String,
-    address: String,
-    number: String,
-    city: String,
-    province: String,
-    region: String,
-    postCode: String,
-    country: String
-){
-    val txtModifier = Modifier.fillMaxWidth().padding(start = 10.dp).padding(vertical = 2.dp)
-    Row(
-        modifier = txtModifier,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ){
-        Column(modifier = Modifier.fillMaxWidth(fraction = 0.7f).padding(vertical = 8.dp)) {
-            Text(text = addressDescription, modifier = txtModifier,
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(text = "$address, $number", textAlign = TextAlign.Start, modifier = txtModifier)
-            Text(text = "$city, $postCode, $province", textAlign = TextAlign.Start, modifier = txtModifier)
-            Text(text = "$region, $country", textAlign = TextAlign.Start, modifier = txtModifier)
-        }
-        IconButton(
-            onClick = {},
-            modifier = Modifier.padding(end = 8.dp)
-        ) {
-            Icon(Icons.Outlined.Edit, contentDescription = "Edit $addressDescription")
-        }
-    }
-}
-
-@Composable
 fun TextInformationRow(
     leftValue: String,
     rightValue: String? = null
@@ -286,17 +271,16 @@ fun TextInformationRow(
 @Composable
 fun ProfileCardContainer(
     cardTitle: String,
-    showEditIcon: Boolean,
-    editAction: () -> Unit,
+    actionIcon: ImageVector?,
+    action: () -> Unit,
     columnCardContent: @Composable () -> Unit
 ){
     Card(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).padding(vertical = 8.dp)
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = 8.dp)
-                .padding(vertical = 6.dp)
+                .padding(horizontal = 8.dp, vertical = 6.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -308,13 +292,9 @@ fun ProfileCardContainer(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.fillMaxWidth(fraction = 0.7f).padding(10.dp)
                 )
-                if(showEditIcon) {
-                    IconButton(
-                        onClick = editAction
-                    ) {
-                        Icon(Icons.Outlined.Edit,
-                            contentDescription = "Edit $cardTitle"
-                        )
+                if(actionIcon != null) {
+                    IconButton(onClick = action) {
+                        Icon(actionIcon, contentDescription = "Edit $cardTitle")
                     }
                 }
             }

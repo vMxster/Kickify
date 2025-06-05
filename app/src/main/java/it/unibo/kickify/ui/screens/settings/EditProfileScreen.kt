@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Button
@@ -33,6 +35,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -88,9 +91,14 @@ fun EditProfileScreen(
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
     val isLoading by settingsViewModel.isLoading.collectAsStateWithLifecycle()
+    val appRepo = koinInject<AppRepository>()
 
     ScreenTemplate(
-        screenTitle = stringResource(R.string.editProfile_title),
+        screenTitle = when(section) {
+            EditProfileSections.USER_INFO -> stringResource(R.string.editProfile_title)
+            EditProfileSections.ADDRESS -> stringResource(R.string.addNewAddress)
+            EditProfileSections.PAYMENT_METHOD -> stringResource(R.string.paymentMethod)
+        },
         navController = navController,
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
@@ -107,15 +115,183 @@ fun EditProfileScreen(
             when(section){
                 EditProfileSections.USER_INFO -> {
                     ProfileImageWithChangeButton(navController, cameraXUtils, settingsViewModel, snackBarHostState)
-                    ProfileInfoChangePassword(settingsViewModel, snackBarHostState)
+                    ProfileInfoChangePassword(settingsViewModel, snackBarHostState, appRepo)
                 }
+
                 EditProfileSections.ADDRESS -> {
-                    Text("address section")
+                    EditAddressSection(appRepo)
                 }
+
                 EditProfileSections.PAYMENT_METHOD -> {
                     Text("payment method section")
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun EditAddressSection(appRepo: AppRepository){
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+            .padding(horizontal = 10.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        val profileScreenModifier = Modifier.fillMaxWidth()
+            .padding(horizontal = 24.dp)
+
+        val focusManager = LocalFocusManager.current
+
+        var streetName by rememberSaveable { mutableStateOf("") }
+        val streetNameFocusRequester = remember { FocusRequester() }
+
+        var number by rememberSaveable { mutableStateOf("") }
+        val numberFocusRequester = remember { FocusRequester() }
+
+        var city by rememberSaveable { mutableStateOf("") }
+        val cityFocusRequester = remember { FocusRequester() }
+
+        var cap by rememberSaveable { mutableStateOf("") }
+        val capFocusRequester = remember { FocusRequester() }
+
+        var province by rememberSaveable { mutableStateOf("") }
+        val provinceFocusRequester = remember { FocusRequester() }
+
+        var nation by rememberSaveable { mutableStateOf("") }
+        val nationFocusRequester = remember { FocusRequester() }
+
+        var defaultAddress by rememberSaveable { mutableStateOf(false) }
+
+        LaunchedEffect(Unit) {
+            streetNameFocusRequester.requestFocus()
+        }
+
+        Text(text = stringResource(R.string.streetNameAddress), modifier = profileScreenModifier)
+        Spacer(modifier = Modifier.height(6.dp))
+        OutlinedTextField(
+            value = streetName,
+            onValueChange = { streetName = it },
+            placeholder = { Text(stringResource(R.string.streetNameAddress)) },
+            shape = RoundedCornerShape(16.dp),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { numberFocusRequester.requestFocus() }
+            ),
+            modifier = profileScreenModifier.focusRequester(streetNameFocusRequester)
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(text = stringResource(R.string.streetNumberAddress), modifier = profileScreenModifier)
+        Spacer(modifier = Modifier.height(6.dp))
+        OutlinedTextField(
+            value = number,
+            onValueChange = { number = it },
+            placeholder = { Text(stringResource(R.string.streetNumberAddress)) },
+            shape = RoundedCornerShape(16.dp),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { cityFocusRequester.requestFocus() }
+            ),
+            modifier = profileScreenModifier.focusRequester(numberFocusRequester)
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(text = stringResource(R.string.cityAddress), modifier = profileScreenModifier)
+        Spacer(modifier = Modifier.height(6.dp))
+        OutlinedTextField(
+            value = city,
+            onValueChange = { city = it },
+            placeholder = { Text(stringResource(R.string.cityAddress)) },
+            shape = RoundedCornerShape(16.dp),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { capFocusRequester.requestFocus() }
+            ),
+            modifier = profileScreenModifier.focusRequester(cityFocusRequester)
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(text = stringResource(R.string.capAddress), modifier = profileScreenModifier)
+        Spacer(modifier = Modifier.height(6.dp))
+        OutlinedTextField(
+            value = cap,
+            onValueChange = { cap = it },
+            placeholder = { Text(stringResource(R.string.capAddress)) },
+            shape = RoundedCornerShape(16.dp),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { provinceFocusRequester.requestFocus() }
+            ),
+            modifier = profileScreenModifier.focusRequester(capFocusRequester)
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(text = stringResource(R.string.provinceAddress), modifier = profileScreenModifier)
+        Spacer(modifier = Modifier.height(6.dp))
+        OutlinedTextField(
+            value = province,
+            onValueChange = { province = it },
+            placeholder = { Text(stringResource(R.string.provinceAddress)) },
+            shape = RoundedCornerShape(16.dp),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { nationFocusRequester.requestFocus() }
+            ),
+            modifier = profileScreenModifier.focusRequester(provinceFocusRequester)
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(text = stringResource(R.string.nationAddress), modifier = profileScreenModifier)
+        Spacer(modifier = Modifier.height(6.dp))
+        OutlinedTextField(
+            value = nation,
+            onValueChange = { nation = it },
+            placeholder = { Text(stringResource(R.string.nationAddress)) },
+            shape = RoundedCornerShape(16.dp),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = { focusManager.clearFocus() }
+            ),
+            modifier = profileScreenModifier.focusRequester(nationFocusRequester)
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(
+            modifier = profileScreenModifier,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text(stringResource(R.string.setDefaultAddress))
+            Switch(checked = false,
+                onCheckedChange = { defaultAddress = it }
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Button(
+            onClick = {},
+            modifier = profileScreenModifier
+        ){
+            Text(stringResource(R.string.addNewAddress))
         }
     }
 }
@@ -259,9 +435,9 @@ fun ProfileImageWithChangeButton(
 @Composable
 fun ProfileInfoChangePassword(
     settingsViewModel: SettingsViewModel,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    appRepo: AppRepository
 ){
-    val appRepo = koinInject<AppRepository>()
     val coroutineScope = rememberCoroutineScope()
     val ctx = LocalContext.current
 
@@ -426,6 +602,43 @@ fun ProfileInfoChangePassword(
             }
         ) {
             Text(stringResource(R.string.changePassword))
+        }
+    }
+}
+
+@Composable
+fun AddressContainer(
+    index: Int,
+    address: String,
+    number: String,
+    city: String,
+    province: String,
+    postCode: String,
+    country: String,
+    defaultAddress: Boolean,
+    deleteAction: () -> Unit
+){
+    val txtModifier = Modifier.fillMaxWidth().padding(start = 10.dp).padding(vertical = 2.dp)
+    Row(
+        modifier = txtModifier,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Column(modifier = Modifier.fillMaxWidth(fraction = 0.7f).padding(vertical = 8.dp)) {
+            val addrDescr = if(defaultAddress) stringResource(R.string.address) + " ${index+1} - " + stringResource(R.string.default_string)
+            else stringResource(R.string.address) + " ${index+1}"
+            Text(text = addrDescr, modifier = txtModifier,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(text = "$address, $number", textAlign = TextAlign.Start, modifier = txtModifier)
+            Text(text = "$city, $postCode, $province", textAlign = TextAlign.Start, modifier = txtModifier)
+            Text(text = country, textAlign = TextAlign.Start, modifier = txtModifier)
+        }
+        IconButton(
+            onClick = { deleteAction() },
+            modifier = Modifier.padding(end = 8.dp)
+        ) {
+            Icon(Icons.Outlined.Delete, contentDescription = "")
         }
     }
 }

@@ -2,6 +2,7 @@ package it.unibo.kickify.data.repositories
 
 import android.content.Context
 import android.util.Log
+import it.unibo.kickify.data.database.Address
 import it.unibo.kickify.data.database.Cart
 import it.unibo.kickify.data.database.CartWithProductInfo
 import it.unibo.kickify.data.database.CompleteProduct
@@ -590,6 +591,24 @@ class AppRepository(
             Log.e(tag, "Errore in getUserProfile", e)
             Result.failure(e)
         }
+    }
+
+    suspend fun getUserAddress(email: String): Result<List<Address>> {
+        return remoteRepository.getUserAddress(email)
+    }
+
+    suspend fun updateUserAddress(
+        email: String, street: String, number: String, cap: String,
+        city: String, province: String, nation: String, default: Boolean
+    ): Result<Boolean> {
+        return remoteRepository.updateUserAddress(email, street, number, cap, city, province, nation, default)
+    }
+
+    suspend fun deleteUserAddress(
+        email: String, street: String, number: String,
+        cap: String, city: String
+    ): Result<Boolean>{
+        return remoteRepository.deleteUserAddress(email, street, number, cap, city)
     }
 
     suspend fun updateUserImage(email: String, imgFile: ByteArray, mimeType: String): Result<String> {
