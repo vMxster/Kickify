@@ -118,8 +118,17 @@
     <string name="profileScreen_fullName">Full Name</string>
     <string name="checkoutScreen_title">Checkout</string>
     <string name="checkoutScreen_contactInformation">Contact Information</string>
-    <string name="checkoutScreen_address">Address</string>
+    <string name="address">Address</string>
     <string name="unavailableAddress">Address Unavailable</string>
+    <string name="streetNameAddress">Street</string>
+    <string name="streetNumberAddress">Number</string>
+    <string name="cityAddress">City</string>
+    <string name="capAddress">ZIP code</string>
+    <string name="provinceAddress">Province</string>
+    <string name="nationAddress">Nation</string>
+    <string name="setDefaultAddress">Set as default address</string>
+    <string name="addNewAddress">Add new address</string>
+    <string name="saveAddress">Save address</string>
     <string name="paymentMethod">Payment Method</string>
     <string name="cardExpires">Expires</string>
     <string name="checkoutScreen_email">Email</string>
@@ -200,4 +209,5 @@
     <string name="biometricAuthFailedOrCancelled">Biometric Authentication failed or cancelled</string>
     <string name="biometricAuthLoginWithEmailAndPsw">Login with Email and Password</string>
     <string name="biometricAuthRetry">Retry Biometric Authentication</string>
+    <string name="default_string">Default</string>
 </resources>

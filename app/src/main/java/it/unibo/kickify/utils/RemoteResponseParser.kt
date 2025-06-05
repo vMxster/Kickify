@@ -1,6 +1,21 @@
 package it.unibo.kickify.utils
 
-import it.unibo.kickify.data.database.*
+import it.unibo.kickify.data.database.Address
+import it.unibo.kickify.data.database.Cart
+import it.unibo.kickify.data.database.CartProduct
+import it.unibo.kickify.data.database.HistoryProduct
+import it.unibo.kickify.data.database.Image
+import it.unibo.kickify.data.database.Notification
+import it.unibo.kickify.data.database.Order
+import it.unibo.kickify.data.database.OrderDetails
+import it.unibo.kickify.data.database.OrderProduct
+import it.unibo.kickify.data.database.Product
+import it.unibo.kickify.data.database.ProductDetails
+import it.unibo.kickify.data.database.Review
+import it.unibo.kickify.data.database.TrackingShipping
+import it.unibo.kickify.data.database.User
+import it.unibo.kickify.data.database.Version
+import it.unibo.kickify.data.database.WishlistProduct
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -99,6 +114,27 @@ class RemoteResponseParser {
                     WishlistProduct(
                         email = itemJson.optString("Email", ""),
                         productId = itemJson.getInt("ID_Prodotto")
+                    )
+                )
+            }
+            return items
+        }
+
+        // Parser per lista indirizzi
+        fun parseAddressList(json: JSONArray): List<Address> {
+            val items = mutableListOf<Address>()
+            for (i in 0 until json.length()) {
+                val itemJson = json.getJSONObject(i)
+                items.add(
+                    Address(
+                        email = itemJson.getString("Email"),
+                        street = itemJson.getString("Via"),
+                        civic = itemJson.getString("NumeroCivico"),
+                        cap = itemJson.getString("CAP"),
+                        city = itemJson.getString("Citta"),
+                        province = itemJson.getString("Provincia"),
+                        nation = itemJson.getString("Nazione"),
+                        default = itemJson.getInt("Predefinito") == 1
                     )
                 )
             }

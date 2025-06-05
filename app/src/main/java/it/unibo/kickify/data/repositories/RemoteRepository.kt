@@ -17,6 +17,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.Parameters
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import it.unibo.kickify.data.database.Address
 import it.unibo.kickify.data.database.Cart
 import it.unibo.kickify.data.database.CartProduct
 import it.unibo.kickify.data.database.HistoryProduct
@@ -609,6 +610,84 @@ class RemoteRepository(
             Result.success(user)
         } catch (e: Exception) {
             Log.e(tag, "Errore durante il recupero del profilo utente", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getUserAddress(email: String): Result<List<Address>> = withContext(Dispatchers.IO) {
+        try {
+            val params = mapOf(
+                "action" to "getUserAddress",
+                "email" to email
+            )
+            val response = makeRequest("auth_handler.php", params)
+            val jsonObject = JSONObject(response)
+            println("json obj: $jsonObject")
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
+            val jsonArray = jsonObject.getJSONArray("address")
+            val addressList = RemoteResponseParser.parseAddressList(jsonArray)
+            addressList.sortedBy { !it.default } // before the default address
+            Result.success(addressList)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante il recupero del profilo utente", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateUserAddress(
+        email: String, street: String, number: String,
+        cap: String, city: String, province: String,
+        nation: String, default: Boolean
+    ): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val params = mapOf(
+                "action" to "updateUserAddress",
+                "email" to email,
+                "via" to street,
+                "civico" to number,
+                "cap" to cap,
+                "citta" to city,
+                "provincia" to province,
+                "nazione" to nation,
+                "predefinito" to (if (default) "1" else "0"),
+            )
+            val response = makeRequest("auth_handler.php", params)
+            val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
+            val success = RemoteResponseParser.parseSuccess(jsonObject)
+            Result.success(success)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante aggiornamento di indirizzo", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun deleteUserAddress(
+        email: String, street: String, number: String,
+        cap: String, city: String
+    ): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val params = mapOf(
+                "action" to "updateUserAddress",
+                "email" to email,
+                "via" to street,
+                "civico" to number,
+                "cap" to cap,
+                "citta" to city
+            )
+            val response = makeRequest("auth_handler.php", params)
+            val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
+            val success = RemoteResponseParser.parseSuccess(jsonObject)
+            Result.success(success)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante rimozione di indirizzo", e)
             Result.failure(e)
         }
     }
