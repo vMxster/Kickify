@@ -544,6 +544,31 @@ class RemoteRepository(
         }
     }
 
+    suspend fun loginWithGoogle(
+        email: String, name: String,
+        surname: String, idToken: String): Result<User> = withContext(Dispatchers.IO) {
+        try {
+            val params = mapOf(
+                "action" to "loginWithGoogle",
+                "email" to email,
+                "name" to name,
+                "surname" to surname,
+                "idToken" to idToken
+            )
+            val response = makeRequest("auth_handler.php", params)
+            val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
+            val userObject = jsonObject.getJSONObject("user")
+            val user = RemoteResponseParser.parseUserProfile(userObject)
+            Result.success(user)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante il login con Google", e)
+            Result.failure(e)
+        }
+    }
+
     suspend fun register(
         email: String,
         firstName: String,

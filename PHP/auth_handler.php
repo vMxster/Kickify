@@ -136,6 +136,29 @@ try {
                 }
                 break;
 
+            case "loginWithGoogle":
+                if (!isset($_POST["email"]) || !isset($_POST["name"]) || 
+                    !isset($_POST["surname"]) || !isset($_POST["idToken"])) {
+                    throw new Exception("Missing required fields");
+                }
+
+                $email = $_POST["email"];
+                $name = $_POST["name"];
+                $surname = $_POST["surname"];
+                $idToken = $_POST["idToken"];
+
+                $user = $dbh->loginWithGoogle($email, $name, $surname, $idToken);
+
+                if ($user) {
+                    $response = [
+                        "success" => true,
+                        "user" => $user
+                    ];
+                } else {
+                    throw new Exception("Google authentication failed");
+                }
+                break;
+
             case "sendOTP":
                 $email = $_POST["email"];
         

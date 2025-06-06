@@ -19,6 +19,7 @@ import it.unibo.kickify.data.repositories.SettingsRepository
 import it.unibo.kickify.data.repositories.local.CartRepository
 import it.unibo.kickify.data.repositories.local.ImageRepository
 import it.unibo.kickify.data.repositories.local.NotificationRepository
+import it.unibo.kickify.data.repositories.local.OAuthUserRepository
 import it.unibo.kickify.data.repositories.local.OrderRepository
 import it.unibo.kickify.data.repositories.local.ProductCartRepository
 import it.unibo.kickify.data.repositories.local.ProductRepository
@@ -35,6 +36,7 @@ import it.unibo.kickify.ui.screens.productList.ProductsViewModel
 import it.unibo.kickify.ui.screens.profile.ProfileViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.screens.wishlist.WishlistViewModel
+import it.unibo.kickify.utils.DatabaseReadyManager
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
@@ -45,8 +47,14 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 val appModule = module {
     single { get<Context>().dataStore }
 
+    single { DatabaseReadyManager() }
+
     single(createdAtStart = true) {
-        KickifyDatabase.getInstance(androidContext())
+        val dbManager = get<DatabaseReadyManager>()
+        val db = KickifyDatabase.getInstance(androidContext())
+        db.openHelper.readableDatabase
+        dbManager.setDatabaseReady()
+        db
     }
 
     single {
@@ -70,7 +78,6 @@ val appModule = module {
 
     single { ProductCartRepository(productCartDao = get<KickifyDatabase>().productCartDao()) }
     single { ImageRepository(imageDao = get<KickifyDatabase>().imageDao()) }
-    single { ProductRepository(productDao = get<KickifyDatabase>().productDao()) }
     single { UserRepository(userDao = get<KickifyDatabase>().userDao()) }
     single { CartRepository(cartDao = get<KickifyDatabase>().cartDao()) }
     single { OrderRepository(orderDao = get<KickifyDatabase>().orderDao()) }
@@ -81,19 +88,21 @@ val appModule = module {
     single { SettingsRepository(dataStore = get()) }
     single { AchievementsRepository(dataStore = get()) }
     single { RemoteRepository(httpClient = get()) }
+    single { ProductRepository(productDao = get<KickifyDatabase>().productDao()) }
+    single { OAuthUserRepository(oauthDao = get<KickifyDatabase>().oauthDao()) }
     single {
         AppRepository(
             get(), get(), get(),
             get(), get(), get(),
             get(), get(), get(),
             get(), get(), get(),
-            get())
+            get(), get())
     }
 
     viewModel { SettingsViewModel(get(), get()) }
     viewModel { AchievementsViewModel(get()) }
     viewModel { LoginViewModel(get()) }
-    viewModel { ProductsViewModel(get()) }
+    viewModel { ProductsViewModel(get(), get()) }
     viewModel { WishlistViewModel(get()) }
     viewModel { NotificationViewModel(get()) }
     viewModel { ForgotPasswordOTPViewModel(get()) }

@@ -206,6 +206,22 @@ interface UserDao {
 }
 
 @Dao
+interface UserOAuthDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertUserOAuth(userOAuth: UserOAuth): Long
+
+    @Query("""
+        SELECT * FROM UTENTE_OAUTH WHERE Email = :email
+    """)
+    suspend fun getUserOAuth(email: String): UserOAuth?
+
+    @Query("""
+        SELECT Email FROM UTENTE_OAUTH WHERE Email = :email
+    """)
+    suspend fun checkUserOAuthExists(email: String): String?
+}
+
+@Dao
 interface CartDao {
     @Query("""
         SELECT * FROM CARRELLO WHERE Email = :email

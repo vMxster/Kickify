@@ -111,6 +111,34 @@ data class User(
 )
 
 @Entity(
+    tableName = "UTENTE_OAUTH",
+    primaryKeys = ["Provider", "Provider_UserID"],
+    foreignKeys = [
+        ForeignKey(
+            entity = User::class,
+            parentColumns = ["Email"],
+            childColumns = ["Email"],
+            onDelete = ForeignKey.NO_ACTION,
+            onUpdate = ForeignKey.NO_ACTION
+        )
+    ],
+    indices = [Index("Email", unique = true)]
+)
+data class UserOAuth(
+    @ColumnInfo(name = "Provider")
+    val provider: String,
+
+    @ColumnInfo(name = "Provider_UserID")
+    val providerUserId: String,
+
+    @ColumnInfo(name = "Data_Link")
+    val dataLink: String,
+
+    @ColumnInfo(name = "Email")
+    val email: String
+)
+
+@Entity(
     tableName = "CARRELLO",
     foreignKeys = [
         ForeignKey(

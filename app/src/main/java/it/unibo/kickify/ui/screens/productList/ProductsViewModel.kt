@@ -6,6 +6,8 @@ import it.unibo.kickify.data.database.CompleteProduct
 import it.unibo.kickify.data.database.Image
 import it.unibo.kickify.data.database.Product
 import it.unibo.kickify.data.repositories.AppRepository
+import it.unibo.kickify.utils.DatabaseReadyManager
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -14,7 +16,8 @@ import java.util.Date
 import java.util.Locale
 
 class ProductsViewModel(
-    private val repository: AppRepository
+    private val repository: AppRepository,
+    private val databaseReadyManager: DatabaseReadyManager
 ) : ViewModel() {
 
     // Prodotti generici per ProductListScreen
@@ -40,10 +43,18 @@ class ProductsViewModel(
     val isLoading: StateFlow<Boolean> = _isLoading
 
     init {
-        loadProducts()
-        loadPopularProducts()
-        loadNewProducts()
-        loadDiscountedProducts()
+        viewModelScope.launch {
+            // Attendi che il database sia pronto
+            databaseReadyManager.isDatabaseReady.collect { isReady ->
+                if (isReady) {
+                    loadProducts()
+                    loadPopularProducts()
+                    loadNewProducts()
+                    loadDiscountedProducts()
+                    this.cancel()
+                }
+            }
+        }
     }
 
     fun loadProducts() {

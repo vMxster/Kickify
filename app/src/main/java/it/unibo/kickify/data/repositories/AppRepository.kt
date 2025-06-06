@@ -2,6 +2,10 @@ package it.unibo.kickify.data.repositories
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import it.unibo.kickify.data.database.Address
 import it.unibo.kickify.data.database.Cart
 import it.unibo.kickify.data.database.CartWithProductInfo
@@ -18,9 +22,11 @@ import it.unibo.kickify.data.database.ProductDetails
 import it.unibo.kickify.data.database.Review
 import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.data.database.User
+import it.unibo.kickify.data.database.UserOAuth
 import it.unibo.kickify.data.repositories.local.CartRepository
 import it.unibo.kickify.data.repositories.local.ImageRepository
 import it.unibo.kickify.data.repositories.local.NotificationRepository
+import it.unibo.kickify.data.repositories.local.OAuthUserRepository
 import it.unibo.kickify.data.repositories.local.OrderRepository
 import it.unibo.kickify.data.repositories.local.ProductCartRepository
 import it.unibo.kickify.data.repositories.local.ProductRepository
@@ -32,7 +38,10 @@ import it.unibo.kickify.utils.ImageStorageManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.Date
 
 class AppRepository(
     private val context: Context,
@@ -47,7 +56,8 @@ class AppRepository(
     private val imageRepository: ImageRepository,
     private val productCartRepository: ProductCartRepository,
     private val versionRepository: VersionRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val oAuthUserRepository: OAuthUserRepository
 ) {
     private val tag = "AppRepository"
 
@@ -563,6 +573,35 @@ class AppRepository(
                         Log.e(tag, "Errore nel recupero del profilo utente dopo la registrazione", e)
                     }
             }
+    }
+
+    suspend fun loginWithGoogle(
+        email: String, name: String,
+        surname: String, idToken: String): Result<User> = withContext(Dispatchers.IO) {
+        try {
+            val remoteResult =
+                remoteRepository.loginWithGoogle(email, name, surname, idToken)
+            if (remoteResult.isSuccess) {
+                val user = remoteResult.getOrNull()
+                user?.let {
+                    userRepository.registerUser(it)
+                    oAuthUserRepository.insertUserOAuth(
+                        UserOAuth(
+                            email = it.email,
+                            provider = "Google",
+                            providerUserId = idToken,
+                            dataLink = LocalDate.now().toString(),
+                        )
+                    )
+                }
+                remoteResult
+            } else {
+                remoteResult
+            }
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in loginWithGoogle", e)
+            Result.failure(e)
+        }
     }
 
     suspend fun changePassword(email: String, password: String): Result<Boolean> {

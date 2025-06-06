@@ -145,22 +145,7 @@ fun LoginScreen(
 
                 // Continua solo se abbiamo ottenuto un token
                 if (idToken != null) {
-                    val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
-                    Firebase.auth.signInWithCredential(firebaseCredential)
-                        .addOnCompleteListener { authTask ->
-                            if (authTask.isSuccessful) {
-                                val user = Firebase.auth.currentUser
-                                if (user != null) {
-                                    email = user.email ?: ""
-                                    password = ""
-                                    loginViewModel.login(email, password)
-                                } else {
-                                    Toast.makeText(ctx, "Nessun utente trovato", Toast.LENGTH_SHORT).show()
-                                }
-                            } else {
-                                Toast.makeText(ctx, "Login fallito", Toast.LENGTH_SHORT).show()
-                            }
-                        }
+                    loginViewModel.loginWithGoogle(idToken)
                 } else {
                     Toast.makeText(ctx, "Token non disponibile", Toast.LENGTH_SHORT).show()
                 }

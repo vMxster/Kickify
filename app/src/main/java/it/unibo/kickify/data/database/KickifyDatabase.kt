@@ -34,7 +34,8 @@ import java.util.Locale
         Wishlist::class,
         DiscountUser::class,
         WishlistProduct::class,
-        Image::class
+        Image::class,
+        UserOAuth::class
     ],
     version = 2)
 abstract class KickifyDatabase : RoomDatabase() {
@@ -50,6 +51,7 @@ abstract class KickifyDatabase : RoomDatabase() {
     abstract fun versionDao(): VersionDao
     abstract fun notificationStateDao(): NotificationStateDao
     abstract fun productStateDao(): ProductStateDao
+    abstract fun oauthDao(): UserOAuthDao
 
     companion object {
         @Volatile

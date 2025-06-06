@@ -977,6 +977,94 @@ class DatabaseHelper {
         return false;
     }
 
+    // User login with Google
+    public function loginWithGoogle($email, $firstName, $lastName, $googleId) {
+        try {
+            $this->db->begin_transaction();
+            
+            // Check if user exists
+            $isRegistered = $this->isUserRegistered($email);
+            
+            if (!$isRegistered) {
+                // User does not exist, register first
+                // Generate a random password since it won't be used (auth is via Google)
+                $randomPassword = bin2hex(random_bytes(8));
+                // Set newsletter preference to No by default
+                $newsletter = 'N';
+                
+                // Register the user
+                $userQuery = "INSERT INTO UTENTE (Email, Nome, Cognome, Password, Data_Registrazione, Preferenze_Newsletter, Ruolo) 
+                            VALUES (?, ?, ?, ?, NOW(), ?, 'Customer')";
+                $userStmt = $this->db->prepare($userQuery);
+                $hashedPassword = password_hash($randomPassword, PASSWORD_DEFAULT);
+                $userStmt->bind_param("sssss", $email, $firstName, $lastName, $hashedPassword, $newsletter);
+                $userStmt->execute();
+
+                // Inserisci nella tabella UTENTE_OAUTH
+                $oauthQuery = "INSERT INTO UTENTE_OAUTH (Provider, Provider_UserID, Data_Link, Email) 
+                            VALUES ('Google', ?, NOW(), ?)";
+                $oauthStmt = $this->db->prepare($oauthQuery);
+                $oauthStmt->bind_param("ss", $googleId, $email);
+                $oauthStmt->execute();
+
+                // Create cart for new user
+                $cartQuery = "INSERT INTO CARRELLO (Email, Data_Modifica, Valore_Totale) 
+                            VALUES (?, NOW(), 0)";
+                $cartStmt = $this->db->prepare($cartQuery);
+                $cartStmt->bind_param("s", $email);
+                $cartStmt->execute();
+
+                // Create wishlist for new user
+                $wishlistQuery = "INSERT INTO WISHLIST (Email, Data_Modifica) VALUES (?, NOW())";
+                $wishlistStmt = $this->db->prepare($wishlistQuery);
+                $wishlistStmt->bind_param("s", $email);
+                $wishlistStmt->execute();
+            } else {
+                // Verifica se esiste già un record OAuth per questo utente
+                $checkOauthQuery = "SELECT 1 FROM UTENTE_OAUTH WHERE Email = ? AND Provider = 'Google'";
+                $checkOauthStmt = $this->db->prepare($checkOauthQuery);
+                $checkOauthStmt->bind_param("s", $email);
+                $checkOauthStmt->execute();
+                $oauthExists = $checkOauthStmt->get_result()->num_rows > 0;
+                
+                if ($oauthExists) {
+                    // Aggiorna il Provider_UserID se necessario
+                    $updateOauthQuery = "UPDATE UTENTE_OAUTH SET Provider_UserID = ? WHERE Email = ? AND Provider = 'Google'";
+                    $updateOauthStmt = $this->db->prepare($updateOauthQuery);
+                    $updateOauthStmt->bind_param("ss", $googleId, $email);
+                    $updateOauthStmt->execute();
+                } else {
+                    // Inserisci nuovo record OAuth
+                    $insertOauthQuery = "INSERT INTO UTENTE_OAUTH (Provider, Provider_UserID, Data_Link, Email) 
+                                    VALUES ('Google', ?, NOW(), ?)";
+                    $insertOauthStmt = $this->db->prepare($insertOauthQuery);
+                    $insertOauthStmt->bind_param("ss", $googleId, $email);
+                    $insertOauthStmt->execute();
+                }
+            }
+            
+            // Get user data for session
+            $query = "SELECT * FROM UTENTE WHERE Email = ?";
+            $stmt = $this->db->prepare($query);
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            $this->db->commit();
+            
+            if ($result->num_rows === 1) {
+                return $result->fetch_assoc();
+            }
+            
+            return false;
+            
+        } catch (Exception $e) {
+            $this->db->rollback();
+            error_log("Error in loginWithGoogle: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
     // Change password
     public function changePassword($email, $password) {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
