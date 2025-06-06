@@ -1016,11 +1016,11 @@ class DatabaseHelper {
         return $result->fetch_all(MYSQLI_ASSOC);
     }
     
-    // Update user address
-    public function updateUserAddress($email, $via, $civico, $cap, $citta, $provincia, $nazione, $predefinito){
-        $query = "UPDATE INDIRIZZO SET Via= ?, NumeroCivico= ?, CAP= ?, Citta= ?, Provincia= ?, Nazione= ?, Predefinito = ? WHERE Email = ?";
+    // Add new user address
+    public function addUserAddress($email, $via, $civico, $cap, $citta, $provincia, $nazione, $predefinito){
+        $query = "INSERT INTO INDIRIZZO (Email, Via, NumeroCivico, CAP, Citta, Provincia, Nazione, Predefinito) VALUES (?,?,?,?,?,?,?,?)";
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param("siisssss", $via, $civico, $cap, $citta, $provincia, $nazione, $predefinito, $email);
+        $stmt->bind_param("ssiisssi", $via, $civico, $cap, $citta, $provincia, $nazione, $predefinito, $email);
         return $stmt->execute();
     }
     
