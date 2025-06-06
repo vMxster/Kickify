@@ -1020,7 +1020,7 @@ class DatabaseHelper {
     public function addUserAddress($email, $via, $civico, $cap, $citta, $provincia, $nazione, $predefinito){
         $query = "INSERT INTO INDIRIZZO (Email, Via, NumeroCivico, CAP, Citta, Provincia, Nazione, Predefinito) VALUES (?,?,?,?,?,?,?,?)";
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param("ssiisssi", $via, $civico, $cap, $citta, $provincia, $nazione, $predefinito, $email);
+        $stmt->bind_param("ssiisssi", $email, $via, $civico, $cap, $citta, $provincia, $nazione, $predefinito);
         return $stmt->execute();
     }
     
