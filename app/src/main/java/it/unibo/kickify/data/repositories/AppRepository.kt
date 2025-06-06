@@ -9,14 +9,12 @@ import it.unibo.kickify.data.database.CompleteProduct
 import it.unibo.kickify.data.database.HistoryProduct
 import it.unibo.kickify.data.database.Image
 import it.unibo.kickify.data.database.Notification
-import it.unibo.kickify.data.database.NotificationState
 import it.unibo.kickify.data.database.Order
 import it.unibo.kickify.data.database.OrderDetailedTracking
 import it.unibo.kickify.data.database.OrderProduct
 import it.unibo.kickify.data.database.OrderProductDetails
 import it.unibo.kickify.data.database.Product
 import it.unibo.kickify.data.database.ProductDetails
-import it.unibo.kickify.data.database.ProductState
 import it.unibo.kickify.data.database.Review
 import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.data.database.User
@@ -597,11 +595,11 @@ class AppRepository(
         return remoteRepository.getUserAddress(email)
     }
 
-    suspend fun updateUserAddress(
+    suspend fun addUserAddress(
         email: String, street: String, number: String, cap: String,
         city: String, province: String, nation: String, default: Boolean
     ): Result<Boolean> {
-        return remoteRepository.updateUserAddress(email, street, number, cap, city, province, nation, default)
+        return remoteRepository.addUserAddress(email, street, number, cap, city, province, nation, default)
     }
 
     suspend fun deleteUserAddress(

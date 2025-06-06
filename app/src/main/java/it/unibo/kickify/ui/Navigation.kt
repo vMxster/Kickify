@@ -8,7 +8,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -17,7 +16,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import it.unibo.kickify.camerax.CameraXUtils
-import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.ui.screens.achievements.AchievementsScreen
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.cart.CartScreen
@@ -38,16 +36,15 @@ import it.unibo.kickify.ui.screens.orders.OrderDetailsScreen
 import it.unibo.kickify.ui.screens.productDetails.ProductDetailsScreen
 import it.unibo.kickify.ui.screens.productList.ProductListScreen
 import it.unibo.kickify.ui.screens.productList.ProductsViewModel
+import it.unibo.kickify.ui.screens.profile.EditProfileScreen
+import it.unibo.kickify.ui.screens.profile.EditProfileSections
 import it.unibo.kickify.ui.screens.profile.ProfileScreen
 import it.unibo.kickify.ui.screens.profile.TakePhotoScreen
 import it.unibo.kickify.ui.screens.register.RegisterScreen
-import it.unibo.kickify.ui.screens.settings.EditProfileScreen
-import it.unibo.kickify.ui.screens.settings.EditProfileSections
 import it.unibo.kickify.ui.screens.settings.SettingsScreen
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.screens.wishlist.WishlistScreen
 import it.unibo.kickify.ui.screens.wishlist.WishlistViewModel
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -92,7 +89,6 @@ fun KickifyNavGraph(
     settingsViewModel: SettingsViewModel
 ) {
     val cameraXUtils =  koinInject<CameraXUtils>()
-    val appRepository = koinInject<AppRepository>()
 
     val wishlistViewModel = koinViewModel<WishlistViewModel>()
     val productsViewModel = koinViewModel<ProductsViewModel>()

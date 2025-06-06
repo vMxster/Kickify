@@ -1,4 +1,4 @@
-package it.unibo.kickify.ui.screens.settings
+package it.unibo.kickify.ui.screens.profile
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -66,17 +66,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.camerax.CameraXUtils
-import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ScreenTemplate
-import it.unibo.kickify.ui.screens.profile.UserProfileIcon
+import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.theme.BluePrimary
 import it.unibo.kickify.ui.theme.GhostWhite
 import it.unibo.kickify.ui.theme.LightGray
 import it.unibo.kickify.utils.LoginRegisterUtils
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
+import org.koin.androidx.compose.koinViewModel
 
 enum class EditProfileSections {
     USER_INFO, ADDRESS, PAYMENT_METHOD
@@ -89,9 +89,62 @@ fun EditProfileScreen(
     cameraXUtils: CameraXUtils,
     settingsViewModel: SettingsViewModel
 ) {
+    val ctx = LocalContext.current
+
     val snackBarHostState = remember { SnackbarHostState() }
-    val isLoading by settingsViewModel.isLoading.collectAsStateWithLifecycle()
-    val appRepo = koinInject<AppRepository>()
+    val isLoadingSettings by settingsViewModel.isLoading.collectAsStateWithLifecycle()
+    val errorMessageSettings by settingsViewModel.errorMessage.collectAsStateWithLifecycle()
+    val userEmail by settingsViewModel.userId.collectAsStateWithLifecycle()
+
+    val profileViewModel = koinViewModel<ProfileViewModel>()
+    val isLoadingProfile by profileViewModel.isLoading.collectAsStateWithLifecycle()
+    val errorMessageProfile by profileViewModel.errorMessage.collectAsStateWithLifecycle()
+    val addressModified by profileViewModel.addressListModified.collectAsStateWithLifecycle()
+    val modifiedPassword by profileViewModel.passwordModified.collectAsStateWithLifecycle()
+
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(modifiedPassword) {
+        if(modifiedPassword && errorMessageProfile == null){
+            snackBarHostState.showSnackbar(
+                message = ctx.getString(R.string.changedPasswordSuccessfully),
+                duration = SnackbarDuration.Long
+            )
+        }
+        if(modifiedPassword && errorMessageProfile != null){
+            snackBarHostState.showSnackbar(
+                message = ctx.getString(R.string.changePasswordError),
+                duration = SnackbarDuration.Long
+            )
+        }
+        profileViewModel.resetChangedPassword()
+        profileViewModel.dismissError()
+    }
+
+    LaunchedEffect(addressModified) {
+        if(addressModified){
+            profileViewModel.resetModifiedAddress()
+            navController.popBackStack()
+        }
+    }
+
+    LaunchedEffect(errorMessageProfile) {
+        errorMessageProfile?.let {
+            snackBarHostState.showSnackbar(
+                message = it,
+                duration = SnackbarDuration.Long
+            )
+        }
+    }
+
+    LaunchedEffect(errorMessageSettings) {
+        errorMessageSettings?.let {
+            snackBarHostState.showSnackbar(
+                message = it,
+                duration = SnackbarDuration.Long
+            )
+        }
+    }
 
     ScreenTemplate(
         screenTitle = when(section) {
@@ -104,7 +157,7 @@ fun EditProfileScreen(
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true,
         snackBarHostState = snackBarHostState,
-        showLoadingOverlay = isLoading
+        showLoadingOverlay = isLoadingSettings || isLoadingProfile
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -115,11 +168,11 @@ fun EditProfileScreen(
             when(section){
                 EditProfileSections.USER_INFO -> {
                     ProfileImageWithChangeButton(navController, cameraXUtils, settingsViewModel, snackBarHostState)
-                    ProfileInfoChangePassword(settingsViewModel, snackBarHostState, appRepo)
+                    ProfileInfoChangePassword(settingsViewModel, profileViewModel)
                 }
 
                 EditProfileSections.ADDRESS -> {
-                    EditAddressSection(appRepo)
+                    EditAddressSection(snackBarHostState, profileViewModel, userEmail, coroutineScope)
                 }
 
                 EditProfileSections.PAYMENT_METHOD -> {
@@ -131,7 +184,12 @@ fun EditProfileScreen(
 }
 
 @Composable
-fun EditAddressSection(appRepo: AppRepository){
+fun EditAddressSection(
+    snackBarHostState: SnackbarHostState,
+    profileViewModel: ProfileViewModel,
+    userEmail: String,
+    coroutineScope: CoroutineScope
+){
     Column(
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
             .padding(horizontal = 10.dp),
@@ -281,14 +339,30 @@ fun EditAddressSection(appRepo: AppRepository){
             verticalAlignment = Alignment.CenterVertically
         ){
             Text(stringResource(R.string.setDefaultAddress))
-            Switch(checked = false,
+            Switch(checked = defaultAddress,
                 onCheckedChange = { defaultAddress = it }
             )
         }
         Spacer(modifier = Modifier.height(12.dp))
 
         Button(
-            onClick = {},
+            onClick = {
+                val areFieldsOk = listOf(streetName, number, cap, city, province, nation)
+                    .all { it.isNotBlank() }
+                if(areFieldsOk){
+                    profileViewModel.addUserAddress(
+                        userEmail, streetName, number, cap, city,
+                        province, nation, defaultAddress
+                    )
+                } else {
+                    coroutineScope.launch {
+                        snackBarHostState.showSnackbar(
+                            message = "Fill in all fields",
+                            duration = SnackbarDuration.Long
+                        )
+                    }
+                }
+            },
             modifier = profileScreenModifier
         ){
             Text(stringResource(R.string.addNewAddress))
@@ -435,8 +509,7 @@ fun ProfileImageWithChangeButton(
 @Composable
 fun ProfileInfoChangePassword(
     settingsViewModel: SettingsViewModel,
-    snackbarHostState: SnackbarHostState,
-    appRepo: AppRepository
+    profileViewModel: ProfileViewModel
 ){
     val coroutineScope = rememberCoroutineScope()
     val ctx = LocalContext.current
@@ -578,21 +651,10 @@ fun ProfileInfoChangePassword(
                 coroutineScope.launch {
                     if(password == confirmPassword
                         && LoginRegisterUtils.isValidPassword(password)){
-                        val res = appRepo.changePassword(
+                        profileViewModel.changePassword(
                             email = userid,
                             password = password
                         )
-                        if(res.isSuccess){
-                            snackbarHostState.showSnackbar(
-                                message = ctx.getString(R.string.changedPasswordSuccessfully),
-                                duration = SnackbarDuration.Long
-                            )
-                        } else {
-                            snackbarHostState.showSnackbar(
-                                message = ctx.getString(R.string.changePasswordError),
-                                duration = SnackbarDuration.Long
-                            )
-                        }
                         password = ""
                         passwordVisibility = false
                         confirmPassword = ""

@@ -22,14 +22,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,50 +41,46 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import it.unibo.kickify.R
-import it.unibo.kickify.data.database.Address
-import it.unibo.kickify.data.database.User
 import it.unibo.kickify.data.models.Language
-import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.PaymentMethodRow
 import it.unibo.kickify.ui.composables.ScreenTemplate
-import it.unibo.kickify.ui.screens.settings.AddressContainer
-import it.unibo.kickify.ui.screens.settings.EditProfileSections
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ProfileScreen(
     navController: NavController,
     settingsViewModel: SettingsViewModel
 ){
+    val snackBarHostState = remember { SnackbarHostState() }
+
     val appLang by settingsViewModel.appLanguage.collectAsStateWithLifecycle()
     val userEmail by settingsViewModel.userId.collectAsStateWithLifecycle()
     val username by settingsViewModel.userName.collectAsStateWithLifecycle()
     val userImg by settingsViewModel.userImg.collectAsStateWithLifecycle()
 
-    val appRepo = koinInject<AppRepository>()
-    val user = remember { mutableStateOf<User?>(null) }
-    val addrList = remember { mutableStateListOf<Address>() }
-    val coroutineScope = rememberCoroutineScope()
+    val profileViewModel = koinViewModel<ProfileViewModel>()
+
+    val user by profileViewModel.user.collectAsStateWithLifecycle()
+    val addrList by profileViewModel.addressList.collectAsStateWithLifecycle()
+    val errorMessage by profileViewModel.errorMessage.collectAsStateWithLifecycle()
+    val isLoading by profileViewModel.isLoading.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         delay(500)
-        val result = appRepo.getUserAddress(userEmail)
-        result.onSuccess { list ->
-            addrList.clear()
-            addrList.addAll(list)
-            println("address success: $list")
-        }.onFailure { e ->
-            print("failure get user addr: $e")
-        }
-        val res = appRepo.getUserProfile(userEmail)
-        res.onSuccess { u ->
-            user.value = u
-        }.onFailure {
+        profileViewModel.getUserAddress(userEmail)
+        profileViewModel.getProfile(userEmail)
+    }
+
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            snackBarHostState.showSnackbar(
+                message = it,
+                duration = SnackbarDuration.Long
+            )
         }
     }
 
@@ -94,7 +89,8 @@ fun ProfileScreen(
         navController = navController,
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
-        showModalDrawer = true
+        showModalDrawer = true,
+        showLoadingOverlay = isLoading
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -119,13 +115,13 @@ fun ProfileScreen(
                 )
 
                 Text(
-                    text = if(user.value == null) username else "${user.value?.name} ${user.value?.surname}",
+                    text = if(user == null) username else "${user?.name} ${user?.surname}",
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
                         .padding(vertical = 4.dp).padding(start = 10.dp),
                     style = MaterialTheme.typography.titleMedium
                 )
-                TextInformationRow(if(user.value == null) userEmail else "${user.value?.email}")
-                TextInformationRow("${stringResource(R.string.phone)}:", user.value?.phone ?: "-")
+                TextInformationRow(if(user == null) userEmail else "${user?.email}")
+                TextInformationRow("${stringResource(R.string.phone)}:", user?.phone ?: "-")
                 TextInformationRow("${stringResource(R.string.language)}:",
                     Language.getLanguageStringFromCode(appLang))
             }
@@ -157,16 +153,9 @@ fun ProfileScreen(
                         country = addr.nation,
                         defaultAddress = addr.default,
                         deleteAction = {
-                            coroutineScope.launch {
-                                val result = appRepo.deleteUserAddress(
-                                    userEmail, addr.street, addr.civic, addr.cap, addr.city
-                                )
-                                result.onSuccess {
-                                    println("address deleted successfully: $it")
-                                }.onFailure {
-                                    println("error deleting address: $it")
-                                }
-                            }
+                            profileViewModel.deleteUserAddress(
+                                userEmail, addr.street, addr.civic, addr.cap, addr.city
+                            )
                         }
                     )
                 }

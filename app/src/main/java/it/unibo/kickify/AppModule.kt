@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.room.Room
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -32,6 +31,7 @@ import it.unibo.kickify.ui.screens.forgotPassword.ForgotPasswordOTPViewModel
 import it.unibo.kickify.ui.screens.login.LoginViewModel
 import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
 import it.unibo.kickify.ui.screens.productList.ProductsViewModel
+import it.unibo.kickify.ui.screens.profile.ProfileViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.screens.wishlist.WishlistViewModel
 import kotlinx.serialization.json.Json
@@ -96,4 +96,5 @@ val appModule = module {
     viewModel { WishlistViewModel(get()) }
     viewModel { NotificationViewModel(get()) }
     viewModel { ForgotPasswordOTPViewModel(get()) }
+    viewModel { ProfileViewModel(get()) }
 }

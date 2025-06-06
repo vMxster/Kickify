@@ -636,14 +636,14 @@ class RemoteRepository(
         }
     }
 
-    suspend fun updateUserAddress(
+    suspend fun addUserAddress(
         email: String, street: String, number: String,
         cap: String, city: String, province: String,
         nation: String, default: Boolean
     ): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
             val params = mapOf(
-                "action" to "updateUserAddress",
+                "action" to "addUserAddress",
                 "email" to email,
                 "via" to street,
                 "civico" to number,
@@ -661,7 +661,7 @@ class RemoteRepository(
             val success = RemoteResponseParser.parseSuccess(jsonObject)
             Result.success(success)
         } catch (e: Exception) {
-            Log.e(tag, "Errore durante aggiornamento di indirizzo", e)
+            Log.e(tag, "Errore durante aggiunta di indirizzo", e)
             Result.failure(e)
         }
     }
@@ -672,7 +672,7 @@ class RemoteRepository(
     ): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
             val params = mapOf(
-                "action" to "updateUserAddress",
+                "action" to "removeUserAddress",
                 "email" to email,
                 "via" to street,
                 "civico" to number,
