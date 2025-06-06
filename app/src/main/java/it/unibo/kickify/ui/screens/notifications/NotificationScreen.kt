@@ -30,7 +30,6 @@ import it.unibo.kickify.ui.composables.NotificationTitleLine
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.theme.BluePrimary
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -51,8 +50,7 @@ fun NotificationScreen(
 
     val notificationList = remember { mutableListOf<Notification>() }
 
-    LaunchedEffect(notificationState) {
-        delay(500)
+    LaunchedEffect(notificationState, email) {
         notificationViewModel.getNotifications(email)
     }
 

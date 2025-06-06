@@ -47,7 +47,6 @@ import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.PaymentMethodRow
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
-import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -69,8 +68,7 @@ fun ProfileScreen(
     val errorMessage by profileViewModel.errorMessage.collectAsStateWithLifecycle()
     val isLoading by profileViewModel.isLoading.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        delay(500)
+    LaunchedEffect(userEmail) {
         profileViewModel.getUserAddress(userEmail)
         profileViewModel.getProfile(userEmail)
     }

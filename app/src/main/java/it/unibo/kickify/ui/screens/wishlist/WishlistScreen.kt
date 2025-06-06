@@ -22,7 +22,6 @@ import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ProductCardWishlistPage
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
-import kotlinx.coroutines.delay
 
 @Composable
 fun WishlistScreen(
@@ -36,8 +35,7 @@ fun WishlistScreen(
 
     val email by settingsViewModel.userId.collectAsStateWithLifecycle()
 
-    LaunchedEffect(wishlistState) {
-        delay(500)
+    LaunchedEffect(wishlistState, email) {
         wishlistViewModel.fetchWishlist(email)
     }
 
