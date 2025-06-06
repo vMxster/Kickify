@@ -86,7 +86,7 @@ try {
                 }
                 break;
             
-            case "updateUserAddress":
+            case "addUserAddress":
                 $email = $_POST["email"];
                 $via = $_POST["via"];
                 $civico = $_POST["civico"];
@@ -95,13 +95,13 @@ try {
                 $provincia = $_POST["provincia"];
                 $nazione = $_POST["nazione"];
                 $predefinito = $_POST["predefinito"];
-                if ($dbh->updateUserAddress($email, $via, $civico, $cap, $citta, $provincia, $nazione, $predefinito)) {
+                if ($dbh->addUserAddress($email, $via, $civico, $cap, $citta, $provincia, $nazione, $predefinito)) {
                     $response = [
                         "success" => true,
-                        "message" => "Indirizzo aggiornato"
+                        "message" => "Indirizzo aggiunto"
                     ];
                 } else {
-                    throw new Exception("Indirizzo non aggiornato");
+                    throw new Exception("Indirizzo non aggiunto");
                 }
 
                 break;
