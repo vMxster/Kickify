@@ -24,10 +24,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import it.unibo.kickify.R
-import it.unibo.kickify.data.models.PaymentMethod
-import it.unibo.kickify.ui.KickifyRoute
+import it.unibo.kickify.data.models.PaymentMethods
 
 @Composable
 fun OrdersTitleLine(title: String){
@@ -58,18 +56,16 @@ fun OrderIDCenterTitle(orderID:String){
 
 @Composable
 fun OrderCardContainer(
-    navController: NavController,
     orderID: String,
     orderDate: String,
-    paymentMethod: PaymentMethod,
+    paymentMethod: PaymentMethods,
     totalPrice: Float,
+    actionDetailsButton: () -> Unit,
     items: @Composable () -> Unit
 ){
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp)
-            .padding(horizontal = 12.dp),
+        modifier = Modifier.fillMaxWidth()
+            .padding(vertical = 6.dp, horizontal = 12.dp),
         shape = RoundedCornerShape(12.dp),
     ) {
         Column(
@@ -82,9 +78,7 @@ fun OrderCardContainer(
             OrderPaymentInfo(paymentMethod, totalPrice)
 
             TextButton(
-                onClick = {
-                    navController.navigate(KickifyRoute.OrderDetails(orderID))
-                }
+                onClick = { actionDetailsButton() }
             ) {
                 Text(text = stringResource(R.string.trackOrder))
             }
@@ -93,7 +87,7 @@ fun OrderCardContainer(
 }
 
 @Composable
-fun OrderPaymentInfo(paymentMethod: PaymentMethod, totalPrice: Float) {
+fun OrderPaymentInfo(paymentMethod: PaymentMethods, totalPrice: Float) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,

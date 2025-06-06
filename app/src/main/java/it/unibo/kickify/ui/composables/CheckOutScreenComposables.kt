@@ -37,12 +37,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.ktor.client.HttpClient
 import it.unibo.kickify.R
-import it.unibo.kickify.data.models.PaymentMethod
-import it.unibo.kickify.data.models.PaymentMethod.AMEX
-import it.unibo.kickify.data.models.PaymentMethod.MAESTRO
-import it.unibo.kickify.data.models.PaymentMethod.MASTERCARD
-import it.unibo.kickify.data.models.PaymentMethod.PAYPAL
-import it.unibo.kickify.data.models.PaymentMethod.VISA
+import it.unibo.kickify.data.models.PaymentMethods
+import it.unibo.kickify.data.models.PaymentMethods.AMEX
+import it.unibo.kickify.data.models.PaymentMethods.MAESTRO
+import it.unibo.kickify.data.models.PaymentMethods.MASTERCARD
+import it.unibo.kickify.data.models.PaymentMethods.PAYPAL
+import it.unibo.kickify.data.models.PaymentMethods.VISA
 import it.unibo.kickify.data.remote.OSMDataSource
 import it.unibo.kickify.utils.Coordinates
 import kotlinx.coroutines.launch
@@ -217,7 +217,7 @@ fun AddressOnMapBox(
 
 @Composable
 fun paymentMethodIcon(paymentMethod: String) : ImageVector {
-    val method = PaymentMethod.getFromString(paymentMethod)
+    val method = PaymentMethods.getFromString(paymentMethod)
     return if (method != null) {
         when (method) {
             AMEX -> ImageVector.vectorResource(R.drawable.amex)
@@ -252,7 +252,7 @@ fun PaymentMethodRow(
             modifier = Modifier.fillMaxWidth(fraction = 0.9f).padding(end = 8.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            if(PaymentMethod.getFromString(paymentMethod) == PAYPAL){
+            if(PaymentMethods.getFromString(paymentMethod) == PAYPAL){
                 Text(paymentMethod)
                 Text(emailAddress)
             } else {

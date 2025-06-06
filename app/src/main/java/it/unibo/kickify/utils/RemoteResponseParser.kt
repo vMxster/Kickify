@@ -192,11 +192,11 @@ class RemoteResponseParser {
                     Order(
                         orderId = orderJson.getInt("ID_Ordine"),
                         email = orderJson.getString("Email"),
-                        shippingType = orderJson.getString("Tipo"),
+                        shippingType = orderJson.getString("Tipo_Spedizione"),
                         orderDate = orderJson.getString("Data_Ordine"),
                         totalCost = orderJson.getDouble("Costo_Totale"),
                         paymentMethod = orderJson.getString("Metodo_Pagamento"),
-                        isPresent = orderJson.getBoolean("Regalo"),
+                        isPresent = orderJson.getInt("Regalo") == 1,
                         discountId = orderJson.optInt("ID_Sconto", 0),
                         nomeDestinatario = orderJson.optString("Nome_Destinatario", ""),
                         cognomeDestinatario = orderJson.optString("Cognome_Destinatario", ""),

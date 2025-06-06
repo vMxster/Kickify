@@ -33,6 +33,7 @@ import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
 import it.unibo.kickify.ui.screens.onboard.OnboardingScreen
 import it.unibo.kickify.ui.screens.orders.MyOrdersScreen
 import it.unibo.kickify.ui.screens.orders.OrderDetailsScreen
+import it.unibo.kickify.ui.screens.orders.OrdersViewModel
 import it.unibo.kickify.ui.screens.productDetails.ProductDetailsScreen
 import it.unibo.kickify.ui.screens.productList.ProductListScreen
 import it.unibo.kickify.ui.screens.productList.ProductsViewModel
@@ -75,7 +76,7 @@ sealed interface KickifyRoute {
     @Serializable data object Settings : KickifyRoute
     @Serializable data object Wishlist : KickifyRoute
     @Serializable data object MyOrders : KickifyRoute
-    @Serializable data class OrderDetails(val orderID: String) : KickifyRoute
+    @Serializable data class OrderDetails(val orderID: Int) : KickifyRoute
     @Serializable data object TakeProfilePhoto : KickifyRoute
     @Serializable data object Achievements : KickifyRoute
     @Serializable data class EditProfile(val section: EditProfileSections): KickifyRoute
@@ -96,6 +97,7 @@ fun KickifyNavGraph(
     val loginViewModel = koinViewModel<LoginViewModel>()
     val notificationViewModel = koinViewModel<NotificationViewModel>()
     val forgotPasswordOTPViewModel = koinViewModel<ForgotPasswordOTPViewModel>()
+    val ordersViewModel = koinViewModel<OrdersViewModel>()
 
     val startDestination by settingsViewModel.startDestination.collectAsStateWithLifecycle()
 
@@ -203,12 +205,12 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.MyOrders> {
-            MyOrdersScreen(navController)
+            MyOrdersScreen(navController, settingsViewModel, ordersViewModel)
         }
 
         composable<KickifyRoute.OrderDetails> { backStackEntry ->
             val route = backStackEntry.toRoute<KickifyRoute.OrderDetails>()
-            OrderDetailsScreen(navController, route.orderID)
+            OrderDetailsScreen(navController, route.orderID.toString())
         }
 
         composable<KickifyRoute.TakeProfilePhoto> {

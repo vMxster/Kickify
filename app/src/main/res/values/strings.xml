@@ -153,6 +153,7 @@
     <string name="myordersScreen_paidWith">Paid with</string>
     <string name="myordersScreen_completedOrders">Completed Orders</string>
     <string name="orderPlaced">Order placed</string>
+    <string name="noOrdersFound">No orders found</string>
     <string name="inProgress">In progress</string>
     <string name="shipped">Shipped</string>
     <string name="delivered">Delivered</string>
