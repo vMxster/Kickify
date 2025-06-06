@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "897714702292",
+    "project_id": "kickify-97c4f49a",
+    "storage_bucket": "kickify-97c4f49a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:897714702292:android:9cb4edc20864ab27433841",
+        "android_client_info": {
+          "package_name": "it.unibo.kickify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "897714702292-ngm2eni5m4c06j32u3uu68ggifm10oj6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-igXnuktUPuX0S5lzXQDtJQMOnXN66Hg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "897714702292-ngm2eni5m4c06j32u3uu68ggifm10oj6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
