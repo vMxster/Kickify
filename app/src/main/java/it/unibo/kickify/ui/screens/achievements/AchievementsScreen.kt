@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -51,27 +50,22 @@ fun AchievementsScreen(
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true
     ) {
-        Card(
-            modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = 8.dp).padding(vertical = 8.dp)
+        LazyColumn(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
+            modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp).padding(vertical = 8.dp)
         ) {
-            LazyColumn(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                item {
-                    Text(
-                        text = stringResource(R.string.allAchievements),
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.fillMaxWidth().padding(10.dp)
-                    )
-                }
-                items(achievements) { achievement ->
-                    // hide secret achievements not yet achieved
-                    if(!achievement.secretAchievement || achievement.achieved) {
-                        AchievementRow(achievement = achievement)
-                    }
+            item {
+                Text(
+                    text = stringResource(R.string.allAchievements),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.fillMaxWidth().padding(10.dp)
+                )
+            }
+            items(achievements) { achievement ->
+                // hide secret achievements not yet achieved
+                if(!achievement.secretAchievement || achievement.achieved) {
+                    AchievementRow(achievement = achievement)
                 }
             }
         }
