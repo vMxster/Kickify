@@ -4,8 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -65,8 +63,7 @@ fun FilterScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .padding(horizontal = 12.dp)
-                .padding(vertical = 8.dp)
+                .padding(horizontal = 12.dp, vertical = 8.dp)
                 .verticalScroll(rememberScrollState())
         ){
             FilterTitleRow(onResetFilter = onResetFilter)
@@ -89,17 +86,14 @@ fun FilterScreen(
             Spacer(Modifier.height(8.dp))
 
             FilterGroupTitle(stringResource(R.string.brand))
-            BrandsGroup(listOf("Adidas", "Asics", "Converse", "Crocs", "Diadora", "Fila",
-                "Havaianas", "Hoka", "Kappa", "Lacoste", "New Balance", "Nike", "On",
-                "Puma", "Reebok", "Salomon", "Saucony", "Sergio Tacchini", "Ugg",
-                "Under Armour", "Vans")
-            )
+            BrandsGroup(listOf("Adidas", "Nike", "Puma"))
             Spacer(Modifier.height(8.dp))
 
             FilterGroupTitle(stringResource(R.string.color))
+            val purple = Color(0xFF800080)
             ColorGroup(
-                listOf(Color.White, Color.Red, Color.Gray, Color.Blue,
-                    Color.Yellow, Color.Black, Color.Green, Color.DarkGray)
+                listOf(Color.Black, Color.Blue, Color.Green,
+                    purple, Color.Red, Color.White)
             )
             Spacer(Modifier.height(8.dp))
 
@@ -121,10 +115,8 @@ fun ApplyFilterButton(onClick: () -> Unit){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp)
-            .padding(vertical = 8.dp)
+        modifier = Modifier.fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 8.dp)
     ){
         Button(
             onClick = onClick,
@@ -137,10 +129,7 @@ fun ApplyFilterButton(onClick: () -> Unit){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PriceSlider(
-    minValue: Int,
-    maxValue: Int
-) {
+fun PriceSlider(minValue: Int, maxValue: Int) {
     val rangeSliderState =
         rememberRangeSliderState(
             activeRangeStart = minValue.toFloat(),
@@ -189,9 +178,7 @@ fun FilterTitleRow(onResetFilter: () -> Unit){
         TextButton(
             onClick = { onResetFilter() }
         ) {
-            Text(
-                text = stringResource(R.string.filterBottomSheet_reset)
-            )
+            Text(text = stringResource(R.string.filterBottomSheet_reset))
         }
     }
 }
@@ -238,10 +225,8 @@ fun FilterGroupTitle(title: String){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 11.dp)
-            .padding(horizontal = 8.dp)
+        modifier = Modifier.fillMaxWidth()
+            .padding(vertical = 11.dp, horizontal = 8.dp)
     ) {
         Text(
             text = title,
@@ -251,13 +236,11 @@ fun FilterGroupTitle(title: String){
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun BrandsGroup(brandsList: List<String>){
-    FlowRow(
-        verticalArrangement = Arrangement.Center,
-        horizontalArrangement = Arrangement.Start,
-        maxItemsInEachRow = 4,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
     ) {
         brandsList.forEach {
@@ -282,10 +265,7 @@ fun GenderGroup(){
 }
 
 @Composable
-fun ColorGroup(
-    colorList: List<Color>
-){
-
+fun ColorGroup(colorList: List<Color>){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -300,15 +280,12 @@ fun ColorGroup(
 }
 
 @Composable
-fun SizeGroup(
-    sizeList: List<Int>
-){
-    val scrollState = rememberScrollState()
+fun SizeGroup(sizeList: List<Int>){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
-            .horizontalScroll(scrollState)
+            .horizontalScroll(rememberScrollState())
     ) {
         for (size in sizeList){
             SingleSizeButton(size.toString())

@@ -90,7 +90,7 @@ fun HomeScreen(
             item(span = { GridItemSpan(2) }) {
                 val categ = stringResource(R.string.homescreen_popular)
                 HomeScreenShoesSectionHeader(
-                    sectionTitle = stringResource(R.string.homescreen_popular),
+                    sectionTitle = categ,
                     onClickButtonAction = {
                         navController.navigate(KickifyRoute.ProductListWithCategory(categ))
                     }
@@ -116,7 +116,7 @@ fun HomeScreen(
             item(span = { GridItemSpan(2) }) {
                 val categ = stringResource(R.string.homescreen_novelties)
                 HomeScreenShoesSectionHeader(
-                    sectionTitle = stringResource(R.string.homescreen_novelties),
+                    sectionTitle = categ,
                     onClickButtonAction = {
                         navController.navigate(KickifyRoute.ProductListWithCategory(categ))
                     }
@@ -138,12 +138,12 @@ fun HomeScreen(
 
             var discounted : List<Product> = listOf()
             discountedProducts.onSuccess { discounted = it }
-                .onFailure { println("popular prod error ${it.message}") }
+                .onFailure { println("discount prod error ${it.message}") }
 
             item(span = { GridItemSpan(2) }) {
                 val categ = stringResource(R.string.homescreen_discounted)
                 HomeScreenShoesSectionHeader(
-                    sectionTitle = stringResource(R.string.homescreen_discounted),
+                    sectionTitle = categ,
                     onClickButtonAction = {
                         navController.navigate(KickifyRoute.ProductListWithCategory(categ))
                     }
