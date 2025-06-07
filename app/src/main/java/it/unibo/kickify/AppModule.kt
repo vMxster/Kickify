@@ -28,6 +28,7 @@ import it.unibo.kickify.data.repositories.local.UserRepository
 import it.unibo.kickify.data.repositories.local.VersionRepository
 import it.unibo.kickify.data.repositories.local.WishlistRepository
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
+import it.unibo.kickify.ui.screens.cart.CartViewModel
 import it.unibo.kickify.ui.screens.forgotPassword.ForgotPasswordOTPViewModel
 import it.unibo.kickify.ui.screens.login.LoginViewModel
 import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
@@ -108,4 +109,5 @@ val appModule = module {
     viewModel { ForgotPasswordOTPViewModel(get()) }
     viewModel { ProfileViewModel(get()) }
     viewModel { OrdersViewModel(get()) }
+    viewModel { CartViewModel(get(), get()) }
 }

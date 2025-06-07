@@ -51,6 +51,7 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
+import it.unibo.kickify.ui.screens.cart.CartViewModel
 import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -71,6 +72,9 @@ fun ScreenTemplate(
 
     val notificationViewModel = koinViewModel<NotificationViewModel>()
     val unreadNotifications by notificationViewModel.unreadNotifications.collectAsStateWithLifecycle()
+
+    val cartViewModel = koinViewModel<CartViewModel>()
+    val cartItems by cartViewModel.cartItems.collectAsStateWithLifecycle()
 
     val scaffoldContent: @Composable () -> Unit = {
         Scaffold(
@@ -159,7 +163,7 @@ fun ScreenTemplate(
                             selected = isSelectedIcon(KickifyRoute.Cart),
                             onClick = { navController.navigate(KickifyRoute.Cart) },
                             icon = { Icon(Icons.Outlined.ShoppingBag, contentDescription = null) },
-                            badge = { SideMenuSimpleCounter(2) }
+                            badge = { SideMenuSimpleCounter(cartItems.size) }
                         )
                         NavigationDrawerItem(
                             label = { Text(stringResource(R.string.notificationscreen_title)) },

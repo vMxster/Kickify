@@ -14,22 +14,23 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
+import it.unibo.kickify.ui.screens.cart.CartViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun BottomBar(
-    navController: NavController,
+    navController: NavController
 ){
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.background,
@@ -66,13 +67,15 @@ fun BottomBar(
             label = { Text(stringResource(R.string.wishlist_title), textAlign = TextAlign.Center) }
         )
 
-        val cartItems by rememberSaveable { mutableIntStateOf(11) }
+        val cartViewModel = koinViewModel<CartViewModel>()
+        val cartItems by cartViewModel.cartItems.collectAsStateWithLifecycle()
+
         NavigationBarItem(
             selected = isSelectedIcon(KickifyRoute.Cart),
             icon = {
                 CustomBadge(
-                    badgeCount = cartItems,
-                    contentDescr = "$cartItems items in cart"
+                    badgeCount = cartItems.size,
+                    contentDescr = "${cartItems.size} items in cart"
                 ){
                     Icon(
                         Icons.Outlined.ShoppingBag,

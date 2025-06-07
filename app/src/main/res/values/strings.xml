@@ -95,6 +95,7 @@
     <string name="shipping">Shipping</string>
     <string name="totalCost">Total Cost</string>
     <string name="cart">Cart</string>
+    <string name="emptyCart">Your cart is empty.</string>
     <string name="cartscreen_title">My Cart</string>
     <string name="cartscreen_checkOutBtn">Checkout</string>
     <string name="cartscreen_paymentSuccessful">Your Payment Is Successful</string>

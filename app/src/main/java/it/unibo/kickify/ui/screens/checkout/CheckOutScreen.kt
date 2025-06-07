@@ -71,9 +71,9 @@ fun CheckOutScreen(
                 CartAndCheckoutResume(
                     subTotal = 287.97,
                     shipping = 10.00,
+                    total = (287.97 + 10.00),
                     onButtonClickAction = {
                         showLoading = true
-
                     }
                 )
             }

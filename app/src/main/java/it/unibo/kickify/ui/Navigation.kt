@@ -19,6 +19,7 @@ import it.unibo.kickify.camerax.CameraXUtils
 import it.unibo.kickify.ui.screens.achievements.AchievementsScreen
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.cart.CartScreen
+import it.unibo.kickify.ui.screens.cart.CartViewModel
 import it.unibo.kickify.ui.screens.checkout.CheckOutScreen
 import it.unibo.kickify.ui.screens.forgotPassword.ForgotPasswordOTPViewModel
 import it.unibo.kickify.ui.screens.forgotPassword.ForgotPasswordScreen
@@ -98,6 +99,7 @@ fun KickifyNavGraph(
     val notificationViewModel = koinViewModel<NotificationViewModel>()
     val forgotPasswordOTPViewModel = koinViewModel<ForgotPasswordOTPViewModel>()
     val ordersViewModel = koinViewModel<OrdersViewModel>()
+    val cartViewModel = koinViewModel<CartViewModel>()
 
     val startDestination by settingsViewModel.startDestination.collectAsStateWithLifecycle()
 
@@ -126,7 +128,7 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.Cart> {
-            CartScreen(navController)
+            CartScreen(navController, cartViewModel)
         }
 
         composable<KickifyRoute.Checkout> {

@@ -1,6 +1,5 @@
 package it.unibo.kickify.ui.composables
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,51 +36,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import it.unibo.kickify.R
 
 @Composable
-fun CartItemsList(){
-    Column(
-        modifier = Modifier.fillMaxWidth()
-            .padding(horizontal = 6.dp)
-            .padding(top = 10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
-        CartItem("Nike Pegasus", 69.99, 41, Color.Green)
-        Spacer(Modifier.height(15.dp))
-        CartItem("Nike Zoom 2K", 129.99, 38, Color.Yellow)
-        Spacer(Modifier.height(15.dp))
-        CartItem("Nike Air Zoom", 87.99, 45, Color.Red)
-    }
-}
-
-@Composable
 fun CartItem(
-    itemName: String,
-    price: Double,
-    size: Int,
-    productColor: Color
+    itemName: String, price: Double,
+    size: Int, productColor: String,
+    imageUrl: String
 ){
     Card(
-        //onClick = onClick,
         modifier = Modifier.height(110.dp)
-            .padding(horizontal = 12.dp)
-            .fillMaxWidth(),
+            .padding(horizontal = 12.dp).fillMaxWidth(),
     ) {
         Row(
             modifier = Modifier.fillMaxSize().padding(end = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Image(
-                painterResource(R.drawable.nike_pegasus),
-                "",
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = "",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(90.dp)
@@ -96,8 +75,7 @@ fun CartItem(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
-                        .padding(top = 6.dp)
-                        .padding(end = 6.dp)
+                        .padding(vertical = 6.dp)
                 ){
                     Text(
                         itemName,
@@ -116,13 +94,12 @@ fun CartItem(
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(Modifier.width(10.dp))
-                    ShoesColorIndicator(productColor)
+                    ShoesColorIndicator( getColorFromString(productColor) )
                 }
                 Spacer(Modifier.height(5.dp))
                 QuantityManager()
             }
             Spacer(Modifier.width(12.dp))
-
         }
     }
 }
@@ -162,22 +139,17 @@ fun QuantityManager(){
 }
 
 @Composable
-fun CartAndCheckoutResume(
-    subTotal: Double,
-    shipping: Double,
+fun CartAndCheckoutResume(subTotal: Double, shipping: Double, total: Double,
     onButtonClickAction: () -> Unit
 ){
     Card(
-        modifier = Modifier.height(180.dp)
-            .padding(horizontal = 10.dp)
-            .padding(bottom = 4.dp)
-            .fillMaxWidth()
+        modifier = Modifier.height(180.dp).fillMaxWidth()
+            .padding(horizontal = 10.dp).padding(bottom = 4.dp)
     ) {
         Column (
             verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxSize()
-                .padding(horizontal = 12.dp)
-                .padding(vertical = 6.dp),
+                .padding(horizontal = 12.dp, vertical = 6.dp),
         ){
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -210,15 +182,11 @@ fun CartAndCheckoutResume(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-                    .padding(vertical = 6.dp)
+                modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
             ){
-                Text(
-                    stringResource(R.string.totalCost),
-                )
+                Text(stringResource(R.string.totalCost))
                 Spacer(Modifier.width(20.dp))
-                Text("€%.2f".format((subTotal+shipping))
-                )
+                Text("€%.2f".format(total))
             }
             Row{
                 Button(
@@ -239,4 +207,17 @@ fun ShoesColorIndicator(productColor: Color, indicatorSize: Dp = 20.dp){
         .clip(CircleShape)
         .background(productColor)
     )
+}
+
+@Composable
+fun getColorFromString(colorString: String): Color {
+    return when(colorString){
+        "Black" -> Color.Black
+        "Blue" -> Color.Blue
+        "Green" -> Color.Green
+        "Purple" -> Color(0xFF800080)
+        "Red" -> Color.Red
+        "White" -> Color.White
+        else -> Color.Transparent
+    }
 }
