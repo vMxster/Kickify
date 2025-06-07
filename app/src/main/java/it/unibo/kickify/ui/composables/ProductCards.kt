@@ -46,9 +46,7 @@ fun ProductCardWishlistPage(
 ){
     Card(
         onClick = onClick,
-        modifier = Modifier
-            .size(200.dp)
-            .fillMaxSize()
+        modifier = Modifier.size(200.dp).fillMaxSize()
     ) {
         Box(
             modifier = Modifier.fillMaxSize()
@@ -79,8 +77,7 @@ fun ProductCardWishlistPage(
                     checked = it
                     onToggleWishlistIcon(it)
                 },
-                modifier = Modifier.padding(top = 4.dp)
-                    .padding(start = 4.dp)
+                modifier = Modifier.padding(top = 4.dp, start = 4.dp)
                     .align(Alignment.TopStart)
             ) {
                 Icon(
@@ -97,17 +94,16 @@ fun ProductCardWishlistPage(
 
 @Composable
 fun SquareProductCardHomePage(
+    productID: Int,
     productName: String,
     mainImgUrl: String,
     price: Double,
     onClick: (Int) -> Unit
 ){
     Card(
-        modifier = Modifier
-            .size(200.dp)
-            .fillMaxSize()
+        modifier = Modifier.size(200.dp).fillMaxSize()
             .padding(horizontal = 12.dp)
-            .clickable { onClick(1) } // Shoe ID to be passed
+            .clickable { onClick(productID) } // Shoe ID to be passed
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -123,16 +119,16 @@ fun SquareProductCardHomePage(
 
 @Composable
 fun RectangularProductCardHomePage(
+    productID: Int,
     productName: String,
     mainImgUrl: String,
     price: Double,
     onClick: (Int) -> Unit
 ){
     Card(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
             .padding(horizontal = 12.dp)
-            .clickable { onClick(1) } // Shoe ID to be passed
+            .clickable { onClick(productID) } // Shoe ID to be passed
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()

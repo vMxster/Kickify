@@ -30,7 +30,7 @@ fun ProductListScreen(
     productsViewModel: ProductsViewModel,
     title: String? = null
 ) {
-    val titleString = title ?: stringResource(R.string.homescreen_popular)
+    val titleString = title ?: stringResource(R.string.allShoes)
 
     val productList by productsViewModel.products.collectAsStateWithLifecycle()
     val isLoading by productsViewModel.isLoading.collectAsStateWithLifecycle()
@@ -50,7 +50,7 @@ fun ProductListScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
             modifier = Modifier.fillMaxSize()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp).padding(top = 10.dp)
         ) {
 
             if (isLoading) {

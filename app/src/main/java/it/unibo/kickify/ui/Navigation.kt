@@ -122,7 +122,7 @@ fun KickifyNavGraph(
         }
     ) {
         composable<KickifyRoute.Home> {
-            HomeScreen(navController)
+            HomeScreen(navController, productsViewModel)
         }
 
         composable<KickifyRoute.Cart> {

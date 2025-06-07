@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,10 +26,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.ShopCategory
-import it.unibo.kickify.ui.KickifyRoute
 
 @Composable
 fun HomeScreenSmallBrandLogos(name: String, brandResLogoID: Int, onClick: (String) -> Unit) {
@@ -50,7 +47,46 @@ fun HomeScreenSmallBrandLogos(name: String, brandResLogoID: Int, onClick: (Strin
 }
 
 @Composable
-fun HomeScreenCategory(categoryName: ShopCategory, onClick: (String) -> Unit) {
+fun HomeScreenBrandsSection(
+    brands: Map<String, Int>,
+    onClickAction: (String) -> Unit
+){
+    Row(
+        modifier = Modifier.fillMaxWidth()
+            .padding(vertical = 6.dp, horizontal = 8.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        for ((name, id) in brands.entries) {
+            val brand = stringResource(R.string.brand)
+            HomeScreenSmallBrandLogos(
+                name = name,
+                brandResLogoID = id,
+                onClick = { onClickAction("$brand: $name") }
+            )
+        }
+    }
+}
+
+@Composable
+fun HomeScreenCategorySection(onClick: (String) -> Unit){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp).padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ShopCategory.entries.forEach {
+            HomeScreenCategoryButton(
+                it, onClick = { category -> onClick(category) }
+            )
+        }
+    }
+}
+
+@Composable
+fun HomeScreenCategoryButton(categoryName: ShopCategory, onClick: (String) -> Unit) {
     Button(
         onClick = { onClick(categoryName.toString()) },
         modifier = Modifier.padding(horizontal = 4.dp),
@@ -73,61 +109,23 @@ private fun getHomeScreenCategoryString(category: ShopCategory): String {
 }
 
 @Composable
-fun HomeScreenSectionSquareProductCards(
-    navController: NavController,
-    sectionTitle:String,
-    /** associates the product with a boolean: true to make a rectangular product card, false to make a square product card*/
-    prodList: Map<String, Boolean>,
-    modifier: Modifier
+fun HomeScreenShoesSectionHeader(
+    sectionTitle: String,
+    onClickButtonAction: () -> Unit,
+    modifier: Modifier = Modifier
 ){
-    Column (
-        modifier = modifier.fillMaxWidth().padding(vertical = 6.dp),
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally
+    Row (
+        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ){
-        Row (modifier = Modifier.fillMaxWidth()
-            .padding(horizontal = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween){
-            Text(
-                text = sectionTitle,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            TextButton(onClick = { navController.navigate(KickifyRoute.ProductListWithCategory(sectionTitle)) }) {
-                Text(stringResource(R.string.homescreen_seeAll))
-            }
-        }
-        Row(modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ){
-            val price = 97.99
-            for(prod in prodList){
-                if(!prod.value){ // to make a square product card
-                    SquareProductCardHomePage(
-                        productName = prod.key,
-                        mainImgUrl = "",
-                        price = price,
-                        onClick = { productId ->
-                            navController.navigate(
-                                KickifyRoute.ProductDetails(productId)
-                            )
-                        }
-                    )
-                } else { // to make a rectangular product card
-                    RectangularProductCardHomePage(
-                        productName = prod.key,
-                        mainImgUrl = "",
-                        price = price,
-                        onClick = { productId ->
-                            navController.navigate(
-                                KickifyRoute.ProductDetails(productId)
-                            )
-                        }
-                    )
-                }
-            }
+        Text(
+            text = sectionTitle,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        TextButton(onClick = { onClickButtonAction() }) {
+            Text(stringResource(R.string.homescreen_seeAll))
         }
     }
 }

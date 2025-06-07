@@ -1,125 +1,165 @@
 package it.unibo.kickify.ui.screens.home
 
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
-import it.unibo.kickify.data.models.ShopCategory
+import it.unibo.kickify.data.database.Product
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
-import it.unibo.kickify.ui.composables.HomeScreenCategory
-import it.unibo.kickify.ui.composables.HomeScreenSectionSquareProductCards
-import it.unibo.kickify.ui.composables.HomeScreenSmallBrandLogos
+import it.unibo.kickify.ui.composables.HomeScreenBrandsSection
+import it.unibo.kickify.ui.composables.HomeScreenCategorySection
+import it.unibo.kickify.ui.composables.HomeScreenShoesSectionHeader
+import it.unibo.kickify.ui.composables.RectangularProductCardHomePage
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.composables.SearchRoundedTextField
+import it.unibo.kickify.ui.composables.SquareProductCardHomePage
+import it.unibo.kickify.ui.screens.productList.ProductsViewModel
 
 @Composable
 fun HomeScreen(
     navController: NavController,
+    productsViewModel: ProductsViewModel
 ){
-    val brands = mapOf("Nike" to R.drawable.nike,
-        "Puma" to R.drawable.puma, "Under Armour" to R.drawable.under_armour,
-        "Adidas" to R.drawable.adidas, "Converse" to R.drawable.converse)
+    val isLoading by productsViewModel.isLoading.collectAsStateWithLifecycle()
+
+    val popularProducts by productsViewModel.popularProducts.collectAsStateWithLifecycle()
+    val newProducts by productsViewModel.newProducts.collectAsStateWithLifecycle()
+    val discountedProducts by productsViewModel.discountedProducts.collectAsStateWithLifecycle()
+
+    val brands = mapOf(
+        "Adidas" to R.drawable.adidas,
+        "Nike" to R.drawable.nike,
+        "Puma" to R.drawable.puma)
 
     ScreenTemplate(
         screenTitle = stringResource(R.string.app_name),
         navController = navController,
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
-        showModalDrawer = true
+        showModalDrawer = true,
+        showLoadingOverlay = isLoading
     ) {
-        val brandIconsScrollState = rememberScrollState()
-        val state = rememberScrollState()
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top,
-            modifier = Modifier.fillMaxSize()
-                .verticalScroll(state)
-        ){
-            SearchRoundedTextField(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                onSearchAction = {
-                    navController.navigate(KickifyRoute.ProductList)
-                }
-            )
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 6.dp).padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                ShopCategory.entries.forEach {
-                    HomeScreenCategory(
-                        it,
-                        onClick = { category ->
-                            navController.navigate(
-                                KickifyRoute.ProductListWithCategory(category)
-                            )
-                        }
-                    )
-                }
+        LazyVerticalGrid(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp, horizontal = 4.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            columns = GridCells.Fixed(2)
+        ) {
+            item(span = { GridItemSpan(2) }) {
+                SearchRoundedTextField(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                    onSearchAction = {
+                        navController.navigate(KickifyRoute.ProductList)
+                    }
+                )
             }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(brandIconsScrollState)
-                    .padding(vertical = 6.dp).padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                for((name, id) in brands.entries){
-                    val brand = stringResource(R.string.brand)
-                    HomeScreenSmallBrandLogos(
-                        name = name,
-                        brandResLogoID = id,
-                        onClick = {
-                            navController.navigate(
-                                KickifyRoute.ProductListWithCategory("$brand: $name")
-                            )
-                        }
-                    )
-                }
+            item(span = { GridItemSpan(2) }) {
+                HomeScreenCategorySection(
+                    onClick = { category ->
+                        navController.navigate(KickifyRoute.ProductListWithCategory(category))
+                    }
+                )
+            }
+            item(span = { GridItemSpan(2) }) {
+                HomeScreenBrandsSection(
+                    brands,
+                    onClickAction = { brand ->
+                        navController.navigate(KickifyRoute.ProductListWithCategory(brand))
+                    }
+                )
             }
 
             // begin shoes section
-            val homeSectionsModifier = Modifier.padding(vertical = 6.dp).padding(horizontal = 8.dp)
-            HomeScreenSectionSquareProductCards(
-                navController,
-                modifier = homeSectionsModifier,
-                sectionTitle = stringResource(R.string.homescreen_popular),
-                prodList = mapOf("p1" to false, "p2" to false)
-            )
+            var populars : List<Product> = listOf()
+            popularProducts.onSuccess { populars = it }
+                .onFailure { println("popular prod error ${it.message}") }
 
-            HomeScreenSectionSquareProductCards(
-                navController,
-                modifier = homeSectionsModifier,
-                sectionTitle = stringResource(R.string.homescreen_novelties),
-                prodList = mapOf("p1" to true)
-            )
+            item(span = { GridItemSpan(2) }) {
+                val categ = stringResource(R.string.homescreen_popular)
+                HomeScreenShoesSectionHeader(
+                    sectionTitle = stringResource(R.string.homescreen_popular),
+                    onClickButtonAction = {
+                        navController.navigate(KickifyRoute.ProductListWithCategory(categ))
+                    }
+                )
+            }
+            items(populars.take(2)) { prod ->
+                SquareProductCardHomePage(
+                    productID = prod.productId,
+                    productName = "${prod.brand} ${prod.name}",
+                    mainImgUrl = "",
+                    price = prod.price,
+                    onClick = {
+                        navController.navigate(KickifyRoute.ProductDetails(prod.productId))
+                    }
+                )
+            }
 
-            HomeScreenSectionSquareProductCards(
-                navController,
-                modifier = homeSectionsModifier,
-                sectionTitle = stringResource(R.string.homescreen_discounted),
-                prodList = mapOf("p1" to false, "p2" to false)
-            )
+            var newProds : List<Product> = listOf()
+            newProducts.onSuccess { newProds = it }
+                .onFailure { println("new prod error ${it.message}") }
+            val newProd = newProds.firstOrNull()
+
+            item(span = { GridItemSpan(2) }) {
+                val categ = stringResource(R.string.homescreen_novelties)
+                HomeScreenShoesSectionHeader(
+                    sectionTitle = stringResource(R.string.homescreen_novelties),
+                    onClickButtonAction = {
+                        navController.navigate(KickifyRoute.ProductListWithCategory(categ))
+                    }
+                )
+            }
+            item(span = { GridItemSpan(2) }) {
+                if (newProd != null) {
+                    RectangularProductCardHomePage(
+                        productID = newProd.productId,
+                        productName = "${newProd.brand} ${newProd.name}",
+                        mainImgUrl = "",
+                        price = newProd.price,
+                        onClick = {
+                            navController.navigate(KickifyRoute.ProductDetails(newProd.productId))
+                        }
+                    )
+                }
+            }
+
+            var discounted : List<Product> = listOf()
+            discountedProducts.onSuccess { discounted = it }
+                .onFailure { println("popular prod error ${it.message}") }
+
+            item(span = { GridItemSpan(2) }) {
+                val categ = stringResource(R.string.homescreen_discounted)
+                HomeScreenShoesSectionHeader(
+                    sectionTitle = stringResource(R.string.homescreen_discounted),
+                    onClickButtonAction = {
+                        navController.navigate(KickifyRoute.ProductListWithCategory(categ))
+                    }
+                )
+            }
+            items(discounted.take(2)) { prod ->
+                SquareProductCardHomePage(
+                    productID = prod.productId,
+                    productName = "${prod.brand} ${prod.name}",
+                    mainImgUrl = "",
+                    price = prod.price,
+                    onClick = {
+                        navController.navigate(KickifyRoute.ProductDetails(prod.productId))
+                    }
+                )
+            }
         }
-
     }
 }
