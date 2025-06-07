@@ -1,5 +1,6 @@
 package it.unibo.kickify.ui.screens.login
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.unibo.kickify.data.database.User
@@ -48,7 +49,6 @@ class LoginViewModel(
                 _isLoggedIn.value = false
                 _loggedInUser.value = null
                 _errorMessage.value = e.message ?: "Unexpected error."
-
             } finally {
                 _isLoading.value = false
             }
@@ -56,9 +56,12 @@ class LoginViewModel(
     }
 
     fun loginWithGoogle(idToken: String) {
+        _errorMessage.value = null
+        _isLoading.value = true
+        _isLoggedIn.value = false
+
         viewModelScope.launch {
             try {
-                _isLoading.value = true
 
                 // Decodificare il token JWT per estrarre le informazioni
                 val tokenParts = idToken.split(".")
@@ -78,8 +81,10 @@ class LoginViewModel(
                 val name = jsonPayload.optString("given_name", "")
                 val surname = jsonPayload.optString("family_name", "")
 
-                if (email.isEmpty()) {
-                    _errorMessage.value = "Email non trovata nel token"
+                if (email.isEmpty() || name.isEmpty() || surname.isEmpty()) {
+                    _isLoading.value = false
+                    _isLoggedIn.value = false
+                    _errorMessage.value = "Dati insufficienti dal token Google"
                     return@launch
                 }
 
@@ -91,19 +96,20 @@ class LoginViewModel(
 
                 // Procedi con l'autenticazione tramite appRepository
                 val result = appRepository.loginWithGoogle(email, name, surname, shortToken)
-
-                if (result.isSuccess) {
-                    val user = result.getOrNull()
-                    if (user != null) {
-                        _loggedInUser.value = user
-                        _isLoggedIn.value = true
-                    } else {
-                        _errorMessage.value = "Impossibile ottenere i dati dell'utente"
-                    }
-                } else {
-                    _errorMessage.value = result.exceptionOrNull()?.message ?: "Login fallito"
+                result.onSuccess { user ->
+                    _isLoggedIn.value = true
+                    Log.d("LoginViewModel", "Login con Google riuscito, isLoggedIn: ${_isLoggedIn.value}")
+                    _errorMessage.value = null
+                    _loggedInUser.value = user
+                }.onFailure { exception ->
+                    Log.e("LoginViewModel", "Fallimento login con Google: ${exception.message}")
+                    _isLoggedIn.value = false
+                    _loggedInUser.value = null
+                    _errorMessage.value = exception.message ?: "Unknown login error"
                 }
             } catch (e: Exception) {
+                Log.e("LoginViewModel", "Eccezione in loginWithGoogle: ${e.message}")
+                _isLoggedIn.value = false
                 _loggedInUser.value = null
                 _errorMessage.value = e.message ?: "Errore imprevisto"
             } finally {

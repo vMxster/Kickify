@@ -19,7 +19,7 @@ import androidx.room.Relation
             onUpdate = ForeignKey.NO_ACTION
         )
     ],
-    indices = [Index(value = ["Sta_Tipo"], unique = true)]
+    indices = [Index(value = ["Sta_Tipo"], unique = false)]
 )
 data class Product(
     @PrimaryKey(autoGenerate = true)
@@ -62,7 +62,7 @@ data class Product(
             onUpdate = ForeignKey.NO_ACTION
         )
     ],
-    indices = [Index("ID_Prodotto", unique = true)],
+    indices = [Index("ID_Prodotto", unique = false)],
     primaryKeys = ["ID_Prodotto", "Colore", "Taglia"],
 )
 data class Version(
@@ -232,7 +232,7 @@ data class CartProduct(
             onUpdate = ForeignKey.NO_ACTION
         )
     ],
-    indices = [Index("Email", unique = true), Index("ID_Sconto", unique = true)]
+    indices = [Index("Email", unique = false), Index("ID_Sconto", unique = false)]
 )
 data class Order(
     @PrimaryKey(autoGenerate = true)
@@ -301,7 +301,7 @@ data class Order(
             onUpdate = ForeignKey.NO_ACTION
         )
     ],
-    indices = [Index("ID_Prodotto", unique = true), Index("ID_Ordine", unique = true)]
+    indices = [Index("ID_Prodotto", unique = false), Index("ID_Ordine", unique = false)]
 )
 data class OrderProduct(
     @ColumnInfo(name = "ID_Prodotto")
@@ -335,7 +335,7 @@ data class OrderProduct(
             onUpdate = ForeignKey.NO_ACTION
         )
     ],
-    indices = [Index("ID_Ordine", unique = true)]
+    indices = [Index("ID_Ordine", unique = false)]
 )
 data class TrackingShipping(
     @ColumnInfo(name = "ID_Ordine")
@@ -389,7 +389,7 @@ data class NotificationState(
         )
     ],
     primaryKeys = ["Email", "Via", "NumeroCivico", "CAP", "Citta"],
-    indices = [Index(value = ["Email"], unique = true)]
+    indices = [Index(value = ["Email"], unique = false)]
 )
 data class Address(
     @ColumnInfo(name = "Email")
@@ -428,7 +428,7 @@ data class Address(
             onUpdate = ForeignKey.NO_ACTION
         )
     ],
-    indices = [Index(value = ["Email"], unique = true)],
+    indices = [Index(value = ["Email"], unique = false)],
     primaryKeys = ["Email", "Timestamp_Invio"]
 )
 data class Message(
@@ -464,8 +464,8 @@ data class Message(
         )
     ],
     indices = [
-        Index(value = ["Email"], unique = true),
-        Index(value = ["TipoNotifica"], unique = true)
+        Index(value = ["Email"], unique = false),
+        Index(value = ["TipoNotifica"], unique = false)
               ]
 )
 data class Notification(
@@ -519,7 +519,7 @@ data class Discount(
             onUpdate = ForeignKey.NO_ACTION
         )
     ],
-    indices = [Index("ID_Prodotto", unique = true)],
+    indices = [Index("ID_Prodotto", unique = false)],
     primaryKeys = ["ID_Prodotto", "Data_Modifica"]
 )
 data class HistoryProduct(
@@ -552,8 +552,8 @@ data class HistoryProduct(
         )
     ],
     indices = [
-        Index(value = ["ID_Prodotto"], unique = true),
-        Index(value = ["Email"], unique = true)
+        Index(value = ["ID_Prodotto"], unique = false),
+        Index(value = ["Email"], unique = false)
               ],
     primaryKeys = ["ID_Prodotto", "Email"]
 )
@@ -615,8 +615,7 @@ data class Wishlist(
         )
     ],
     indices = [
-        Index("ID_Sconto", unique = true),
-        Index("Email", unique = true)
+        Index(value = ["Email", "ID_Sconto"], unique = true),
               ],
     primaryKeys = ["ID_Sconto", "Email"]
 )
@@ -647,8 +646,7 @@ data class DiscountUser(
         )
     ],
     indices = [
-        Index("ID_Prodotto", unique = true),
-        Index("Email", unique = true)
+        Index(value = ["Email", "ID_Prodotto"], unique = true),
               ],
     primaryKeys = ["ID_Prodotto", "Email"]
 )

@@ -57,7 +57,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.google.firebase.auth.GoogleAuthProvider
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.ScreenTemplate
@@ -66,8 +65,6 @@ import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.theme.MediumGray
 import it.unibo.kickify.utils.LoginRegisterUtils
 import kotlinx.coroutines.launch
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
@@ -103,7 +100,6 @@ fun LoginScreen(
     var passwordVisibility by remember { mutableStateOf(false) }
     val passwordFocusRequester = remember { FocusRequester() }
 
-    // Inizializza il CredentialManager
     val credentialManager = remember { CredentialManager.create(ctx) }
 
     // Funzione per gestire l'accesso con Google
@@ -132,7 +128,6 @@ fun LoginScreen(
                     else -> {
                         try {
                             val credentialBundle = credential.data
-
                             credentialBundle.getString("com.google.android.libraries.identity.googleid.BUNDLE_KEY_ID_TOKEN")
                                 ?: throw Exception("Token non trovato nel bundle")
                         } catch (e: Exception) {
@@ -151,13 +146,20 @@ fun LoginScreen(
                 }
             } catch (e: GetCredentialException) {
                 when (e) {
-                    is NoCredentialException ->
-                        Toast.makeText(ctx, "Nessuna credenziale disponibile", Toast.LENGTH_SHORT).show()
                     is GetCredentialCancellationException ->
                         Toast.makeText(ctx, "Autenticazione annullata", Toast.LENGTH_SHORT).show()
-                    else -> Toast.makeText(ctx, "Autenticazione annullata", Toast.LENGTH_SHORT)
-                        .show()
+                    else -> Toast.makeText(
+                        ctx,
+                        "Errore durante l'autenticazione: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
+            } catch (e: Exception) {
+                Toast.makeText(
+                    ctx,
+                    "Errore imprevisto: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
@@ -172,8 +174,8 @@ fun LoginScreen(
                 userid = email,
                 username = "${loggedInUser?.name} ${loggedInUser?.surname}"
             )
-            loginViewModel.clearData()
             onLoginSuccess()
+            loginViewModel.clearData()
         }
     }
 
@@ -321,7 +323,6 @@ fun LoginScreen(
                     if(LoginRegisterUtils.isValidEmail(email)
                         && password.isNotEmpty()){
                         loginViewModel.login(email, password)
-
                     } else {
                         coroutineScope.launch {
                             snackBarHostState.showSnackbar(

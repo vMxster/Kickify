@@ -91,9 +91,15 @@ class AppRepository(
                         if (remoteImages.isNotEmpty()) {
                             val savedImages = ImageStorageManager(context).saveAll(remoteImages)
                             images.forEachIndexed { index, image ->
-                                image.url = savedImages[index].second
+                                val url = savedImages[index].second
                                 try {
-                                    imageRepository.insertImage(image)
+                                    imageRepository.insertImage(
+                                        Image(
+                                            productId = image.productId,
+                                            number = image.number,
+                                            url = url,
+                                        )
+                                    )
                                 } catch (e: Exception) {
                                     Log.e(tag, "Errore inserimento immagine per prodotto ${image.productId}: ${e.message}")
                                 }
@@ -584,7 +590,13 @@ class AppRepository(
             if (remoteResult.isSuccess) {
                 val user = remoteResult.getOrNull()
                 user?.let {
-                    userRepository.registerUser(it)
+                    val existingUser = userRepository.getUserProfile(email.lowercase())
+                    if (existingUser != null) {
+                        val updatedUser = it.copy(password = existingUser.password)
+                        userRepository.registerUser(updatedUser)
+                    } else {
+                        userRepository.registerUser(it)
+                    }
                     oAuthUserRepository.insertUserOAuth(
                         UserOAuth(
                             email = it.email,
@@ -594,9 +606,11 @@ class AppRepository(
                         )
                     )
                 }
-                remoteResult
+                Result.success(
+                    userRepository.getUserProfile(email.lowercase()) ?: throw Exception("Profilo utente non trovato")
+                )
             } else {
-                remoteResult
+                Result.failure(Exception("Login fallito: credenziali non valide"))
             }
         } catch (e: Exception) {
             Log.e(tag, "Errore in loginWithGoogle", e)
@@ -618,7 +632,13 @@ class AppRepository(
             if (remoteResult.isSuccess) {
                 val userProfile = remoteResult.getOrNull()
                 userProfile?.let {
-                    userRepository.registerUser(it)
+                    val existingUser = userRepository.getUserProfile(email.lowercase())
+                    if (existingUser != null) {
+                        val updatedUser = it.copy(password = existingUser.password)
+                        userRepository.registerUser(updatedUser)
+                    } else {
+                        userRepository.registerUser(it)
+                    }
                 }
             }
             Result.success(
