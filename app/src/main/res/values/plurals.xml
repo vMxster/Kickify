@@ -1,0 +1,6 @@
+<resources>
+    <plurals name="secretAchievementsHint">
+        <item quantity="one">There is one last unlocked secret achievements. Try exploring all app pages and menus.</item>
+        <item quantity="other">There are %d unlocked secret achievements. Try exploring all app pages and menus.</item>
+    </plurals>
+</resources>

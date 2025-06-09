@@ -90,6 +90,12 @@ class AchievementsViewModel(
     private val _achievements = MutableStateFlow(predefinedAchievements)
     val achievements: StateFlow<List<Achievement>> = _achievements.asStateFlow()
 
+    private val _lastUnlockedAchievement = MutableStateFlow<Achievement?>(null)
+    val lastUnlockedAchievement: StateFlow<Achievement?> = _lastUnlockedAchievement.asStateFlow()
+
+    private val _showAchievementDialog = MutableStateFlow(false)
+    val showAchievementDialog: StateFlow<Boolean> = _showAchievementDialog.asStateFlow()
+
     init {
         loadAchievements()
     }
@@ -127,11 +133,18 @@ class AchievementsViewModel(
                         )
                         updatedList[achievementIndex] = updatedAchievement
                         repository.saveAchievementState(updatedAchievement)
+                        _lastUnlockedAchievement.value = updatedAchievement
+                        _showAchievementDialog.value = true
                     }
                 }
                 updatedList
             }
         }
+    }
+
+    fun dismissUnlockedAchievementDialog(){
+        _showAchievementDialog.value = false
+        _lastUnlockedAchievement.value = null
     }
 
     fun resetAllAchievements() {

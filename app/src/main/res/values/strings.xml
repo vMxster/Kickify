@@ -180,6 +180,9 @@
     <string name="allAchievements">All Achievements</string>
     <string name="achieved_achievement">Achieved</string>
     <string name="notAchieved_achievement">Not achieved</string>
+    <string name="unlockedAchievement">Congratulations! You unlocked the achievement: </string>
+    <string name="secretAchievements">Secret Achievements</string>
+    <string name="allSecretAchievementsUnlocked">Congratulations! You found all secret achievements!</string>
     <string name="achievement_1stAppLogin">First in-app login</string>
     <string name="achievement_1stAppLogin_descr">Log in for the first time</string>
     <string name="achievement_1stReview">First review</string>

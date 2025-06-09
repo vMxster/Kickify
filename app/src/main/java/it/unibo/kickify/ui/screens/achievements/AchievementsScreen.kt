@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,10 +19,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -42,6 +45,9 @@ fun AchievementsScreen(
     achievementsViewModel: AchievementsViewModel
 ) {
     val achievements by achievementsViewModel.achievements.collectAsStateWithLifecycle()
+    val secretAchievements by remember { mutableStateOf(achievements.filter { it.secretAchievement }) }
+    val unlockedSecretAchievements by remember { mutableStateOf(secretAchievements.filter { !it.achieved }) }
+    val stdAchievements by remember { mutableStateOf(achievements.filter { !it.secretAchievement }) }
 
     ScreenTemplate(
         screenTitle = stringResource(R.string.myAchievements),
@@ -62,10 +68,39 @@ fun AchievementsScreen(
                     modifier = Modifier.fillMaxWidth().padding(10.dp)
                 )
             }
-            items(achievements) { achievement ->
-                // hide secret achievements not yet achieved
-                if(!achievement.secretAchievement || achievement.achieved) {
-                    AchievementRow(achievement = achievement)
+
+            // show standard achievements
+            items(stdAchievements) { achievement ->
+                AchievementRow(achievement = achievement)
+            }
+
+            // show secret achievements only when unlocked
+            if(secretAchievements.isNotEmpty()){
+                item {
+                    Text(
+                        text = stringResource(R.string.secretAchievements),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.fillMaxWidth().padding(10.dp)
+                    )
+                }
+                item {
+                    Text(
+                        text =
+                            if(unlockedSecretAchievements.isEmpty())
+                                stringResource(R.string.allSecretAchievementsUnlocked)
+                            else pluralStringResource(
+                                id = R.plurals.secretAchievementsHint,
+                                count = unlockedSecretAchievements.size,
+                                formatArgs = arrayOf(unlockedSecretAchievements.size)
+                            ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.fillMaxWidth().padding(10.dp)
+                    )
+                }
+                items(secretAchievements){ achievement ->
+                    if(achievement.achieved) {
+                        AchievementRow(achievement = achievement)
+                    }
                 }
             }
         }
@@ -81,7 +116,9 @@ fun AchievementRow(achievement: Achievement) {
         AchievementImage(imageRes = achievement.resourceIconID, achieved = achievement.achieved)
         Spacer(modifier = Modifier.width(16.dp))
 
-        Column {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
             Text(
                 text = stringResource(achievement.titleResId),
                 style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp)
@@ -90,7 +127,6 @@ fun AchievementRow(achievement: Achievement) {
                 text = stringResource(achievement.descriptionResId),
                 style = TextStyle(fontSize = 14.sp)
             )
-            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = if (!achievement.achieved) stringResource(R.string.notAchieved_achievement)
                 else stringResource(R.string.achieved_achievement) + " ${achievement.achievedDate}",
@@ -109,15 +145,15 @@ fun AchievementImage(imageRes: Int, achieved: Boolean) {
         Icon(
             imageVector = Icons.Default.Lock,
             contentDescription = "",
-            tint = Color.White.copy(alpha = 0.7f),
-            modifier = Modifier
-                .size(48.dp)
+            tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+            modifier = Modifier.size(48.dp)
         )
     } else {
         Image(
             painter = painterResource(id = imageRes),
             contentDescription = "",
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier.size(48.dp),
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
         )
     }
 }

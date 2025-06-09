@@ -199,7 +199,7 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.Settings> {
-            SettingsScreen(navController, settingsViewModel)
+            SettingsScreen(navController, settingsViewModel, achievementsViewModel)
         }
 
         composable<KickifyRoute.Wishlist> {

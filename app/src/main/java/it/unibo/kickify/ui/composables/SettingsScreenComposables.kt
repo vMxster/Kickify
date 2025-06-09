@@ -158,10 +158,17 @@ fun ThemeChooserRow(
                     onThemeSelected(selectedTh)
                 },
                 selected = index == selectedIndex,
-                label = {
-                    Text(th.toString())
-                }
+                label = { Text( getThemeString(th) ) }
             )
         }
+    }
+}
+
+@Composable
+private fun getThemeString(theme: Theme): String {
+    return when(theme){
+        Theme.Light -> stringResource(R.string.theme_light)
+        Theme.Dark -> stringResource(R.string.theme_dark)
+        Theme.System -> stringResource(R.string.theme_system)
     }
 }

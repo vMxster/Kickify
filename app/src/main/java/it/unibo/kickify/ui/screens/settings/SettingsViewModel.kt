@@ -50,6 +50,12 @@ class SettingsViewModel(
         initialValue = ""
     )
 
+    val isUserLoggedIn = repository.userLoggedIn.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = false
+    )
+
     val userImg = repository.userImgFilename.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
@@ -159,7 +165,7 @@ class SettingsViewModel(
     fun setUserAccount(userid: String, username: String) = viewModelScope.launch {
         this@SettingsViewModel.setUserId(userid)
         this@SettingsViewModel.setUserName(username)
-        //this@SettingsViewModel.setLastAccessNow()
+        repository.setUserLoggedIn(true)
     }
 
     fun removeUserAccount() = viewModelScope.launch {

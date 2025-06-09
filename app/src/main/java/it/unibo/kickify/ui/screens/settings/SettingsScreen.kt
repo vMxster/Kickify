@@ -47,6 +47,7 @@ import it.unibo.kickify.PushNotificationManager
 import it.unibo.kickify.R
 import it.unibo.kickify.authentication.BiometricAuthManager
 import it.unibo.kickify.data.models.Language
+import it.unibo.kickify.data.models.Theme
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ScreenTemplate
@@ -54,12 +55,15 @@ import it.unibo.kickify.ui.composables.SettingsItemWithLeadingIcon
 import it.unibo.kickify.ui.composables.SettingsItemWithTrailingSwitchButton
 import it.unibo.kickify.ui.composables.SettingsTitleLine
 import it.unibo.kickify.ui.composables.ThemeChooserRow
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
+import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 
 @Composable
 fun SettingsScreen(
     navController: NavController,
-    settingsViewModel: SettingsViewModel
+    settingsViewModel: SettingsViewModel,
+    achievementsViewModel: AchievementsViewModel
 ) {
     val ctx = LocalContext.current
     val themeState by settingsViewModel.theme.collectAsStateWithLifecycle()
@@ -69,9 +73,11 @@ fun SettingsScreen(
     val languageState by settingsViewModel.appLanguage.collectAsStateWithLifecycle()
     val userid by settingsViewModel.userId.collectAsStateWithLifecycle()
     val username by settingsViewModel.userName.collectAsStateWithLifecycle()
+    val userLoggedIn by settingsViewModel.isUserLoggedIn.collectAsStateWithLifecycle()
 
-    LaunchedEffect(userid, username) {
-        if(userid == "" && username == ""){
+    LaunchedEffect(userid, username, userLoggedIn) {
+        delay(1000) // wait settings to be loaded
+        if(userid == "" && username == "" && !userLoggedIn){
             navController.navigate(KickifyRoute.Login){
                 popUpTo(navController.graph.id){ inclusive = true }
                 launchSingleTop = true
@@ -161,6 +167,9 @@ fun SettingsScreen(
                 selectedTheme = themeState,
                 onThemeSelected = {
                     settingsViewModel.setTheme(it)
+                    if(it == Theme.Dark){
+                        achievementsViewModel.achieveAchievement(6)
+                    }
                 }
             )
             Row(
@@ -172,10 +181,13 @@ fun SettingsScreen(
                 Text(stringResource(R.string.language))
                 LanguageSelector(
                     languageCodeState = languageState,
-                    onSelectedLanguageChange = {
+                    onSelectedLanguageChange = { lang ->
                         settingsViewModel.setAppLanguage(
-                            Language.getCodeFromLanguageString(it)
+                            Language.getCodeFromLanguageString(lang)
                         )
+                        if (lang == "Latinum") {
+                            achievementsViewModel.achieveAchievement(7)
+                        }
                     }
                 )
             }

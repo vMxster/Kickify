@@ -19,6 +19,7 @@ class SettingsRepository(
         private val USER_ID = stringPreferencesKey("userid")
         private val USER_NAME = stringPreferencesKey("username")
         private val USER_IMG = stringPreferencesKey("userImgFilename")
+        private val LOGGEDIN = booleanPreferencesKey("loggedIn")
         private val THEME = stringPreferencesKey("theme")
         private val ENABLED_BIOMETRIC_LOGIN = booleanPreferencesKey("biometric_login")
         private val ENABLED_LOCATION = booleanPreferencesKey("enabled_location")
@@ -45,6 +46,16 @@ class SettingsRepository(
 
     // set userImgFilename
     suspend fun setUserImgFilename(userImgFilename: String) = dataStore.edit { it[USER_IMG] = userImgFilename }
+
+    // get is used logged in
+    val userLoggedIn : Flow<Boolean> = dataStore.data.map {
+        it[LOGGEDIN] ?: false
+    }
+
+    // set is user logged in
+    suspend fun setUserLoggedIn(loggedIn: Boolean) = dataStore.edit {
+        it[LOGGEDIN] = loggedIn
+    }
 
     // get theme
     val theme = dataStore.data
