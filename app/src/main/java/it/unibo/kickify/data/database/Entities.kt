@@ -876,17 +876,6 @@ data class ProductDetails(
     val cartQuantity: Int
 )
 
-data class OrderTracking(
-    val orderId: Int,
-    val shippingType: String,
-    val orderDate: String,
-    val currentStatus: String,
-    val currentLocation: String,
-    val estimatedArrival: String,
-    val trackingStates: List<TrackingStateOrder>,
-    val products: List<TrackingProduct>
-)
-
 data class TrackingStateOrder(
     val orderId: Int,
     val status: String,
@@ -928,4 +917,16 @@ data class OrderAddress (
 
     @ColumnInfo(name = "Spe_Citta")
     val shippingCity: String
+)
+
+data class ProductWithImage(
+    @Embedded
+    val product: Product,
+
+    @Relation(
+        entity = Image::class,
+        parentColumn = "ID_Prodotto",
+        entityColumn = "ID_Prodotto"
+    )
+    val images: Image
 )

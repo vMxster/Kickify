@@ -19,6 +19,7 @@ import it.unibo.kickify.data.database.OrderProduct
 import it.unibo.kickify.data.database.OrderProductDetails
 import it.unibo.kickify.data.database.Product
 import it.unibo.kickify.data.database.ProductDetails
+import it.unibo.kickify.data.database.ProductWithImage
 import it.unibo.kickify.data.database.Review
 import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.data.database.User
@@ -210,6 +211,20 @@ class AppRepository(
             }
         } catch (e: Exception) {
             Log.e(tag, "Errore in getDiscountedProducts", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun searchProducts(query: String): Result<List<ProductWithImage>> = withContext(Dispatchers.IO) {
+        try {
+            val products = productRepository.searchProducts(query)
+            if (products.isNotEmpty()) {
+                Result.success(products)
+            } else {
+                Result.success(emptyList())
+            }
+        } catch (e: Exception) {
+            Log.e(tag, "Errore nella ricerca prodotti", e)
             Result.failure(e)
         }
     }

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import it.unibo.kickify.data.database.CompleteProduct
 import it.unibo.kickify.data.database.Image
 import it.unibo.kickify.data.database.Product
+import it.unibo.kickify.data.database.ProductWithImage
 import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.utils.DatabaseReadyManager
 import kotlinx.coroutines.cancel
@@ -41,6 +42,10 @@ class ProductsViewModel(
     // Stati di caricamento
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
+
+    // Risultati della ricerca
+    private val _searchResults = MutableStateFlow<Result<List<ProductWithImage>>>(Result.success(emptyList()))
+    val searchResults: StateFlow<Result<List<ProductWithImage>>> = _searchResults
 
     init {
         viewModelScope.launch {
@@ -109,5 +114,21 @@ class ProductsViewModel(
 
     fun clearProductDetails() {
         _productDetails.value = null
+    }
+
+    // Ricerca per Stringa
+    fun searchProducts(query: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+
+            try {
+                val result = repository.searchProducts(query)
+                _searchResults.value = result
+            } catch (e: Exception) {
+                _searchResults.value = Result.failure(e)
+            } finally {
+                _isLoading.value = false
+            }
+        }
     }
 }

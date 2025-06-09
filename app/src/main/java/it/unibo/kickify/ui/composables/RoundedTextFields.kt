@@ -28,9 +28,11 @@ import it.unibo.kickify.R
 
 @Composable
 fun SearchRoundedTextField(
-    modifier: Modifier,
-    onSearchAction: () -> Unit
+    modifier: Modifier = Modifier,
+    onSearch: (String) -> Unit
 ) {
+    var searchText by remember { mutableStateOf("") }
+
     RoundedTextFieldGeneralWithLeadingIcon(
         leadingIcon = Icons.Outlined.Search,
         singleline = true,
@@ -38,15 +40,18 @@ fun SearchRoundedTextField(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Search
         ),
-        keyboardActions =  KeyboardActions(
+        keyboardActions = KeyboardActions(
             onSearch = {
-                // when click on search button on keyboard
-                onSearchAction()
+                if (searchText.isNotEmpty()) {
+                    onSearch(searchText)
+                }
             }
         ),
         placeholderString = "",
         passwordTransformation = false,
-        modifier = modifier.padding(horizontal = 6.dp)
+        modifier = modifier,
+        text = searchText,
+        onValueChange = { searchText = it }
     )
 }
 
@@ -144,13 +149,13 @@ fun RoundedTextFieldGeneralWithLeadingIcon(
     keyboardActions: KeyboardActions,
     placeholderString: String,
     passwordTransformation: Boolean,
-    modifier: Modifier
+    modifier: Modifier,
+    text: String,
+    onValueChange: (String) -> Unit
 ) {
-    var text by remember { mutableStateOf("") }
-
     TextField(
         value = text,
-        onValueChange = { text = it },
+        onValueChange = onValueChange,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         singleLine = singleline,
@@ -165,7 +170,7 @@ fun RoundedTextFieldGeneralWithLeadingIcon(
         leadingIcon = {
             Icon(
                 imageVector = leadingIcon,
-                contentDescription = "",
+                contentDescription = "Cerca",
             )
         },
         visualTransformation = when(passwordTransformation) {

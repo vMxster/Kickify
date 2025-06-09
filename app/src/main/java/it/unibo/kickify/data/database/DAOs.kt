@@ -159,6 +159,11 @@ interface ProductDao {
         )
     """)
     suspend fun getDiscountedProducts(): List<Product>
+
+    @Transaction
+    @Query("SELECT p.*, i.URL FROM PRODOTTO p LEFT JOIN IMMAGINE i ON p.ID_Prodotto = i.ID_Prodotto " +
+            "WHERE i.Numero = 1 AND (p.Nome LIKE :query OR p.Marca LIKE :query) GROUP BY p.ID_Prodotto")
+    suspend fun searchProducts(query: String): List<ProductWithImage>
 }
 
 @Dao

@@ -47,4 +47,7 @@ class ProductRepository(private val productDao: ProductDao) {
 
     suspend fun getDiscountedProducts(): List<Product> =
         productDao.getDiscountedProducts()
+
+    suspend fun searchProducts(query: String): List<ProductWithImage> =
+        productDao.searchProducts(query)
 }

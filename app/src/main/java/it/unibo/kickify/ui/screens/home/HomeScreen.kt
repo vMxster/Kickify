@@ -61,7 +61,8 @@ fun HomeScreen(
             item(span = { GridItemSpan(2) }) {
                 SearchRoundedTextField(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                    onSearchAction = {
+                    onSearch = { query ->
+                        productsViewModel.searchProducts(query)
                         navController.navigate(KickifyRoute.ProductList)
                     }
                 )
