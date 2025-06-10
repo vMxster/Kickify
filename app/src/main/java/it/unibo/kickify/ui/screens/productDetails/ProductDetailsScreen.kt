@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
+import it.unibo.kickify.data.database.Review
+import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.ui.composables.ColorsList
 import it.unibo.kickify.ui.composables.ProductDetailsFooter
 import it.unibo.kickify.ui.composables.ProductImage
@@ -28,6 +29,7 @@ import it.unibo.kickify.ui.composables.ProductName
 import it.unibo.kickify.ui.composables.ProductPhotoGallery
 import it.unibo.kickify.ui.composables.ProductPrice
 import it.unibo.kickify.ui.composables.RatingBar
+import it.unibo.kickify.ui.composables.ReviewCard
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.composables.SectionTitle
 import it.unibo.kickify.ui.composables.SizesList
@@ -39,6 +41,7 @@ fun ProductDetailsScreen(
     productsViewModel: ProductsViewModel,
     productId: Int
 ) {
+    val productReviews by productsViewModel.productReviews.collectAsStateWithLifecycle()
     val productList by productsViewModel.products.collectAsStateWithLifecycle()
     val isLoading by productsViewModel.isLoading.collectAsStateWithLifecycle()
 
@@ -46,6 +49,13 @@ fun ProductDetailsScreen(
     val prodInfo = list.firstOrNull { pair -> pair.first.productId == productId }
     val product = prodInfo?.first
     val img = prodInfo?.second
+
+    var reviews: List<ReviewWithUserInfo> = listOf()
+    var votes: List<Double> = listOf()
+    productReviews?.onSuccess { l ->
+        reviews = l
+        votes = reviews.map { r -> r.review.vote }
+    }
 
     ScreenTemplate(
         screenTitle = stringResource(R.string.details),
@@ -63,10 +73,7 @@ fun ProductDetailsScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            if (isLoading) {
-                CircularProgressIndicator()
-
-            } else if (list.isEmpty()) {
+            if (list.isEmpty()) {
                 Text(stringResource(R.string.errorLoadingData))
 
             } else {
@@ -88,7 +95,7 @@ fun ProductDetailsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     ProductPrice(product?.price ?: 0.0)
-                    RatingBar(nrRatings = 4, listOf(5.0, 5.0, 5.0, 5.0))
+                    RatingBar(nrRatings = reviews.size, votes)
                 }
 
                 ProductLongDescription(longDescr = product?.desc ?: "")
@@ -122,6 +129,26 @@ fun ProductDetailsScreen(
                     ),
                     onColorSelected = { }
                 )
+
+                SectionTitle(title = stringResource(R.string.prodDetails_reviews))
+                if(reviews.isNotEmpty()){
+                    reviews.forEach { r ->
+                        ReviewCard(r)
+                        println("review: $r")
+                    }
+                } else {
+                    Text(stringResource(R.string.prodDetails_noReviewsFound))
+                    ReviewCard(
+                        ReviewWithUserInfo(
+                            Review(
+                                1, "email@email.com",
+                                4.5, "commento", "2025-06-10"
+                            ),
+                            name = "Caius Iulius",
+                            surname = "Caesar Octavianus Augustus"
+                        )
+                    )
+                }
             }
         }
     }

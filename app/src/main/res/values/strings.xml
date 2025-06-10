@@ -113,6 +113,8 @@
     <string name="errorLoadingData">An error occurred while loading data.</string>
     <string name="errorProductsNotFound">Error: products not found.</string>
     <string name="prodDetails_gallery">Gallery</string>
+    <string name="prodDetails_reviews">Reviews</string>
+    <string name="prodDetails_noReviewsFound">No reviews found.</string>
     <string name="price">Price</string>
     <string name="prodDetails_addToCart">Add To Cart</string>
     <string name="color">Color</string>

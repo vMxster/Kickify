@@ -14,12 +14,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.StarHalf
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.unibo.kickify.R
+import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.ui.theme.BluePrimary
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -96,21 +100,17 @@ fun SectionTitle(
 }
 
 @Composable
-fun RatingBar(
-    nrRatings: Int,
-    votesList: List<Double>
-){
-    val avgValue = votesList.sum() / nrRatings
+fun RatingBar(nrRatings: Int, votesList: List<Double>){
+    val avgValue = if(votesList.isNotEmpty()) votesList.sum()/nrRatings else 0.0
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-
         Text(
             text = "($nrRatings)",
             style = MaterialTheme.typography.bodyLarge
         )
-        RatingStars(avgRatingToDisplay = avgValue)
+        RatingStars(ratingToDisplay = avgValue)
         Text(
             text = "$avgValue",
             style = MaterialTheme.typography.bodyLarge
@@ -257,13 +257,13 @@ fun ProductDetailsFooter(
 @Composable
 private fun RatingStars(
     modifier: Modifier = Modifier,
-    avgRatingToDisplay: Double,
+    ratingToDisplay: Double,
     stars: Int = 5,
     starsColor: Color = Color(red = 1.0f, green = 1.0f, blue = 0.0f)
 ) {
-    val filledStars = floor(avgRatingToDisplay).toInt()
-    val unfilledStars = (stars - ceil(avgRatingToDisplay)).toInt()
-    val halfStar = !(avgRatingToDisplay.rem(1).equals(0.0))
+    val filledStars = floor(ratingToDisplay).toInt()
+    val unfilledStars = (stars - ceil(ratingToDisplay)).toInt()
+    val halfStar = !(ratingToDisplay.rem(1).equals(0.0))
     Row(modifier = modifier) {
         repeat(filledStars) {
             Icon(imageVector = Icons.Outlined.Star, contentDescription = null, tint = starsColor)
@@ -280,6 +280,49 @@ private fun RatingStars(
                 imageVector = Icons.Outlined.StarOutline,
                 contentDescription = null,
                 tint = starsColor
+            )
+        }
+    }
+}
+
+@Composable
+fun ReviewCard(reviewWithUserInfo: ReviewWithUserInfo) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Outlined.Person,
+                    contentDescription = "",
+                    modifier = Modifier.
+                    size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "${reviewWithUserInfo.name} ${reviewWithUserInfo.surname}",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                RatingStars(ratingToDisplay = reviewWithUserInfo.review.vote)
+                Text(text = reviewWithUserInfo.review.reviewDate)
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = reviewWithUserInfo.review.comment,
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.bodyLarge
             )
         }
     }
