@@ -513,7 +513,8 @@ class RemoteRepository(
                 "last_access" to lastAccess
             )
             val response = makeRequest("product_handler.php", params)
-            val jsonArray = JSONArray(response)
+            val jsonObject = JSONObject(response)
+            val jsonArray = jsonObject.getJSONArray("reviews")
             val reviews = RemoteResponseParser.parseReviews(jsonArray)
             Result.success(reviews)
         } catch (e: Exception) {

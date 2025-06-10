@@ -1,6 +1,5 @@
 package it.unibo.kickify.ui.composables
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -36,13 +35,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import it.unibo.kickify.R
+import it.unibo.kickify.data.database.Image
 import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.ui.theme.BluePrimary
 import kotlin.math.ceil
@@ -119,19 +119,16 @@ fun RatingBar(nrRatings: Int, votesList: List<Double>){
 }
 
 @Composable
-fun ProductPhotoGallery(
-    images: List<Int>,
-    productName: String,
-) {
+fun ProductPhotoGallery(images: List<Image>, productName: String) {
     Row (
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ){
-        for (i in images.indices){
-            Image(
-                painterResource(images[i]),
-                "$productName image $i",
+        for (i in images){
+            AsyncImage(
+                model = i.url,
+                "$productName image ${i.number}",
                 contentScale = ContentScale.FillWidth,
                 modifier = Modifier.size(70.dp)
             )
@@ -140,41 +137,57 @@ fun ProductPhotoGallery(
     }
 }
 
+private fun parseColorName(colorName: String): Color {
+    return when (colorName.lowercase()) {
+        "red" -> Color.Red
+        "green" -> Color.Green
+        "blue" -> Color.Blue
+        "white" -> Color.White
+        "black" -> Color.Black
+        "gray", "grey" -> Color.Gray
+        "cyan" -> Color.Cyan
+        "magenta" -> Color.Magenta
+        "yellow" -> Color.Yellow
+        "darkgray", "darkgrey" -> Color.DarkGray
+        "lightgray", "lightgrey" -> Color.LightGray
+        else -> Color.Transparent
+    }
+}
+
 @Composable
 fun ColorsList(
     colorSelected: Color?,
-    colorAvailability: Map<Color, Boolean>,
+    colorAvailability: Map<String, Boolean>,
     onColorSelected: (Color) -> Unit
 ){
-    val scrollState = rememberScrollState()
     var selectedColor by remember { mutableStateOf(colorSelected) }
 
     Spacer(Modifier.height(10.dp))
     Row(modifier = Modifier.fillMaxWidth()
-        .horizontalScroll(scrollState),
+        .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ){
-        for (color in colorAvailability.entries){
-            if(color.value) { // if color is available
+        for ((colorString, available) in colorAvailability.entries){
+            val color = parseColorName(colorString)
+
+            if(available) { // if color is available
                 Button(
                     onClick = {
-                        selectedColor = color.key
-                        onColorSelected(color.key)
+                        selectedColor = color
+                        onColorSelected(color)
                     },
-                    enabled = color.value,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = color.key
+                        containerColor = color
                     ),
                     shape = CircleShape,
                     modifier = Modifier.size(44.dp)
                         .border(
                             width = 4.dp,
-                            color = if (selectedColor == color.key) BluePrimary else Color.Transparent,
+                            color = if (selectedColor == color) BluePrimary else Color.Transparent,
                             shape = CircleShape
                         )
-                ) {
-                }
+                ) { }
 
                 Spacer(Modifier.width(18.dp))
             }

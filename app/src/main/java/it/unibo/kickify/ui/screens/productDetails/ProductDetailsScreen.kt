@@ -10,17 +10,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
-import it.unibo.kickify.data.database.Review
 import it.unibo.kickify.data.database.ReviewWithUserInfo
+import it.unibo.kickify.data.database.Version
 import it.unibo.kickify.ui.composables.ColorsList
 import it.unibo.kickify.ui.composables.ProductDetailsFooter
 import it.unibo.kickify.ui.composables.ProductImage
@@ -41,8 +41,10 @@ fun ProductDetailsScreen(
     productsViewModel: ProductsViewModel,
     productId: Int
 ) {
+    val productDetails by productsViewModel.productDetails.collectAsStateWithLifecycle()
     val productReviews by productsViewModel.productReviews.collectAsStateWithLifecycle()
     val productList by productsViewModel.products.collectAsStateWithLifecycle()
+    val productImages by productsViewModel.productImages.collectAsStateWithLifecycle()
     val isLoading by productsViewModel.isLoading.collectAsStateWithLifecycle()
 
     val list = productList.getOrNull() ?: emptyList()
@@ -52,9 +54,18 @@ fun ProductDetailsScreen(
 
     var reviews: List<ReviewWithUserInfo> = listOf()
     var votes: List<Double> = listOf()
+    var prodVersions: List<Version> = listOf()
+
     productReviews?.onSuccess { l ->
         reviews = l
         votes = reviews.map { r -> r.review.vote }
+    }
+    productDetails?.onSuccess { r -> prodVersions = r.versions }
+
+    LaunchedEffect(Unit) {
+        productsViewModel.getReviewsOfProduct(productId)
+        productsViewModel.loadProductDetails(productId)
+        productsViewModel.getProductImages(productId)
     }
 
     ScreenTemplate(
@@ -67,8 +78,7 @@ fun ProductDetailsScreen(
     ) {
         Column(
             modifier = Modifier.fillMaxSize()
-                .padding(horizontal = 16.dp)
-                .padding(vertical = 10.dp)
+                .padding(horizontal = 16.dp, vertical = 10.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
@@ -102,31 +112,29 @@ fun ProductDetailsScreen(
 
                 SectionTitle(title = stringResource(R.string.prodDetails_gallery))
                 ProductPhotoGallery(
-                    images = listOf(
-                        R.drawable.nike_air_zoom_1,
-                        R.drawable.nike_air_zoom_2, R.drawable.nike_air_zoom_3
-                    ),
+                    images = productImages,
                     productName = product?.name ?: ""
                 )
 
+                val colorAvailability: MutableMap<String, Boolean> = mutableMapOf()
+                val sizesAvailability: MutableMap<Int, Boolean> = mutableMapOf()
+                if(prodVersions.isNotEmpty()) {
+                    prodVersions.forEach { v ->
+                        sizesAvailability[v.size.toInt()] = v.quantity > 0
+                        colorAvailability[v.color] = v.quantity > 0
+                    }
+                }
                 SectionTitle(title = stringResource(R.string.size))
                 SizesList(
-                    sizeSelected = 40,
-                    sizesAvailability = mapOf(
-                        38 to true, 39 to true, 40 to true, 41 to true,
-                        42 to false, 43 to true, 44 to true, 45 to true
-                    ),
+                    sizeSelected = null,
+                    sizesAvailability = sizesAvailability,
                     onSizeSelected = { }
                 )
 
                 SectionTitle(title = stringResource(R.string.color))
                 ColorsList(
-                    colorSelected = Color.White,
-                    colorAvailability = mapOf(
-                        Color.White to true, Color.Black to false,
-                        Color.Red to true, Color.Blue to true,
-                        Color.Yellow to false
-                    ),
+                    colorSelected = null,
+                    colorAvailability = colorAvailability,
                     onColorSelected = { }
                 )
 
@@ -134,20 +142,9 @@ fun ProductDetailsScreen(
                 if(reviews.isNotEmpty()){
                     reviews.forEach { r ->
                         ReviewCard(r)
-                        println("review: $r")
                     }
                 } else {
                     Text(stringResource(R.string.prodDetails_noReviewsFound))
-                    ReviewCard(
-                        ReviewWithUserInfo(
-                            Review(
-                                1, "email@email.com",
-                                4.5, "commento", "2025-06-10"
-                            ),
-                            name = "Caius Iulius",
-                            surname = "Caesar Octavianus Augustus"
-                        )
-                    )
                 }
             }
         }

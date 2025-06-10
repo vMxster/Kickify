@@ -2,10 +2,6 @@ package it.unibo.kickify.data.repositories
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import it.unibo.kickify.data.database.Address
 import it.unibo.kickify.data.database.Cart
 import it.unibo.kickify.data.database.CartWithProductInfo
@@ -39,10 +35,8 @@ import it.unibo.kickify.utils.ImageStorageManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.Date
 
 class AppRepository(
     private val context: Context,
@@ -62,7 +56,7 @@ class AppRepository(
 ) {
     private val tag = "AppRepository"
 
-   val lastAccess = settingsRepository.lastAccess
+    val lastAccess = settingsRepository.lastAccess
 
     suspend fun setLastAccessNow() = withContext(Dispatchers.IO) {
         settingsRepository.setLastAccess()
@@ -117,27 +111,31 @@ class AppRepository(
         }
     }
 
+    suspend fun getProductImages(productId: Int): List<Image> = withContext(Dispatchers.IO) {
+        return@withContext productRepository.getProductImages(productId)
+    }
+
     suspend fun getProductData(productId: Int, userEmail: String): Result<ProductDetails> = withContext(Dispatchers.IO) {
-            try {
-                val remoteResult = remoteRepository.getProductData(productId, userEmail)
-                if (remoteResult.isSuccess) {
-                    val remoteProduct = remoteResult.getOrNull()
-                    remoteProduct?.let {
-                        for (variant in it.variants) {
-                            versionRepository.insertProductVariant(variant)
-                        }
-                        for (review in it.reviews) {
-                            reviewRepository.addReview(review)
-                        }
+        try {
+            val remoteResult = remoteRepository.getProductData(productId, userEmail)
+            if (remoteResult.isSuccess) {
+                val remoteProduct = remoteResult.getOrNull()
+                remoteProduct?.let {
+                    for (variant in it.variants) {
+                        versionRepository.insertProductVariant(variant)
                     }
-                    return@withContext remoteResult
+                    for (review in it.reviews) {
+                        reviewRepository.addReview(review)
+                    }
                 }
-                Result.failure(Exception("Prodotto non trovato"))
-            } catch (e: Exception) {
-                Log.e(tag, "Errore in getProductData", e)
-                Result.failure(e)
+                return@withContext remoteResult
             }
+            Result.failure(Exception("Prodotto non trovato"))
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in getProductData", e)
+            Result.failure(e)
         }
+    }
 
     suspend fun getProductHistory(productId: Int): Result<List<HistoryProduct>> =
         withContext(Dispatchers.IO) {
