@@ -1,7 +1,9 @@
 package it.unibo.kickify.ui.screens.achievements
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import it.unibo.kickify.PushNotificationManager
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.Achievement
 import it.unibo.kickify.data.repositories.AchievementsRepository
@@ -15,7 +17,9 @@ import java.util.Date
 import java.util.Locale
 
 class AchievementsViewModel(
-    private val repository: AchievementsRepository
+    private val repository: AchievementsRepository,
+    private val notificationMgr: PushNotificationManager,
+    private val application: Application
 ) : ViewModel() {
 
     private val predefinedAchievements = listOf(
@@ -135,6 +139,11 @@ class AchievementsViewModel(
                         repository.saveAchievementState(updatedAchievement)
                         _lastUnlockedAchievement.value = updatedAchievement
                         _showAchievementDialog.value = true
+
+                        notificationMgr.sendNotification(
+                            notificationTitle = application.getString(R.string.unlockedAchievement),
+                            notificationMessage = application.getString(updatedAchievement.titleResId)
+                        )
                     }
                 }
                 updatedList

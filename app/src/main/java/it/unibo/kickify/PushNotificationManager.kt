@@ -10,11 +10,9 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 
-class PushNotificationManager(
-    private val context: Context
-) {
+class PushNotificationManager(private val context: Context) {
     private val channelID = "kickifyNotifications1"
-    private val notificationManager = this.context.getSystemService(NotificationManager::class.java)
+    private val notificationManager = this.context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager//this.context.getSystemService(NotificationManager::class.java)
 
     private var lastUsedNotificationID = 0
 
@@ -41,42 +39,25 @@ class PushNotificationManager(
             description = getChannelVisibleDescriptionString() // description visible in settings
         }
 
-        //val notificationManager = this.context.getSystemService(NotificationManager::class.java)
-        val notificationManager = this.context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
     }
 
-    fun sendNotificationNoAction(
+    fun sendNotification(
         notificationTitle:String,
         notificationMessage: String,
-        icon: Int = R.drawable.ic_launcher_foreground,
-        priority: Int = NotificationCompat.PRIORITY_HIGH,
-        // actionOnClick: PendingIntent,
-        setAutoCancelNotification: Boolean = true
+        icon: Int = R.drawable.kickify_logo,
+        priority: Int = NotificationCompat.PRIORITY_HIGH
     ){
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(
+            context, 0, Intent(),
+            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notification = NotificationCompat.Builder(this.context, this.channelID)
             .setContentTitle(notificationTitle)
             .setContentText(notificationMessage)
             .setSmallIcon(icon)
             .setPriority(priority)
-            //.setContentIntent(pendingIntent)
-            .setAutoCancel(setAutoCancelNotification)
-            .build()
-
-        notificationManager.notify(getNotificationID(), notification)
-    }
-
-    fun sendNotificationWithActionTEST() {
-        val intent = Intent(this.context, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
-            this.context, 0, intent, PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val notification = NotificationCompat.Builder(this.context, this.channelID)
-            .setContentTitle("Notifica con Azione")
-            .setContentText("Tocca per aprire l'app")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .build()

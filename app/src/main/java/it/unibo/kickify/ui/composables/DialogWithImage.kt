@@ -125,7 +125,7 @@ fun AchievementDialog(
                         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
                     )
                     Text(
-                        text = stringResource(R.string.unlockedAchievement),
+                        text = stringResource(R.string.unlockedSecretAchievement),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(16.dp)
                     )
