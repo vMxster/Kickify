@@ -189,7 +189,7 @@ fun ProductImage(
     AsyncImage(
         model = imgUrl,
         contentDescription = "$productName image",
-        contentScale = ContentScale.FillWidth,
+        contentScale = ContentScale.FillHeight,
         modifier = modifier.size(size)
     )
 }

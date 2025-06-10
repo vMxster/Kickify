@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -42,6 +43,21 @@ fun HomeScreen(
         "Adidas" to R.drawable.adidas,
         "Nike" to R.drawable.nike,
         "Puma" to R.drawable.puma)
+
+    var populars : List<Product> = listOf()
+    var newProds : List<Product> = listOf()
+    var discounted : List<Product> = listOf()
+
+    LaunchedEffect(popularProducts, newProducts, discountedProducts) {
+        popularProducts.onSuccess { populars = it }
+            .onFailure { println("popular prod error ${it.message}") }
+
+        newProducts.onSuccess { newProds = it }
+            .onFailure { println("new prod error ${it.message}") }
+
+        discountedProducts.onSuccess { discounted = it }
+            .onFailure { println("discount prod error ${it.message}") }
+    }
 
     ScreenTemplate(
         screenTitle = stringResource(R.string.app_name),
@@ -84,10 +100,6 @@ fun HomeScreen(
             }
 
             // begin shoes section
-            var populars : List<Product> = listOf()
-            popularProducts.onSuccess { populars = it }
-                .onFailure { println("popular prod error ${it.message}") }
-
             item(span = { GridItemSpan(2) }) {
                 val categ = stringResource(R.string.homescreen_popular)
                 HomeScreenShoesSectionHeader(
@@ -109,9 +121,6 @@ fun HomeScreen(
                 )
             }
 
-            var newProds : List<Product> = listOf()
-            newProducts.onSuccess { newProds = it }
-                .onFailure { println("new prod error ${it.message}") }
             val newProd = newProds.firstOrNull()
 
             item(span = { GridItemSpan(2) }) {
@@ -136,10 +145,6 @@ fun HomeScreen(
                     )
                 }
             }
-
-            var discounted : List<Product> = listOf()
-            discountedProducts.onSuccess { discounted = it }
-                .onFailure { println("discount prod error ${it.message}") }
 
             item(span = { GridItemSpan(2) }) {
                 val categ = stringResource(R.string.homescreen_discounted)

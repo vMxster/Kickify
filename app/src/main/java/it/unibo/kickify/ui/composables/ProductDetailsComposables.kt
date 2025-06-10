@@ -46,10 +46,11 @@ import kotlin.math.floor
 
 @Composable
 fun ProductName(
-    title: String,
+    brand: String,
+    name: String,
     modifier: Modifier){
     Text(
-        text = title,
+        text = "$brand $name",
         textAlign = TextAlign.Start,
         modifier = modifier,
         fontSize = 30.sp

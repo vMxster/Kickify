@@ -6,10 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,16 +33,13 @@ fun ProductListScreen(
     val productList by productsViewModel.products.collectAsStateWithLifecycle()
     val isLoading by productsViewModel.isLoading.collectAsStateWithLifecycle()
 
-    LaunchedEffect(productList) {
-        productsViewModel.loadProducts()
-    }
-
     ScreenTemplate(
         screenTitle = titleString,
         navController = navController,
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
-        showModalDrawer = true
+        showModalDrawer = true,
+        showLoadingOverlay = isLoading
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -52,14 +47,8 @@ fun ProductListScreen(
             modifier = Modifier.fillMaxSize()
                 .padding(horizontal = 16.dp).padding(top = 10.dp)
         ) {
-
-            if (isLoading) {
-                CircularProgressIndicator()
-
-            } else if (productList.isSuccess) {
-                val products = productList.getOrNull() ?: emptyList()
-
-                if (products.isEmpty()) {
+            productList.onSuccess { list ->
+                if (list.isEmpty()) {
                     Text(stringResource(R.string.errorLoadingData))
 
                 } else {
@@ -68,9 +57,9 @@ fun ProductListScreen(
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         horizontalArrangement = Arrangement.spacedBy(20.dp)
                     ) {
-                        items(products.size) { index ->
-                            val prod = products[index].first
-                            val img = products[index].second
+                        items(list.size) { index ->
+                            val prod = list[index].first
+                            val img = list[index].second
 
                             ProductCardShoesPage(
                                 productName = "${prod.brand} ${prod.name}",
@@ -86,6 +75,9 @@ fun ProductListScreen(
                         }
                     }
                 }
+            }.onFailure { e ->
+                Text(stringResource(R.string.errorLoadingData) +
+                "\n${e.message}")
             }
         }
     }

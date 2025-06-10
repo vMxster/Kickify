@@ -11,7 +11,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,27 +42,18 @@ fun ProductDetailsScreen(
     val productList by productsViewModel.products.collectAsStateWithLifecycle()
     val isLoading by productsViewModel.isLoading.collectAsStateWithLifecycle()
 
-    LaunchedEffect(productList) {
-        productsViewModel.loadProducts()
-    }
-
     val list = productList.getOrNull() ?: emptyList()
     val prodInfo = list.firstOrNull { pair -> pair.first.productId == productId }
     val product = prodInfo?.first
     val img = prodInfo?.second
-
-    /*val productInfo = mapOf("name" to "Nike Air Zoom",
-        "descr" to "Nike Air Zoom is a responsive cushioning technology in footwear," +
-                "enhancing athletic performance and comfort across sneakers, while blending sport " +
-                "functionality with casual style.")
-    val price = 97.99*/
 
     ScreenTemplate(
         screenTitle = stringResource(R.string.details),
         navController = navController,
         showTopAppBar = true,
         bottomAppBarContent = { ProductDetailsFooter(product?.price ?: 0.0) },
-        showModalDrawer = true
+        showModalDrawer = true,
+        showLoadingOverlay = isLoading
     ) {
         Column(
             modifier = Modifier.fillMaxSize()
@@ -87,8 +77,9 @@ fun ProductDetailsScreen(
                 )
 
                 ProductName(
-                    product?.name ?: "",
-                    Modifier.fillMaxWidth()
+                    brand = product?.brand ?: "",
+                    name = product?.name ?: "",
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Row(
