@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import it.unibo.kickify.R
+import it.unibo.kickify.data.models.Achievement
 
 @Composable
 fun DialogWithImage(
@@ -80,71 +81,72 @@ fun DialogWithImage(
 
 @Composable
 fun AchievementDialog(
-    imageResId: Int,
-    achievementTitleResId: Int,
-    achievementDescriptionResId: Int,
+    displayDialog: Boolean,
+    achievement: Achievement,
     onDismissRequest: () -> Unit,
     goToAchievementsPage: () -> Unit
 ) {
     val configuration = LocalConfiguration.current
     val screenHeightDp = configuration.screenHeightDp.dp * 60/100
 
-    Dialog(onDismissRequest = onDismissRequest) {
-        Card(
-            modifier = Modifier.fillMaxWidth()
-                .height(screenHeightDp)
-                .padding(16.dp),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally,
+    if (displayDialog) {
+        Dialog(onDismissRequest = onDismissRequest) {
+            Card(
+                modifier = Modifier.fillMaxWidth()
+                    .height(screenHeightDp)
+                    .padding(16.dp),
+                shape = RoundedCornerShape(16.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.Top
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    IconButton(
-                        onClick = { onDismissRequest() },
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        IconButton(
+                            onClick = { onDismissRequest() },
+                            modifier = Modifier.padding(8.dp),
+                        ) {
+                            Icon(
+                                Icons.Outlined.Close,
+                                contentDescription = stringResource(R.string.close)
+                            )
+                        }
+                    }
+                    Image(
+                        painter = painterResource(achievement.resourceIconID),
+                        contentDescription = "",
+                        contentScale = ContentScale.FillHeight,
+                        modifier = Modifier.fillMaxWidth().height(150.dp),
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
+                    )
+                    Text(
+                        text = stringResource(R.string.unlockedAchievement),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                    Text(
+                        text = stringResource(achievement.titleResId),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text = stringResource(achievement.descriptionResId),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    Button(
+                        onClick = { goToAchievementsPage() },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Icon(
-                            Icons.Outlined.Close,
-                            contentDescription = stringResource(R.string.close)
-                        )
+                        Text(stringResource(R.string.allAchievements))
                     }
-                }
-                Image(
-                    painter = painterResource(imageResId),
-                    contentDescription = "",
-                    contentScale = ContentScale.FillHeight,
-                    modifier = Modifier.fillMaxWidth().height(150.dp),
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
-                )
-                Text(
-                    text = stringResource(R.string.unlockedAchievement),
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(16.dp)
-                )
-                Text(
-                    text = stringResource(achievementTitleResId),
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    text = stringResource(achievementDescriptionResId),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-                Spacer(Modifier.height(10.dp))
-                Button(
-                    onClick = { goToAchievementsPage() },
-                    modifier = Modifier.padding(8.dp),
-                ) {
-                    Text(stringResource(R.string.allAchievements))
                 }
             }
         }
