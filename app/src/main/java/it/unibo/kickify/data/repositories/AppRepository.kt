@@ -20,6 +20,7 @@ import it.unibo.kickify.data.database.Review
 import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.data.database.User
 import it.unibo.kickify.data.database.UserOAuth
+import it.unibo.kickify.data.models.NotificationType
 import it.unibo.kickify.data.repositories.local.CartRepository
 import it.unibo.kickify.data.repositories.local.ImageRepository
 import it.unibo.kickify.data.repositories.local.NotificationRepository
@@ -343,9 +344,10 @@ class AppRepository(
                 val remoteNotifications = remoteResult.getOrNull() ?: emptyList()
                 if (remoteNotifications.isNotEmpty()) {
                     for (notification in remoteNotifications) {
-                        notificationRepository.addNotification(notification)
+                        //notificationRepository.addNotification(notification)
                     }
                 }
+                return@withContext Result.success(remoteNotifications)
             }
             Result.success(
                 notificationRepository.getUserNotifications(email)
@@ -356,13 +358,13 @@ class AppRepository(
         }
     }
 
-    suspend fun createNotification(email: String, message: String, type: String): Result<Boolean> {
-        val result = remoteRepository.createNotification(email, message, type)
+    suspend fun createNotification(email: String, message: String, type: NotificationType): Result<Boolean> {
+        val result = remoteRepository.createNotification(email, message, type.internalName)
         if (result.isSuccess && result.getOrNull() == true) {
             notificationRepository.createNotification(Notification(
                 email = email,
                 message = message,
-                type = type,
+                type = type.internalName,
                 date = LocalDateTime.now().toString(),
                 state = "Unread",
                 notificationId = 0

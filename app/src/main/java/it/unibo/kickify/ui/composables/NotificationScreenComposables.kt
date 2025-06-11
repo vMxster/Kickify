@@ -38,8 +38,7 @@ fun NotificationItem(
 ){
     Row(
         modifier = Modifier.fillMaxWidth()
-            .padding(horizontal = 6.dp)
-            .padding(vertical = 8.dp)
+            .padding(horizontal = 6.dp, vertical = 8.dp)
             .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -61,7 +60,7 @@ fun NotificationItem(
                         NotificationType.ProductBackinStock -> stringResource(R.string.notificationscreen_productBackInStock)
                         NotificationType.OrderShipped -> stringResource(R.string.notificationscreen_orderShipped)
                         NotificationType.FlashSale -> stringResource(R.string.notificationscreen_flashSale)
-                        NotificationType.ItemsinCart -> stringResource(R.string.notificationscreen_productsInCart)
+                        NotificationType.ItemsInCart -> stringResource(R.string.notificationscreen_productsInCart)
                         NotificationType.OrderPlaced -> stringResource(R.string.orderPlaced)
                         NotificationType.RequestedProductReview -> stringResource(R.string.notificationscreen_productReviewRequested)
                     },
@@ -87,7 +86,7 @@ private fun NotificationImageFromType(notificationType: NotificationType){
                 NotificationType.ProductBackinStock -> painterResource(R.drawable.stock_light)
                 NotificationType.OrderShipped -> painterResource(R.drawable.order_light)
                 NotificationType.FlashSale -> painterResource(R.drawable.sale_light)
-                NotificationType.ItemsinCart -> painterResource(R.drawable.cart_light)
+                NotificationType.ItemsInCart -> painterResource(R.drawable.cart_light)
                 NotificationType.OrderPlaced -> painterResource(R.drawable.pack_light)
                 NotificationType.RequestedProductReview -> painterResource(R.drawable.review_light)
         },
@@ -99,11 +98,11 @@ private fun NotificationImageFromType(notificationType: NotificationType){
 }
 
 @Composable
-fun NotificationDotIndicator(productColor: Color){
+fun NotificationDotIndicator(notificationColor: Color){
     Box(Modifier
-        .size(7.dp)
+        .size(11.dp)
         .clip(CircleShape)
-        .background(productColor)
+        .background(notificationColor)
     )
 }
 
@@ -114,8 +113,6 @@ fun NotificationTitleLine(title: String){
             .padding(horizontal = 6.dp)
             .padding(top = 6.dp)
     ){
-        Text(title,
-            style = MaterialTheme.typography.titleLarge
-        )
+        Text(title, style = MaterialTheme.typography.titleLarge)
     }
 }

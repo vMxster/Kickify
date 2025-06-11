@@ -316,7 +316,7 @@ class RemoteRepository(
                 "message" to message,
                 "type" to type
             )
-            val response = makeRequest("notification_handler.php", params)
+            val response = makeRequest("notifications_handler.php", params)
             val jsonObject = JSONObject(response)
             if (!RemoteResponseParser.parseSuccess(jsonObject)) {
                 return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
@@ -334,9 +334,9 @@ class RemoteRepository(
             val params = mapOf(
                 "action" to "markNotificationsAsRead",
                 "email" to email,
-                "notificationIds" to notificationIds.joinToString(",")
+                "notificationIds" to notificationIds.joinToString(",", prefix = "[", postfix = "]")
             )
-            val response = makeRequest("notification_handler.php", params)
+            val response = makeRequest("notifications_handler.php", params)
             val jsonObject = JSONObject(response)
             if (!RemoteResponseParser.parseSuccess(jsonObject)) {
                 return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))

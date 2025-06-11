@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
-import it.unibo.kickify.data.database.Notification
 import it.unibo.kickify.data.models.NotificationType
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.NotificationItem
@@ -31,6 +29,8 @@ import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.theme.BluePrimary
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun NotificationScreen(
@@ -42,16 +42,21 @@ fun NotificationScreen(
     val isLoading by notificationViewModel.isLoading.collectAsStateWithLifecycle()
     val errorMessage by notificationViewModel.errorMessage.collectAsStateWithLifecycle()
     val notificationState by notificationViewModel.notificationState.collectAsStateWithLifecycle()
-    val unreadNotifications by notificationViewModel.unreadNotifications.collectAsStateWithLifecycle()
 
     val email by settingsViewModel.userId.collectAsStateWithLifecycle()
-    val lastAccess = "2025-06-01 10:02:41" //by settingsViewModel.lastAccess.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
 
-    val notificationList = remember { mutableListOf<Notification>() }
+    val notificationList = notificationState ?: mutableListOf()
 
     LaunchedEffect(notificationState, email) {
         notificationViewModel.getNotifications(email)
+    }
+
+    fun convertDateFormat(dateString: String): String {
+        val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val dateTime = LocalDateTime.parse(dateString, inputFormatter)
+        val outputFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
+        return dateTime.format(outputFormatter)
     }
 
     ScreenTemplate(
@@ -71,29 +76,33 @@ fun NotificationScreen(
             verticalArrangement = Arrangement.Top
         ) {
             if(errorMessage == null){
-                for (n in notificationList){
-                    NotificationTitleLine(n.date)
-                    NotificationItem(
-                        NotificationType.ProductBackinStock, //n.type
-                        notificationText = "REMOTE:" + n.message,
-                        colorDot = if(n.state == "Unread") BluePrimary else Color.Gray,
-                        onClick = {
-                            coroutineScope.launch {
-                                notificationViewModel.markNotificationsAsRead(
-                                    email = email,
-                                    notificationIds = listOf(n.notificationId)
-                                )
-                                notificationViewModel.getNotifications(email)
+                val notificationGrouped = notificationList.groupBy { convertDateFormat(it.date) }
+                for ((date, notifications) in notificationGrouped.entries){
+                    println("notification grouped: $notificationGrouped")
+                    println("all notifications: $notificationList")
+                    NotificationTitleLine(date)
+                    for(n in notifications) {
+                        NotificationItem(
+                            notificationType = NotificationType.getTypeFromString(n.type),
+                            notificationText = n.message,
+                            colorDot = if (n.state == "Unread") BluePrimary else Color.Gray,
+                            onClick = {
+                                coroutineScope.launch {
+                                    notificationViewModel.markNotificationsAsRead(
+                                        email = email,
+                                        notificationIds = listOf(n.notificationId)
+                                    )
+                                    notificationViewModel.getNotifications(email)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             } else {
                 Text("an error occurred:\n$errorMessage")
             }
 
-
-            HorizontalDivider(modifier = Modifier.padding(vertical = 15.dp))
+            /*HorizontalDivider(modifier = Modifier.padding(vertical = 15.dp))
 
             NotificationTitleLine("11 April 2025")
             NotificationItem(
@@ -133,7 +142,7 @@ fun NotificationScreen(
                 notificationText = "Share your experience with the product you purchased!",
                 colorDot = BluePrimary,
                 // onClick = onClick
-            ) { }
+            ) { }*/
         }
     }
 }

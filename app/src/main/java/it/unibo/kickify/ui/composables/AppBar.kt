@@ -34,9 +34,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
+import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
 import it.unibo.kickify.ui.screens.productList.FilterScreen
 import it.unibo.kickify.ui.theme.BluePrimary
 import kotlinx.coroutines.launch
@@ -47,11 +49,13 @@ fun AppBar(
     navController: NavController,
     title: String = "",
     onNavigationMenuClick: () -> Unit,
-    unreadNotifications: Int,
+    notificationViewModel: NotificationViewModel
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
     var showSheet by remember { mutableStateOf(false) }
+
+    val unreadNotifications by notificationViewModel.unreadNotifications.collectAsStateWithLifecycle()
 
     CenterAlignedTopAppBar(
         title = {
@@ -103,7 +107,7 @@ fun AppBar(
             if(title == stringResource(R.string.notificationscreen_title)){
                 TextButton(onClick = { /*TODO*/ }) {
                     Text(
-                        text = stringResource(R.string.notificationscreen_clearAll),
+                        text = stringResource(R.string.notificationscreen_markAllRead),
                         color = BluePrimary
                     )
                 }

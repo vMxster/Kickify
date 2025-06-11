@@ -101,7 +101,7 @@
     <string name="cartscreen_paymentSuccessful">Your Payment Is Successful</string>
     <string name="cartscreen_backToShopping">Back To Shopping</string>
     <string name="notificationscreen_title">Notifications</string>
-    <string name="notificationscreen_clearAll">Clear All</string>
+    <string name="notificationscreen_markAllRead">All Read</string>
     <string name="notificationscreen_productBackInStock">Product back in stock</string>
     <string name="notificationscreen_orderShipped">Order shipped</string>
     <string name="notificationscreen_flashSale">Flash sale alert</string>

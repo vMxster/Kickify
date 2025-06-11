@@ -90,7 +90,7 @@ fun ScreenTemplate(
                                 coroutineScope.launch { drawerState.open() }
                             }
                         },
-                        unreadNotifications
+                        notificationViewModel
                     )
                 }
             },
