@@ -55,6 +55,7 @@ import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.screens.cart.CartViewModel
 import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
+import it.unibo.kickify.ui.screens.wishlist.WishlistViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -81,8 +82,12 @@ fun ScreenTemplate(
     val settingsViewModel = koinViewModel<SettingsViewModel>()
     val email by settingsViewModel.userId.collectAsStateWithLifecycle()
 
+    val wishlistViewModel = koinViewModel<WishlistViewModel>()
+    val wishlistItems by wishlistViewModel.wishlistState.collectAsStateWithLifecycle()
+
     LaunchedEffect(email) {
         notificationViewModel.getNotifications(email)
+        wishlistViewModel.fetchWishlist(email)
         cartViewModel.loadCart()
     }
 
@@ -166,7 +171,7 @@ fun ScreenTemplate(
                             selected = isSelectedIcon(KickifyRoute.Wishlist),
                             onClick = { navController.navigate(KickifyRoute.Wishlist) },
                             icon = { Icon(Icons.Outlined.FavoriteBorder, contentDescription = null) },
-                            badge = { SideMenuSimpleCounter(20) }
+                            badge = { SideMenuSimpleCounter(wishlistItems.size) }
                         )
                         NavigationDrawerItem(
                             label = { Text(stringResource(R.string.cart)) },

@@ -1,6 +1,5 @@
 package it.unibo.kickify.ui.composables
 
-import androidx.compose.foundation.layout.offset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
@@ -20,7 +19,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -28,12 +26,19 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.screens.cart.CartViewModel
+import it.unibo.kickify.ui.screens.wishlist.WishlistViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun BottomBar(
     navController: NavController
 ){
+    val wishlistViewModel = koinViewModel<WishlistViewModel>()
+    val wishlistItems by wishlistViewModel.wishlistState.collectAsStateWithLifecycle()
+
+    val cartViewModel = koinViewModel<CartViewModel>()
+    val cartItems by cartViewModel.cartItems.collectAsStateWithLifecycle()
+
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground
@@ -60,7 +65,14 @@ fun BottomBar(
 
         NavigationBarItem(
             selected = isSelectedIcon(KickifyRoute.Wishlist),
-            icon = { Icon(Icons.Outlined.FavoriteBorder, contentDescription = null) },
+            icon = {
+                CustomBadge(
+                    badgeCount = wishlistItems.size,
+                    contentDescr = "${wishlistItems.size} items in cart"
+                ) {
+                    Icon(Icons.Outlined.FavoriteBorder, contentDescription = null)
+                }
+            },
             onClick = {
                 if(!isSelectedIcon(KickifyRoute.Wishlist)){
                     navController.navigate(KickifyRoute.Wishlist)
@@ -68,9 +80,6 @@ fun BottomBar(
             },
             label = { Text(stringResource(R.string.wishlist_title), textAlign = TextAlign.Center) }
         )
-
-        val cartViewModel = koinViewModel<CartViewModel>()
-        val cartItems by cartViewModel.cartItems.collectAsStateWithLifecycle()
 
         NavigationBarItem(
             selected = isSelectedIcon(KickifyRoute.Cart),
@@ -110,12 +119,13 @@ fun BottomBar(
 fun CustomBadge(
     badgeCount: Int,
     contentDescr: String,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit){
     BadgedBox(
         badge = {
             if(badgeCount > 0) {
                 Badge(
-                    modifier = Modifier.offset(x = (-4).dp, y = (-4).dp)
+                    modifier = modifier
                 ) {
                     Text( if(badgeCount <= 9) "$badgeCount" else "9+",
                         modifier = Modifier.semantics {

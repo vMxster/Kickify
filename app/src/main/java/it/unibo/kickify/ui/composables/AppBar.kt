@@ -2,6 +2,7 @@ package it.unibo.kickify.ui.composables
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.EmojiEvents
@@ -91,7 +92,8 @@ fun AppBar(
                 ) {
                     CustomBadge(
                         badgeCount = 100,
-                        contentDescr = "$unreadNotificationsCount notifications to read"
+                        contentDescr = "$unreadNotificationsCount notifications to read",
+                        modifier = Modifier.offset(x = (-4).dp, y = (-4).dp)
                     ) {
                         Icon(
                             Icons.Outlined.Notifications,
