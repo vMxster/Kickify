@@ -7,6 +7,7 @@ import it.unibo.kickify.data.repositories.AppRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class NotificationViewModel (
@@ -24,6 +25,14 @@ class NotificationViewModel (
 
     private val _unreadNotifications = MutableStateFlow(0)
     val unreadNotifications: StateFlow<Int> = _unreadNotifications.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            _notificationState.collectLatest { notifications ->
+                _unreadNotifications.value = notifications?.count { it.state == "Unread" } ?: 0
+            }
+        }
+    }
 
     fun getNotifications(email: String) {
         dismissError()
@@ -51,13 +60,14 @@ class NotificationViewModel (
         }
     }
 
-    fun markNotificationsAsRead(email: String, notificationIds: List<Int>) {
+    fun markAllNotificationsAsRead(email: String){
+        val ids = _notificationState.value?.map { it.notificationId } ?: listOf()
         dismissError()
         _isLoading.value = true
 
         viewModelScope.launch {
             try {
-                val result = repository.markNotificationsAsRead(email, notificationIds)
+                val result = repository.markNotificationsAsRead(email, ids)
                 result.onSuccess {
                     dismissError()
 
@@ -74,13 +84,19 @@ class NotificationViewModel (
         }
     }
 
-    fun getUnreadNotificationsCount(email: String) {
+    fun markNotificationsAsRead(email: String, notificationIds: List<Int>) {
         dismissError()
         _isLoading.value = true
 
         viewModelScope.launch {
             try {
-                _unreadNotifications.value = repository.getUnreadNotificationsCount(email)
+                val result = repository.markNotificationsAsRead(email, notificationIds)
+                result.onSuccess {
+                    dismissError()
+
+                }.onFailure { exception ->
+                    _errorMessage.value = exception.message
+                }
 
             } catch (e: Exception) {
                 _errorMessage.value = e.message ?: "Unexpected error."

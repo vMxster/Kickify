@@ -6,12 +6,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,15 +36,13 @@ fun NotificationScreen(
     notificationViewModel: NotificationViewModel,
     settingsViewModel: SettingsViewModel
 ){
-    val snackBarHostState = remember { SnackbarHostState() }
     val isLoading by notificationViewModel.isLoading.collectAsStateWithLifecycle()
     val errorMessage by notificationViewModel.errorMessage.collectAsStateWithLifecycle()
     val notificationState by notificationViewModel.notificationState.collectAsStateWithLifecycle()
+    val notificationList = notificationState ?: listOf()
 
     val email by settingsViewModel.userId.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
-
-    val notificationList = notificationState ?: mutableListOf()
 
     LaunchedEffect(notificationState, email) {
         notificationViewModel.getNotifications(email)
@@ -65,7 +61,6 @@ fun NotificationScreen(
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true,
-        snackBarHostState = snackBarHostState,
         showLoadingOverlay = isLoading
     ) {
         Column(
@@ -78,8 +73,6 @@ fun NotificationScreen(
             if(errorMessage == null){
                 val notificationGrouped = notificationList.groupBy { convertDateFormat(it.date) }
                 for ((date, notifications) in notificationGrouped.entries){
-                    println("notification grouped: $notificationGrouped")
-                    println("all notifications: $notificationList")
                     NotificationTitleLine(date)
                     for(n in notifications) {
                         NotificationItem(
@@ -101,48 +94,6 @@ fun NotificationScreen(
             } else {
                 Text("an error occurred:\n$errorMessage")
             }
-
-            /*HorizontalDivider(modifier = Modifier.padding(vertical = 15.dp))
-
-            NotificationTitleLine("11 April 2025")
-            NotificationItem(
-                NotificationType.ProductBackinStock,
-                notificationText = "Great news, Mario: the Converse Chuck 70 High All Star is back in stock!!",
-                colorDot = BluePrimary,
-                // onClick = onClick
-            ) { }
-            NotificationItem(
-                NotificationType.OrderShipped,
-                notificationText = "Your order #609327855 was handed over to the SDA express courier...",
-                colorDot = BluePrimary,
-                // onClick = onClick
-            ) { }
-            NotificationItem(
-                NotificationType.FlashSale,
-                notificationText = "Your favourite product Adidas Spezial is noew 20% off for a short time, ...",
-                colorDot = BluePrimary,
-                // onClick = onClick
-            ) { }
-
-            NotificationTitleLine("10 April 2025")
-            NotificationItem(
-                NotificationType.ItemsinCart,
-                notificationText = "You spend a lot of time browsing but just spend a minute to make them...",
-                colorDot = BluePrimary,
-                // onClick = onClick
-            ) { }
-            NotificationItem(
-                NotificationType.OrderPlaced,
-                notificationText = "Your payment has been succesfully processed and we are starting to...",
-                colorDot = Color.Gray,
-                // onClick = onClick
-            ) { }
-            NotificationItem(
-                NotificationType.RequestedProductReview,
-                notificationText = "Share your experience with the product you purchased!",
-                colorDot = BluePrimary,
-                // onClick = onClick
-            ) { }*/
         }
     }
 }

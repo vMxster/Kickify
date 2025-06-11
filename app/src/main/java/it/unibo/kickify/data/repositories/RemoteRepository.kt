@@ -649,7 +649,6 @@ class RemoteRepository(
             )
             val response = makeRequest("auth_handler.php", params)
             val jsonObject = JSONObject(response)
-            println("json obj: $jsonObject")
             if (!RemoteResponseParser.parseSuccess(jsonObject)) {
                 return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
             }
