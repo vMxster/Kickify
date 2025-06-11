@@ -203,7 +203,7 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.Wishlist> {
-            WishlistScreen(navController, settingsViewModel, wishlistViewModel)
+            WishlistScreen(navController, settingsViewModel, wishlistViewModel, productsViewModel)
         }
 
         composable<KickifyRoute.MyOrders> {

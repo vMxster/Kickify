@@ -20,6 +20,7 @@ import it.unibo.kickify.data.database.Review
 import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.data.database.User
 import it.unibo.kickify.data.database.UserOAuth
+import it.unibo.kickify.data.database.WishlistProduct
 import it.unibo.kickify.data.database.Version
 import it.unibo.kickify.data.models.NotificationType
 import it.unibo.kickify.data.repositories.local.CartRepository
@@ -313,19 +314,21 @@ class AppRepository(
     }
 
     // WISHLIST
-    suspend fun getWishlistItems(email: String): Result<List<Product>> = withContext(Dispatchers.IO) {
+    suspend fun getWishlistItems(email: String): Result<List<WishlistProduct>> = withContext(Dispatchers.IO) {
         try {
             val remoteResult = remoteRepository.getWishlistItems(email)
             if (remoteResult.isSuccess) {
                 val remoteWishlist = remoteResult.getOrNull() ?: emptyList()
                 if (remoteWishlist.isNotEmpty()) {
                     for (item in remoteWishlist) {
-                        wishlistRepository.addToWishlist(email, item.productId)
+                        //wishlistRepository.addToWishlist(email, item.productId)
                     }
                 }
-                Result.success(
-                    wishlistRepository.getWishlistItems(email)
-                )
+                return@withContext Result.success(remoteWishlist)
+                /*Result.success(
+                    //wishlistRepository.getWishlistItems(email)
+                    remoteWishlist
+                )*/
             } else {
                 Result.failure(Exception("Nessun Articolo nella wishlist"))
             }

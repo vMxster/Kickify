@@ -2,7 +2,7 @@ package it.unibo.kickify.ui.screens.wishlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import it.unibo.kickify.data.database.Product
+import it.unibo.kickify.data.database.WishlistProduct
 import it.unibo.kickify.data.repositories.AppRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,8 +19,8 @@ class WishlistViewModel(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
-    private val _wishlistState = MutableStateFlow<List<Product>>(emptyList())
-    val wishlistState : StateFlow<List<Product>> = _wishlistState.asStateFlow()
+    private val _wishlistState = MutableStateFlow<List<WishlistProduct>>(emptyList())
+    val wishlistState : StateFlow<List<WishlistProduct>> = _wishlistState.asStateFlow()
 
     fun fetchWishlist(email: String) {
         _errorMessage.value = null
