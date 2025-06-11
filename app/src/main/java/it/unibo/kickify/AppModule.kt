@@ -101,7 +101,7 @@ val appModule = module {
     }
 
     viewModel { SettingsViewModel(get(), get()) }
-    viewModel { AchievementsViewModel(get()) }
+    viewModel { AchievementsViewModel(get(), get(), get()) }
     viewModel { LoginViewModel(get()) }
     viewModel { ProductsViewModel(get(), get()) }
     viewModel { WishlistViewModel(get()) }

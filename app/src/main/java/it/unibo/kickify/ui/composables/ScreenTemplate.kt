@@ -51,7 +51,6 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
-import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.cart.CartViewModel
 import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
 import kotlinx.coroutines.launch
@@ -76,10 +75,6 @@ fun ScreenTemplate(
 
     val cartViewModel = koinViewModel<CartViewModel>()
     val cartItems by cartViewModel.cartItems.collectAsStateWithLifecycle()
-
-    val achievementsViewModel = koinViewModel<AchievementsViewModel>()
-    val lastUnlockedAchievement by achievementsViewModel.lastUnlockedAchievement.collectAsStateWithLifecycle()
-    val showAchievementDialog by achievementsViewModel.showAchievementDialog.collectAsStateWithLifecycle()
 
     val scaffoldContent: @Composable () -> Unit = {
         Scaffold(
@@ -108,21 +103,6 @@ fun ScreenTemplate(
             ) {
                 content() // screen content
 
-                if (showAchievementDialog && lastUnlockedAchievement != null) {
-                    AchievementDialog(
-                        imageResId = lastUnlockedAchievement!!.resourceIconID,
-                        achievementTitleResId = lastUnlockedAchievement!!.titleResId,
-                        achievementDescriptionResId = lastUnlockedAchievement!!.descriptionResId,
-                        onDismissRequest = {
-                            achievementsViewModel.dismissUnlockedAchievementDialog()
-                        },
-                        goToAchievementsPage = {
-                            achievementsViewModel.dismissUnlockedAchievementDialog()
-                            navController.navigate(KickifyRoute.Achievements)
-                        }
-                    )
-                }
-
                 AnimatedVisibility(
                     visible = showLoadingOverlay,
                     enter = fadeIn(),
@@ -135,9 +115,7 @@ fun ScreenTemplate(
                             .clickable(enabled = false) {}
                             .wrapContentSize(Alignment.Center)
                     ) {
-                        CircularProgressIndicator(
-                            //color = MaterialTheme.colorScheme.o
-                        )
+                        CircularProgressIndicator()
                     }
                 }
             }
