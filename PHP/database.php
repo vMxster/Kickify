@@ -210,28 +210,36 @@ class DatabaseHelper {
 
     public function getProductData($productId, $userEmail) {
         $query = "SELECT 
-            p.*,
-            v.Colore,
-            v.Taglia,
-            v.Quantita,
-            CASE WHEN w.Email IS NOT NULL THEN 1 ELSE 0 END as InWishlist,
-            CASE WHEN cart.ID_Prodotto IS NOT NULL THEN 1 ELSE 0 END as InCart,
-            cart.Quantita as CartQuantity
-        FROM PRODOTTO p
-        LEFT JOIN VARIANTE v ON p.ID_Prodotto = v.ID_Prodotto
-        LEFT JOIN (
-            SELECT a.ID_Prodotto, w.Email 
-            FROM WISHLIST w 
-            JOIN aggiungere a ON w.Email = a.Email 
-            WHERE w.Email = ?
-        ) w ON p.ID_Prodotto = w.ID_Prodotto
-        LEFT JOIN (
-            SELECT comp.ID_Prodotto, comp.Quantita 
-            FROM CARRELLO c 
-            JOIN comprendere comp ON c.ID_Carrello = comp.ID_Carrello 
-            WHERE c.Email = ?
-        ) cart ON p.ID_Prodotto = cart.ID_Prodotto
-        WHERE p.ID_Prodotto = ?";
+                p.*,
+                v.Colore,
+                v.Taglia,
+                v.Quantita,
+                r.Punteggio,
+                r.Descrizione as RecensioneDescrizione,
+                r.Data_Recensione,
+                r.Email as ReviewerEmail,
+                u.Nome as RecensioneNome,
+                u.Cognome as RecensioneCognome,
+                CASE WHEN w.Email IS NOT NULL THEN 1 ELSE 0 END as InWishlist,
+                CASE WHEN cart.ID_Prodotto IS NOT NULL THEN 1 ELSE 0 END as InCart,
+                cart.Quantita as CartQuantity
+            FROM PRODOTTO p
+            LEFT JOIN VARIANTE v ON p.ID_Prodotto = v.ID_Prodotto
+            LEFT JOIN RECENSIONE r ON p.ID_Prodotto = r.ID_Prodotto 
+            LEFT JOIN UTENTE u ON r.Email = u.Email
+            LEFT JOIN (
+                SELECT a.ID_Prodotto, w.Email 
+                FROM WISHLIST w 
+                JOIN aggiungere a ON w.Email = a.Email 
+                WHERE w.Email = ?
+            ) w ON p.ID_Prodotto = w.ID_Prodotto
+            LEFT JOIN (
+                SELECT comp.ID_Prodotto, comp.Quantita 
+                FROM CARRELLO c 
+                JOIN comprendere comp ON c.ID_Carrello = comp.ID_Carrello 
+                WHERE c.Email = ?
+            ) cart ON p.ID_Prodotto = cart.ID_Prodotto
+            WHERE p.ID_Prodotto = ?";
     
         try {
             $stmt = $this->db->prepare($query);
@@ -247,6 +255,8 @@ class DatabaseHelper {
                 'inCart' => false,
                 'cartQuantity' => 0
             ];
+
+            $uniqueReviews = [];
     
             while($row = $result->fetch_assoc()) {
                 if(!$productData['product']) {
@@ -283,7 +293,9 @@ class DatabaseHelper {
                             'Punteggio' => $row['Punteggio'],
                             'Descrizione' => $row['RecensioneDescrizione'],
                             'Data_Recensione' => $row['Data_Recensione'],
-                            'Email' => $row['ReviewerEmail']
+                            'Email' => $row['ReviewerEmail'],
+                            'Nome' => $row['RecensioneNome'],
+                            'Cognome' => $row['RecensioneCognome']
                         ];
                         $uniqueReviews[$reviewKey] = true;
                     }
@@ -312,6 +324,12 @@ class DatabaseHelper {
         
         $stmt = $this->db->prepare($query);
         $stmt->bind_param("is", $productId, $lastAccess);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function getVersions() {
+        $stmt = $this->db->prepare("SELECT * FROM VARIANTE");
         $stmt->execute();
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
@@ -1488,15 +1506,14 @@ class DatabaseHelper {
     }
 
     // Get product reviews
-    public function getProductReviews($productId, $lastAccess) {
+    public function getProductReviews($productId) {
         $query = "SELECT r.*, u.Nome, u.Cognome 
                 FROM RECENSIONE r 
                 JOIN UTENTE u ON r.Email = u.Email 
                 WHERE r.ID_Prodotto = ? 
-                AND r.Data_Recensione > ? 
                 ORDER BY r.Data_Recensione DESC";
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param("ss", $productId, $lastAccess);
+        $stmt->bind_param("s", $productId);
         $stmt->execute();
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }

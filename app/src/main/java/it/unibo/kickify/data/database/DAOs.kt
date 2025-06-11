@@ -175,7 +175,7 @@ interface ProductStateDao {
 @Dao
 interface VersionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertProductVariant(variant: Version)
+    suspend fun insertProductVariant(version: Version)
 }
 
 @Dao

@@ -8,6 +8,7 @@ import it.unibo.kickify.data.database.Product
 import it.unibo.kickify.data.database.ProductDetails
 import it.unibo.kickify.data.database.ProductWithImage
 import it.unibo.kickify.data.database.ReviewWithUserInfo
+import it.unibo.kickify.data.database.Version
 import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.utils.DatabaseReadyManager
 import kotlinx.coroutines.cancel
@@ -38,6 +39,9 @@ class ProductsViewModel(
     private val _productDetails = MutableStateFlow<Result<CompleteProduct>?>(null)
     val productDetails: StateFlow<Result<CompleteProduct>?> = _productDetails
 
+    private val _productVariants = MutableStateFlow<Result<Map<Int, List<Version>>>>(Result.success(emptyMap()))
+    val productVariants: StateFlow<Result<Map<Int, List<Version>>>> = _productVariants
+
     private val _productDataAndReviews = MutableStateFlow<Result<ProductDetails>?>(null)
     val productDataAndReviews: StateFlow<Result<ProductDetails>?> =_productDataAndReviews
 
@@ -51,19 +55,18 @@ class ProductsViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    // Risultati della ricerca
     private val _searchResults = MutableStateFlow<Result<List<ProductWithImage>>>(Result.success(emptyList()))
     val searchResults: StateFlow<Result<List<ProductWithImage>>> = _searchResults
 
     init {
         viewModelScope.launch {
-            // Attendi che il database sia pronto
             databaseReadyManager.isDatabaseReady.collect { isReady ->
                 if (isReady) {
                     loadProducts()
-                    loadPopularProducts()
-                    loadNewProducts()
-                    loadDiscountedProducts()
+                    launch { loadVersions() }
+                    launch { loadPopularProducts() }
+                    launch { loadNewProducts() }
+                    launch { loadDiscountedProducts() }
                     this.cancel()
                 }
             }
@@ -78,6 +81,20 @@ class ProductsViewModel(
                 val mapValues = result.getOrNull() ?: emptyMap()
                 val listValues = mapValues.map { (product, image) -> Pair(product, image) }
                 _products.value = Result.success(listValues)
+            } else {
+                _products.value = Result.failure(result.exceptionOrNull() ?: Exception("Errore caricamento prodotti"))
+            }
+        }
+        _isLoading.value = false
+    }
+
+    private fun loadVersions() {
+        _isLoading.value = true
+        viewModelScope.launch {
+            val result = repository.getVersions()
+            if (result.isSuccess) {
+                val mapValues = result.getOrNull() ?: emptyMap()
+                _productVariants.value = Result.success(mapValues)
             } else {
                 _products.value = Result.failure(result.exceptionOrNull() ?: Exception("Errore caricamento prodotti"))
             }

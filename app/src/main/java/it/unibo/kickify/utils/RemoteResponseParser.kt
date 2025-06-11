@@ -12,6 +12,7 @@ import it.unibo.kickify.data.database.OrderProduct
 import it.unibo.kickify.data.database.Product
 import it.unibo.kickify.data.database.ProductDetails
 import it.unibo.kickify.data.database.Review
+import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.data.database.TrackingShipping
 import it.unibo.kickify.data.database.User
 import it.unibo.kickify.data.database.Version
@@ -44,6 +45,22 @@ class RemoteResponseParser {
                 addDate = json.getString("Data_Aggiunta"),
                 state = json.getString("Sta_Tipo")
             )
+        }
+
+        fun parseVersions(jsonArray: JSONArray): List<Version> {
+            val versions = mutableListOf<Version>()
+            for (i in 0 until jsonArray.length()) {
+                val versionJson = jsonArray.getJSONObject(i)
+                versions.add(
+                    Version(
+                        productId = versionJson.getInt("ID_Prodotto"),
+                        color = versionJson.getString("Colore"),
+                        size = versionJson.getDouble("Taglia"),
+                        quantity = versionJson.getInt("Quantita")
+                    )
+                )
+            }
+            return versions
         }
 
         fun parseProductDetails(json: JSONObject): ProductDetails {
@@ -97,11 +114,12 @@ class RemoteResponseParser {
         }
 
         fun parseCart(json: JSONObject): Cart {
+            val cartData = json.getJSONObject("cart")
             return Cart(
-                cartId = json.getInt("ID_Carrello"),
-                email = json.getString("Email"),
-                totalValue = json.getDouble("Valore_Totale"),
-                modifyDate = json.getString("Data_Modifica")
+                cartId = cartData.getInt("ID_Carrello"),
+                email = cartData.getString("Email"),
+                totalValue = json.getDouble("cartTotal"),
+                modifyDate = cartData.getString("Data_Modifica"),
             )
         }
 
@@ -235,17 +253,21 @@ class RemoteResponseParser {
         }
 
         // Parser per le recensioni
-        fun parseReviews(json: JSONArray): List<Review> {
-            val reviews = mutableListOf<Review>()
+        fun parseReviews(json: JSONArray): List<ReviewWithUserInfo> {
+            val reviews = mutableListOf<ReviewWithUserInfo>()
             for (i in 0 until json.length()) {
                 val reviewJson = json.getJSONObject(i)
                 reviews.add(
-                    Review(
-                        productId = reviewJson.optInt("ID_Prodotto", 0),
-                        email = reviewJson.getString("Email"),
-                        vote = reviewJson.getDouble("Punteggio"),
-                        comment = reviewJson.optString("Descrizione", ""),
-                        reviewDate = reviewJson.getString("Data_Recensione"),
+                    ReviewWithUserInfo(
+                        Review(
+                            productId = reviewJson.optInt("ID_Prodotto", 0),
+                            email = reviewJson.getString("Email"),
+                            vote = reviewJson.getDouble("Punteggio"),
+                            comment = reviewJson.optString("Descrizione", ""),
+                            reviewDate = reviewJson.getString("Data_Recensione"),
+                        ),
+                        name = reviewJson.optString("Nome"),
+                        surname = reviewJson.optString("Cognome")
                     )
                 )
             }

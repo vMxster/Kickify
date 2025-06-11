@@ -870,7 +870,7 @@ data class OrderProductDetails(
 data class ProductDetails(
     val product: Product,
     val variants: List<Version>,
-    val reviews: List<Review>,
+    val reviews: List<ReviewWithUserInfo>,
     val inWishlist: Boolean,
     val inCart: Boolean,
     val cartQuantity: Int

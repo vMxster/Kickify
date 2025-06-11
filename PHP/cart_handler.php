@@ -23,7 +23,7 @@ try {
                     $cartInfo = calculateCartInfo($dbh, $cart['ID_Carrello']);
                     $response = [
                         'success' => true,
-                        'cartId' => $cart['ID_Carrello'],
+                        'cart' => $cart,
                         'itemCount' => $cartInfo['itemCount'],
                         'cartTotal' => $cartInfo['total']
                     ];

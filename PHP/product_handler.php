@@ -244,15 +244,24 @@ try {
             break;
 
         case "getProductReviews":
-            if (!isset($_POST["productId"]) || !isset($_POST["last_access"])) {
+            if (!isset($_POST["productId"])) {
                 throw new Exception("Missing required fields");
             }
     
-            $reviews = $dbh->getProductReviews($_POST["productId"], $_POST["last_access"]);
+            $reviews = $dbh->getProductReviews($_POST["productId"]);
     
             $response = [
                 "success" => true,
                 "reviews" => $reviews
+            ];
+            break;
+
+        case "getVersions":
+            $versions = $dbh->getVersions();
+
+            $response = [
+                "success" => true,
+                "versions" => $versions
             ];
             break;
 

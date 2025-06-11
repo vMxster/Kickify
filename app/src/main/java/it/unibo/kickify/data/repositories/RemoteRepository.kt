@@ -28,8 +28,10 @@ import it.unibo.kickify.data.database.OrderDetails
 import it.unibo.kickify.data.database.Product
 import it.unibo.kickify.data.database.ProductDetails
 import it.unibo.kickify.data.database.Review
+import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.data.database.TrackingShipping
 import it.unibo.kickify.data.database.User
+import it.unibo.kickify.data.database.Version
 import it.unibo.kickify.data.database.WishlistProduct
 import it.unibo.kickify.utils.RemoteResponseParser
 import kotlinx.coroutines.Dispatchers
@@ -118,6 +120,37 @@ class RemoteRepository(
             Result.success(history)
         } catch (e: Exception) {
             Log.e(tag, "Errore durante il recupero della cronologia del prodotto $productId", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getProductRating(productId: Int): Double {
+        return try {
+            val params = mapOf(
+                "action" to "getProductRating",
+                "productId" to productId.toString()
+            )
+            val response = makeRequest("review_handler.php", params)
+            val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                throw Exception(RemoteResponseParser.parseError(jsonObject))
+            }
+            jsonObject.optDouble("rating", 0.0)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante il recupero della valutazione del prodotto $productId", e)
+            0.0
+        }
+    }
+
+    suspend fun getVersions(): Result<List<Version>> = withContext(Dispatchers.IO) {
+        try {
+            val params = mapOf("action" to "getVersions")
+            val response = makeRequest("product_handler.php", params)
+            val jsonArray = JSONArray(response)
+            val versions = RemoteResponseParser.parseVersions(jsonArray)
+            Result.success(versions)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante il recupero delle versioni dei prodotti", e)
             Result.failure(e)
         }
     }
@@ -505,12 +538,11 @@ class RemoteRepository(
         }
     }
 
-    suspend fun getReviews(productId: Int, lastAccess: String): Result<List<Review>> = withContext(Dispatchers.IO) {
+    suspend fun getReviews(productId: Int): Result<List<ReviewWithUserInfo>> = withContext(Dispatchers.IO) {
         try {
             val params = mapOf(
                 "action" to "getProductReviews",
-                "productId" to productId.toString(),
-                "last_access" to lastAccess
+                "productId" to productId.toString()
             )
             val response = makeRequest("product_handler.php", params)
             val jsonObject = JSONObject(response)

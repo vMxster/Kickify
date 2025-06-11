@@ -20,6 +20,7 @@ import it.unibo.kickify.data.database.Review
 import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.data.database.User
 import it.unibo.kickify.data.database.UserOAuth
+import it.unibo.kickify.data.database.Version
 import it.unibo.kickify.data.models.NotificationType
 import it.unibo.kickify.data.repositories.local.CartRepository
 import it.unibo.kickify.data.repositories.local.ImageRepository
@@ -116,6 +117,31 @@ class AppRepository(
         return@withContext productRepository.getProductImages(productId)
     }
 
+    suspend fun getVersions(): Result<Map<Int, List<Version>>> = withContext(Dispatchers.IO) {
+        try {
+            val remoteResult = remoteRepository.getVersions()
+            if (remoteResult.isSuccess) {
+                val versions = remoteResult.getOrNull() ?: emptyList()
+                if (versions.isNotEmpty()) {
+                    versions.forEach { version ->
+                        try {
+                            versionRepository.insertProductVariant(version)
+                        } catch (e: Exception) {
+                            Log.e(tag, "Errore inserimento versione ${version.productId}: ${e.message}")
+                        }
+                    }
+                    val groupedVersions = versions.groupBy { it.productId }
+                    return@withContext Result.success(groupedVersions)
+                }
+                return@withContext Result.success(emptyMap())
+            }
+            Result.failure(Exception("Nessuna versione trovata"))
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in getVersions", e)
+            Result.failure(e)
+        }
+    }
+
     suspend fun getProductData(productId: Int, userEmail: String): Result<ProductDetails> = withContext(Dispatchers.IO) {
         try {
             val remoteResult = remoteRepository.getProductData(productId, userEmail)
@@ -124,9 +150,6 @@ class AppRepository(
                 remoteProduct?.let {
                     for (variant in it.variants) {
                         versionRepository.insertProductVariant(variant)
-                    }
-                    for (review in it.reviews) {
-                        reviewRepository.addReview(review)
                     }
                 }
                 return@withContext remoteResult
@@ -495,48 +518,26 @@ class AppRepository(
     }
 
     // RECENSIONI
-    suspend fun addReview(
-        email: String,
-        productId: Int,
-        rating: Double,
-        comment: String
-    ): Result<Boolean> {
-        val result = remoteRepository.addReview(email, productId, rating, comment)
-        if (result.isSuccess && result.getOrNull() == true) {
-            val review = Review(
-                productId = productId,
-                email = email,
-                vote = rating,
-                comment = comment,
-                reviewDate = LocalDateTime.now().toString()
-            )
-            reviewRepository.addReview(review)
+    suspend fun addReview(email: String, productId: Int, rating: Double, comment: String): Result<Boolean> =
+        withContext(Dispatchers.IO) {
+            remoteRepository.addReview(email, productId, rating, comment)
         }
-        return result
-    }
 
-    suspend fun deleteReview(email: String, productId: Int): Result<Boolean> {
-        val result = remoteRepository.deleteReview(email, productId)
-        if (result.isSuccess && result.getOrNull() == true) {
-            reviewRepository.deleteReview(email, productId)
+    suspend fun deleteReview(email: String, productId: Int): Result<Boolean> =
+        withContext(Dispatchers.IO) {
+            remoteRepository.deleteReview(email, productId)
         }
-        return result
-    }
+
 
     suspend fun getReviews(productId: Int): Result<List<ReviewWithUserInfo>> = withContext(Dispatchers.IO) {
         try {
-            val remoteResult = remoteRepository.getReviews(productId, lastAccess.first())
+            val remoteResult = remoteRepository.getReviews(productId)
             if (remoteResult.isSuccess) {
                 val remoteReviews = remoteResult.getOrNull() ?: emptyList()
-                if (remoteReviews.isNotEmpty()) {
-                    for (review in remoteReviews) {
-                        reviewRepository.addReview(review)
-                    }
-                }
+                return@withContext Result.success(remoteReviews)
+            } else {
+                Result.failure(Exception("Nessuna recensione trovata"))
             }
-            Result.success(
-                reviewRepository.getProductReviews(productId, lastAccess.first())
-            )
         } catch (e: Exception) {
             Log.e(tag, "Errore in getReviews", e)
             Result.failure(e)
@@ -544,13 +545,14 @@ class AppRepository(
     }
 
     suspend fun getProductRating(productId: Int): Result<Double> = withContext(Dispatchers.IO) {
-        Result.success(reviewRepository.getProductRating(productId))
+        Result.success(remoteRepository.getProductRating(productId))
     }
 
     suspend fun canUserReview(email: String, productId: Int): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
-            val canReview = reviewRepository.canUserReview(email, productId)
-            Result.success(canReview)
+            Result.success(
+                reviewRepository.canUserReview(email, productId)
+            )
         } catch (e: Exception) {
             Log.e(tag, "Errore in canUserReview", e)
             Result.failure(e)
