@@ -1,5 +1,6 @@
 package it.unibo.kickify.ui.composables
 
+import androidx.compose.foundation.layout.offset
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
@@ -19,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -112,8 +114,10 @@ fun CustomBadge(
     BadgedBox(
         badge = {
             if(badgeCount > 0) {
-                Badge {
-                    Text( if(badgeCount <= 10) "$badgeCount" else "10+",
+                Badge(
+                    modifier = Modifier.offset(x = (-4).dp, y = (-4).dp)
+                ) {
+                    Text( if(badgeCount <= 9) "$badgeCount" else "9+",
                         modifier = Modifier.semantics {
                             contentDescription = contentDescr
                         }

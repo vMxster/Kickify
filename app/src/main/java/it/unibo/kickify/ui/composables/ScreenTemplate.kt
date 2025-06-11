@@ -37,6 +37,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -53,6 +54,7 @@ import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.screens.cart.CartViewModel
 import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
+import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -76,6 +78,14 @@ fun ScreenTemplate(
     val cartViewModel = koinViewModel<CartViewModel>()
     val cartItems by cartViewModel.cartItems.collectAsStateWithLifecycle()
 
+    val settingsViewModel = koinViewModel<SettingsViewModel>()
+    val email by settingsViewModel.userId.collectAsStateWithLifecycle()
+
+    LaunchedEffect(email) {
+        notificationViewModel.getNotifications(email)
+        cartViewModel.loadCart()
+    }
+
     val scaffoldContent: @Composable () -> Unit = {
         Scaffold(
             topBar = {
@@ -90,7 +100,10 @@ fun ScreenTemplate(
                                 coroutineScope.launch { drawerState.open() }
                             }
                         },
-                        notificationViewModel
+                        unreadNotificationsCount = unreadNotifications,
+                        markAllNotificationsAsRead = {
+                            notificationViewModel.markAllNotificationsAsRead(email)
+                        }
                     )
                 }
             },
