@@ -21,21 +21,23 @@ import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ProductCardWishlistPage
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.productList.ProductsViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 
 @Composable
 fun WishlistScreen(
     navController: NavController,
     settingsViewModel: SettingsViewModel,
-    wishlistViewModel: WishlistViewModel
+    wishlistViewModel: WishlistViewModel,
+    productsViewModel: ProductsViewModel
 ){
     val isLoading by wishlistViewModel.isLoading.collectAsStateWithLifecycle()
-    val errorMessage by wishlistViewModel.errorMessage.collectAsStateWithLifecycle()
     val wishlistState by wishlistViewModel.wishlistState.collectAsStateWithLifecycle()
+    val products by productsViewModel.products.collectAsStateWithLifecycle()
 
     val email by settingsViewModel.userId.collectAsStateWithLifecycle()
 
-    LaunchedEffect(wishlistState, email) {
+    LaunchedEffect(wishlistState, email, products) {
         wishlistViewModel.fetchWishlist(email)
     }
 
@@ -53,38 +55,38 @@ fun WishlistScreen(
             modifier = Modifier.fillMaxSize()
                 .padding(horizontal = 16.dp)
         ){
-            if(errorMessage != null){
-                if(wishlistState.isEmpty()){
-                    Text(stringResource(R.string.emptyWishlist))
-                } else {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                        horizontalArrangement = Arrangement.spacedBy(20.dp)
-                    ) {
-                        items(wishlistState.size) { index ->
-                            val prodInfo = wishlistState[index]
+            val prodList = products.getOrNull() ?: emptyList()
+
+            if (wishlistState.isEmpty()) {
+                Text(stringResource(R.string.emptyWishlist))
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    items(wishlistState.size) { index ->
+                        val prodID = wishlistState[index].productId
+                        prodList.firstOrNull { it.first.productId == prodID }.let {
+                            val prodInfo = it?.first
+                            val prodImg = it?.second
+
                             ProductCardWishlistPage(
-                                mainImgUrl = "",
-                                productName = "${prodInfo.brand} ${prodInfo.name}",
-                                price = prodInfo.price,
+                                mainImgUrl = prodImg?.url ?: "",
+                                productName = "${prodInfo?.brand} ${prodInfo?.name}",
+                                price = prodInfo?.price ?: 0.0,
                                 onClick = {
-                                    navController.navigate(KickifyRoute.ProductDetails(
-                                        prodInfo.productId))
+                                    navController.navigate(KickifyRoute.ProductDetails(prodID))
                                 },
                                 onToggleWishlistIcon = { checked ->
-                                    if(!checked){
-                                        wishlistViewModel.removeFromWishlist(
-                                            email, prodInfo.productId
-                                        )
+                                    if (!checked) {
+                                        wishlistViewModel.removeFromWishlist(email, prodID)
                                     }
                                 }
                             )
                         }
                     }
                 }
-            } else {
-                Text(stringResource(R.string.errorLoadingWishlist))
             }
         }
     }
