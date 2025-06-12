@@ -47,12 +47,12 @@ import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.PaymentMethodRow
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    settingsViewModel: SettingsViewModel
+    settingsViewModel: SettingsViewModel,
+    profileViewModel: ProfileViewModel
 ){
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -60,8 +60,6 @@ fun ProfileScreen(
     val userEmail by settingsViewModel.userId.collectAsStateWithLifecycle()
     val username by settingsViewModel.userName.collectAsStateWithLifecycle()
     val userImg by settingsViewModel.userImg.collectAsStateWithLifecycle()
-
-    val profileViewModel = koinViewModel<ProfileViewModel>()
 
     val user by profileViewModel.user.collectAsStateWithLifecycle()
     val addrList by profileViewModel.addressList.collectAsStateWithLifecycle()

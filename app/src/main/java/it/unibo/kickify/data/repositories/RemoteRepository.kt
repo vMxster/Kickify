@@ -27,7 +27,6 @@ import it.unibo.kickify.data.database.Order
 import it.unibo.kickify.data.database.OrderDetails
 import it.unibo.kickify.data.database.Product
 import it.unibo.kickify.data.database.ProductDetails
-import it.unibo.kickify.data.database.Review
 import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.data.database.TrackingShipping
 import it.unibo.kickify.data.database.User
@@ -182,7 +181,8 @@ class RemoteRepository(
                 "user_email" to email
             )
             val response = makeRequest("cart_handler.php", params)
-            val jsonArray = JSONArray(response)
+            val jsonObject = JSONObject(response)
+            val jsonArray = jsonObject.getJSONArray("items")
             val items = RemoteResponseParser.parseCartItems(jsonArray)
             Result.success(items)
         } catch (e: Exception) {
