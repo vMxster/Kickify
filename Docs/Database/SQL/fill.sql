@@ -12,9 +12,6 @@ INSERT INTO STATO_PRODOTTO (Tipo, Descrizione) VALUES
     	('Not Available', 'Il prodotto non è attualmente disponibile in magazzino'),
     	('Coming', 'Il prodotto è previsto in arrivo prossimamente');
 
--- Aggiornamento dati nella tabella MESSAGGIO
-INSERT INTO MESSAGGIO (Email, Oggetto, Corpo, Timestamp_Invio) VALUES ('tomassimartin@hotmail.com', 	'Risposta', 'Ciao, ho pensato a questo', NOW());
-
 -- Aggiornamento dati nella tabella NOTIFICA
 INSERT INTO NOTIFICA (ID_Notifica, TipoNotifica, Messaggio, Timestamp_Invio, Tipo, Email) VALUES 	('1', 'Flash Sale', 'Your favorite product Ultraboost [1] is now 6% off for a short time!!', NOW(), 	'Unread', 'tomassimartin@hotmail.com');
 
@@ -29,8 +26,8 @@ INSERT INTO PRODOTTO (Nome, Descrizione, Marca, Tipo, Genere, Prezzo, Data_Aggiu
     ('RS-X', 'Scarpa dal design futuristico', 'Puma', 'Sneakers', 'Man', 110.00, '2025-01-08', 'Available'),
     ('Cali', 'Scarpa casual retrò', 'Puma', 'Sneakers', 'Woman', 90.00, '2025-01-08', 'Available'),
     ('Suede XL', 'Scarpe comode e di tendenza', 'Puma', 'Sneakers', 'Kids', 35.00, '2025-01-08', 'Available'),
-    ('All Star', 'Scarpa iconica in tela', 'Converse', 'Sneakers', 'Man', 75.00, '2025-01-08', 'Available'),
-    ('HOVR', 'Scarpa da corsa ammortizzata', 'Under Armour', 'Sneakers', 'Woman', 110.00, '2025-01-08', 'Available');
+    ('Samba', 'Scarpe comode e di tendenza', 'Adidas', 'Sneakers', 'Man', 120.00, '2025-04-14', 'Available'),
+    ('Cortez', 'Scarpe comode e di tendenza', 'Nike', 'Sneakers', 'Woman', 100.00, '2025-04-16', 'Available');
 
 -- Aggiornamento dati nella tabella RECENSIONE
 INSERT INTO RECENSIONE (`ID_Prodotto`, `Email`, `Punteggio`, `Descrizione`, `Data_Recensione`) VALUES ('1', 	'tomassimartin@hotmail.com', '4', 'Ottima Scarpa', NOW());

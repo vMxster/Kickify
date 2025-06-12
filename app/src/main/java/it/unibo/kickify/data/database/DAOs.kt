@@ -122,16 +122,19 @@ interface ProductDao {
     suspend fun getProductCartInfo(productId: Int, email: String): CartQuantity?
 
     @Query("""
-        SELECT ps.* FROM PRODOTTO_STORICO ps 
-        WHERE ps.ID_Prodotto = :productId
+        SELECT * FROM PRODOTTO_STORICO ps1
+        WHERE ps1.Data_Modifica = (
+            SELECT MAX(ps2.Data_Modifica) FROM PRODOTTO_STORICO ps2
+            WHERE ps2.ID_Prodotto = ps1.ID_Prodotto
+        )
     """)
-    suspend fun getProductHistory(productId: Int): List<HistoryProduct>
+    suspend fun getProductsHistory(): List<HistoryProduct>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProduct(product: Product)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertProductHistory(remoteHistory: List<HistoryProduct>)
+    suspend fun insertProductsHistory(remoteHistory: List<HistoryProduct>)
 
     @Query("""
         SELECT * FROM PRODOTTO 
@@ -153,10 +156,13 @@ interface ProductDao {
     suspend fun getNewProducts(): List<Product>
 
     @Query("""
-        SELECT * FROM PRODOTTO 
-        WHERE ID_Prodotto IN (
-            SELECT ID_Prodotto FROM PRODOTTO_STORICO
+        SELECT p.* FROM PRODOTTO p
+        JOIN PRODOTTO_STORICO ps ON p.ID_Prodotto = ps.ID_Prodotto
+        WHERE ps.Data_Modifica = (
+            SELECT MAX(ps2.Data_Modifica) FROM PRODOTTO_STORICO ps2
+            WHERE ps2.ID_Prodotto = ps.ID_Prodotto
         )
+        AND p.Prezzo < ps.Prezzo
     """)
     suspend fun getDiscountedProducts(): List<Product>
 

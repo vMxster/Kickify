@@ -230,12 +230,12 @@ try {
             ];
             break;
         
-        case "getProductHistory":
-            if (!isset($_POST["productId"]) || !isset($_POST["last_access"])) {
+        case "getProductsHistory":
+            if (!isset($_POST["last_access"])) {
                 throw new Exception("Missing required fields");
             }
     
-            $history = $dbh->getProductHistory($_POST["productId"], $_POST["last_access"]);
+            $history = $dbh->getProductsHistory($_POST["last_access"]);
     
             $response = [
                 "success" => true,

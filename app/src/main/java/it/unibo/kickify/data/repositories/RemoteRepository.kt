@@ -106,11 +106,10 @@ class RemoteRepository(
         }
     }
 
-    suspend fun getProductHistory(productId: Int, lastAccess: String): Result<List<HistoryProduct>> = withContext(Dispatchers.IO) {
+    suspend fun getProductsHistory(lastAccess: String): Result<List<HistoryProduct>> = withContext(Dispatchers.IO) {
         try {
             val params = mapOf(
-                "action" to "getProductHistory",
-                "productId" to productId.toString(),
+                "action" to "getProductsHistory",
                 "last_access" to lastAccess
             )
             val response = makeRequest("product_handler.php", params)
@@ -118,7 +117,7 @@ class RemoteRepository(
             val history = RemoteResponseParser.parseProductHistory(jsonArray)
             Result.success(history)
         } catch (e: Exception) {
-            Log.e(tag, "Errore durante il recupero della cronologia del prodotto $productId", e)
+            Log.e(tag, "Errore durante il recupero della cronologia dei prodotti", e)
             Result.failure(e)
         }
     }

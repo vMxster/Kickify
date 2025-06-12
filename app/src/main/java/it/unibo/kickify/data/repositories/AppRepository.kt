@@ -162,19 +162,18 @@ class AppRepository(
         }
     }
 
-    suspend fun getProductHistory(productId: Int): Result<List<HistoryProduct>> =
+    suspend fun getProductsHistory(): Result<List<HistoryProduct>> =
         withContext(Dispatchers.IO) {
             try {
-                val remoteResult = remoteRepository.getProductHistory(productId, lastAccess.first())
+                val remoteResult = remoteRepository.getProductsHistory(lastAccess.first())
                 if (remoteResult.isSuccess) {
                     val remoteHistory = remoteResult.getOrNull() ?: emptyList()
-
                     if (remoteHistory.isNotEmpty()) {
-                        productRepository.insertProductHistory(remoteHistory)
+                        productRepository.insertProductsHistory(remoteHistory)
                     }
                 }
                 Result.success(
-                    productRepository.getProductHistory(productId)
+                    productRepository.getProductsHistory()
                 )
             } catch (e: Exception) {
                 Log.e(tag, "Errore in getProductHistory", e)

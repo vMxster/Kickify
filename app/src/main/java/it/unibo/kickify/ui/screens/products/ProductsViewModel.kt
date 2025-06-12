@@ -3,6 +3,7 @@ package it.unibo.kickify.ui.screens.products
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.unibo.kickify.data.database.CompleteProduct
+import it.unibo.kickify.data.database.HistoryProduct
 import it.unibo.kickify.data.database.Image
 import it.unibo.kickify.data.database.Product
 import it.unibo.kickify.data.database.ProductDetails
@@ -21,26 +22,33 @@ class ProductsViewModel(
     private val databaseReadyManager: DatabaseReadyManager
 ) : ViewModel() {
 
-    // Prodotti generici per ProductListScreen
+    // Prodotti generici
     private val _products = MutableStateFlow<Result<List<Pair<Product, Image>>>>(Result.success(emptyList()))
     val products: StateFlow<Result<List<Pair<Product, Image>>>> = _products
 
-    // Prodotti specifici per HomeScreen
+    // Prodotti Popolari
     private val _popularProducts = MutableStateFlow<Result<List<Product>>>(Result.success(emptyList()))
     val popularProducts: StateFlow<Result<List<Product>>> = _popularProducts
 
+    // Prodotti Nuovi
     private val _newProducts = MutableStateFlow<Result<List<Product>>>(Result.success(emptyList()))
     val newProducts: StateFlow<Result<List<Product>>> = _newProducts
 
+    // Prodotti Scontati
     private val _discountedProducts = MutableStateFlow<Result<List<Product>>>(Result.success(emptyList()))
     val discountedProducts: StateFlow<Result<List<Product>>> = _discountedProducts
 
-    // Dettagli prodotto per ProductDetailsScreen
+    // Dettagli prodotto
     private val _productDetails = MutableStateFlow<Result<CompleteProduct>?>(null)
     val productDetails: StateFlow<Result<CompleteProduct>?> = _productDetails
 
+    // Varianti prodotto
     private val _productVariants = MutableStateFlow<Result<Map<Int, List<Version>>>>(Result.success(emptyMap()))
     val productVariants: StateFlow<Result<Map<Int, List<Version>>>> = _productVariants
+
+    // Cronologia prodotti
+    private val _productHistory = MutableStateFlow<Result<List<HistoryProduct>>>(Result.success(emptyList()))
+    val productHistory: StateFlow<Result<List<HistoryProduct>>> = _productHistory
 
     private val _productDataAndReviews = MutableStateFlow<Result<ProductDetails>?>(null)
     val productDataAndReviews: StateFlow<Result<ProductDetails>?> =_productDataAndReviews
@@ -64,11 +72,28 @@ class ProductsViewModel(
                 if (isReady) {
                     loadProducts()
                     launch { loadVersions() }
+                    launch { loadProductsHistory() }
                     launch { loadPopularProducts() }
                     launch { loadNewProducts() }
                     launch { loadDiscountedProducts() }
                     this.cancel()
                 }
+            }
+        }
+    }
+
+    private fun loadProductsHistory() {
+        viewModelScope.launch {
+            try {
+                repository.getProductsHistory().also { result ->
+                    if (result.isSuccess) {
+                        _productHistory.value = Result.success(result.getOrNull() ?: emptyList())
+                    } else {
+                        _productHistory.value = Result.failure(result.exceptionOrNull() ?: Exception("Errore caricamento cronologia prodotti"))
+                    }
+                }
+            } catch (e: Exception) {
+                _products.value = Result.failure(e)
             }
         }
     }
