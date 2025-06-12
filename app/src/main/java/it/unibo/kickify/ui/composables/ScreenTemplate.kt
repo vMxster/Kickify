@@ -56,6 +56,7 @@ import it.unibo.kickify.ui.screens.cart.CartViewModel
 import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.screens.wishlist.WishlistViewModel
+import it.unibo.kickify.ui.theme.BluePrimary
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -133,7 +134,7 @@ fun ScreenTemplate(
                             .clickable(enabled = false) {}
                             .wrapContentSize(Alignment.Center)
                     ) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(color = BluePrimary)
                     }
                 }
             }
