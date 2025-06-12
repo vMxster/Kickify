@@ -91,7 +91,7 @@ fun AppBar(
                     onClick = { navController.navigate(KickifyRoute.Notifications){ launchSingleTop = true } }
                 ) {
                     CustomBadge(
-                        badgeCount = 100,
+                        badgeCount = unreadNotificationsCount,
                         contentDescr = "$unreadNotificationsCount notifications to read",
                         modifier = Modifier.offset(x = (-4).dp, y = (-4).dp)
                     ) {
