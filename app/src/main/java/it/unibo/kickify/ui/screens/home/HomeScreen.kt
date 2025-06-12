@@ -116,7 +116,7 @@ fun HomeScreen(
             }.onFailure {
                 item(span = { GridItemSpan(2) }) {
                     Text(stringResource(R.string.homescreen_noPopularShoes),
-                        modifier = Modifier.padding(horizontal = 12.dp))
+                        modifier = Modifier.padding(horizontal = 16.dp))
                 }
             }
 
@@ -153,7 +153,7 @@ fun HomeScreen(
             }.onFailure {
                 item(span = { GridItemSpan(2) }) {
                     Text(stringResource(R.string.homescreen_noNovelties),
-                        modifier = Modifier.padding(horizontal = 12.dp))
+                        modifier = Modifier.padding(horizontal = 16.dp))
                 }
             }
 
@@ -186,7 +186,7 @@ fun HomeScreen(
             }.onFailure {
                 item(span = { GridItemSpan(2) }) {
                     Text(stringResource(R.string.homescreen_noDiscountedShoes),
-                        modifier = Modifier.padding(horizontal = 12.dp))
+                        modifier = Modifier.padding(horizontal = 16.dp))
                 }
             }
         }

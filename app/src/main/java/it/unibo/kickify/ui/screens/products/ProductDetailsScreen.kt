@@ -12,8 +12,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -49,7 +54,7 @@ fun ProductDetailsScreen(
     val list = productList.getOrNull() ?: emptyList()
     val prodInfo = list.firstOrNull { pair -> pair.first.productId == productId }
     val product = prodInfo?.first
-    val img = prodInfo?.second
+    var mainImageIndex by remember { mutableIntStateOf(1) }
 
     var reviews: List<ReviewWithUserInfo> = listOf()
     var votes: List<Double> = listOf()
@@ -60,6 +65,9 @@ fun ProductDetailsScreen(
         votes = reviews.map { r -> r.review.vote }
     }
     productDetails?.onSuccess { r -> prodVersions = r.versions }
+
+    var selectedSize by remember { mutableStateOf<Int?>(null) }
+    var selectedColor by remember { mutableStateOf<Color?>(null) }
 
     LaunchedEffect(Unit) {
         productsViewModel.getReviewsOfProduct(productId)
@@ -86,8 +94,9 @@ fun ProductDetailsScreen(
                 Text(stringResource(R.string.errorLoadingData))
 
             } else {
+                val mainImg = productImages.find { it.number == mainImageIndex }
                 ProductImage(
-                    imgUrl = img?.url ?: "",
+                    imgUrl = mainImg?.url ?: "",
                     productName = product?.name ?: "",
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -112,7 +121,8 @@ fun ProductDetailsScreen(
                 SectionTitle(title = stringResource(R.string.prodDetails_gallery))
                 ProductPhotoGallery(
                     images = productImages,
-                    productName = product?.name ?: ""
+                    productName = product?.name ?: "",
+                    clickOnImageAction = { index -> mainImageIndex = index }
                 )
 
                 val colorAvailability: MutableMap<String, Boolean> = mutableMapOf()
@@ -126,15 +136,15 @@ fun ProductDetailsScreen(
                 SectionTitle(title = stringResource(R.string.size))
                 SizesList(
                     sizeSelected = null,
-                    sizesAvailability = sizesAvailability,
-                    onSizeSelected = { }
+                    sizesAvailability = sizesAvailability.toSortedMap(),
+                    onSizeSelected = { size -> selectedSize = size }
                 )
 
                 SectionTitle(title = stringResource(R.string.color))
                 ColorsList(
                     colorSelected = null,
-                    colorAvailability = colorAvailability,
-                    onColorSelected = { }
+                    colorAvailability = colorAvailability.toSortedMap(),
+                    onColorSelected = { color -> selectedColor = color }
                 )
 
                 SectionTitle(title = stringResource(R.string.prodDetails_reviews))

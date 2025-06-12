@@ -165,13 +165,13 @@ fun ProductCardShoesPage(
         onClick = onClick,
         modifier = Modifier.size(200.dp)
     ) {
-        ProductImage(imgUrl = mainImgUrl, productName = productName,
-            modifier = Modifier.fillMaxWidth())
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            ProductImage(imgUrl = mainImgUrl, productName = productName,
+                modifier = Modifier.fillMaxWidth(fraction = 0.8f))
             ProductNameText(productName)
             ProductCategoryText(category)
             ProductPriceText(price)

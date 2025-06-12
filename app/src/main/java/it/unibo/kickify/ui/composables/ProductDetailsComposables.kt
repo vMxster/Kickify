@@ -1,6 +1,7 @@
 package it.unibo.kickify.ui.composables
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -119,7 +120,10 @@ fun RatingBar(nrRatings: Int, votesList: List<Double>){
 }
 
 @Composable
-fun ProductPhotoGallery(images: List<Image>, productName: String) {
+fun ProductPhotoGallery(
+    images: List<Image>, productName: String,
+    clickOnImageAction: (Int) -> Unit
+) {
     Row (
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Start,
@@ -128,9 +132,10 @@ fun ProductPhotoGallery(images: List<Image>, productName: String) {
         for (i in images){
             AsyncImage(
                 model = i.url,
-                "$productName image ${i.number}",
+                contentDescription = "$productName image ${i.number}",
                 contentScale = ContentScale.FillWidth,
-                modifier = Modifier.size(70.dp)
+                modifier = Modifier.size(95.dp)
+                    .clickable { clickOnImageAction(i.number) }
             )
             Spacer(Modifier.width(18.dp))
         }
@@ -272,7 +277,7 @@ private fun RatingStars(
     modifier: Modifier = Modifier,
     ratingToDisplay: Double,
     stars: Int = 5,
-    starsColor: Color = Color(red = 1.0f, green = 1.0f, blue = 0.0f)
+    starsColor: Color = Color(red = 255, green = 120, blue = 0)
 ) {
     val filledStars = floor(ratingToDisplay).toInt()
     val unfilledStars = (stars - ceil(ratingToDisplay)).toInt()
