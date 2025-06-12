@@ -38,11 +38,13 @@ import it.unibo.kickify.ui.composables.ReviewCard
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.composables.SectionTitle
 import it.unibo.kickify.ui.composables.SizesList
+import it.unibo.kickify.ui.screens.cart.CartViewModel
 
 @Composable
 fun ProductDetailsScreen(
     navController: NavController,
     productsViewModel: ProductsViewModel,
+    cartViewModel: CartViewModel,
     productId: Int
 ) {
     val productDetails by productsViewModel.productDetails.collectAsStateWithLifecycle()
@@ -79,7 +81,20 @@ fun ProductDetailsScreen(
         screenTitle = stringResource(R.string.details),
         navController = navController,
         showTopAppBar = true,
-        bottomAppBarContent = { ProductDetailsFooter(product?.price ?: 0.0) },
+        bottomAppBarContent = {
+            ProductDetailsFooter(product?.price ?: 0.0,
+                addProductToCart = {
+                    if(selectedColor != null && selectedSize != null) {
+                        cartViewModel.updateQuantity(
+                            productId = productId,
+                            color = selectedColor.toString(),
+                            size = selectedSize!!.toDouble(),
+                            newQuantity = 1
+                        )
+                    }
+                }
+            )
+        },
         showModalDrawer = true,
         showLoadingOverlay = isLoading
     ) {

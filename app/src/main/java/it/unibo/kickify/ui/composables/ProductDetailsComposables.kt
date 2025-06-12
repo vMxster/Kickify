@@ -242,12 +242,12 @@ fun SizesList(
 
 @Composable
 fun ProductDetailsFooter(
-    price: Double
+    price: Double,
+    addProductToCart: () -> Unit
 ){
     Row(
         modifier = Modifier.fillMaxWidth()
-            .padding(horizontal = 12.dp)
-            .padding(vertical = 16.dp),
+            .padding(horizontal = 12.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ){
@@ -263,7 +263,7 @@ fun ProductDetailsFooter(
             colors = ButtonDefaults.buttonColors(
                 containerColor = BluePrimary
             ),
-            onClick = {}
+            onClick = { addProductToCart() }
         ) {
             Text(
                 text = stringResource(R.string.prodDetails_addToCart)
