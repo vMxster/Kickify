@@ -163,15 +163,15 @@ fun ProductCardShoesPage(
 ) {
     Card(
         onClick = onClick,
-        modifier = Modifier
-            .fillMaxSize().size(200.dp)
+        modifier = Modifier.size(200.dp)
     ) {
+        ProductImage(imgUrl = mainImgUrl, productName = productName,
+            modifier = Modifier.fillMaxWidth())
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ProductImage(imgUrl = mainImgUrl, productName = productName)
             ProductNameText(productName)
             ProductCategoryText(category)
             ProductPriceText(price)
@@ -189,7 +189,7 @@ fun ProductImage(
     AsyncImage(
         model = imgUrl,
         contentDescription = "$productName image",
-        contentScale = ContentScale.FillHeight,
+        contentScale = ContentScale.Fit,
         modifier = modifier.size(size)
     )
 }
@@ -197,7 +197,7 @@ fun ProductImage(
 @Composable
 fun ProductNameText(
     productName:String,
-    style: TextStyle = MaterialTheme.typography.bodyMedium,
+    style: TextStyle = MaterialTheme.typography.bodyLarge,
     textAlign: TextAlign = TextAlign.Center,
     fontWeight: FontWeight = FontWeight.Bold
 ){
@@ -212,7 +212,7 @@ fun ProductNameText(
 @Composable
 fun ProductCategoryText(
     category: ShopCategory,
-    style: TextStyle = MaterialTheme.typography.bodySmall,
+    style: TextStyle = MaterialTheme.typography.bodyMedium,
     textAlign: TextAlign = TextAlign.Center
 ){
     Text(

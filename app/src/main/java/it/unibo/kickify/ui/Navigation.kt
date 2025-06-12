@@ -48,6 +48,7 @@ import it.unibo.kickify.ui.screens.settings.SettingsScreen
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.screens.wishlist.WishlistScreen
 import it.unibo.kickify.ui.screens.wishlist.WishlistViewModel
+import it.unibo.kickify.ui.theme.BluePrimary
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -110,7 +111,7 @@ fun KickifyNavGraph(
             .background(MaterialTheme.colorScheme.background),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(color = BluePrimary)
         }
         return
     }

@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -39,21 +38,12 @@ fun HomeScreen(
     val popularProducts by productsViewModel.popularProducts.collectAsStateWithLifecycle()
     val newProducts by productsViewModel.newProducts.collectAsStateWithLifecycle()
     val discountedProducts by productsViewModel.discountedProducts.collectAsStateWithLifecycle()
-    val prodVariants by productsViewModel.productVariants.collectAsStateWithLifecycle()
 
     val brands = mapOf(
         "Adidas" to R.drawable.adidas,
         "Nike" to R.drawable.nike,
         "Puma" to R.drawable.puma
     )
-
-    LaunchedEffect(popularProducts, newProducts, discountedProducts, prodVariants, products) {
-        println("\npopulars: $popularProducts")
-        println("new: $newProducts")
-        println("discounted: $discountedProducts")
-        println("variants: $prodVariants")
-        println("products: $products")
-    }
 
     ScreenTemplate(
         screenTitle = stringResource(R.string.app_name),
@@ -107,15 +97,21 @@ fun HomeScreen(
             }
             popularProducts.onSuccess { populars ->
                 items(populars.take(2)) { prod ->
-                    SquareProductCardHomePage(
-                        productID = prod.productId,
-                        productName = "${prod.brand} ${prod.name}",
-                        mainImgUrl = "",
-                        price = prod.price,
-                        onClick = {
-                            navController.navigate(KickifyRoute.ProductDetails(prod.productId))
-                        }
-                    )
+                    products.onSuccess { list ->
+                        val image = list.find {
+                            it.second.productId == prod.productId && it.second.number == 1
+                        }?.second
+
+                        SquareProductCardHomePage(
+                            productID = prod.productId,
+                            productName = "${prod.brand} ${prod.name}",
+                            mainImgUrl = image?.url ?: "",
+                            price = prod.price,
+                            onClick = {
+                                navController.navigate(KickifyRoute.ProductDetails(prod.productId))
+                            }
+                        )
+                    }
                 }
             }.onFailure {
                 item(span = { GridItemSpan(2) }) {
@@ -137,15 +133,21 @@ fun HomeScreen(
                 if (newProducts.isNotEmpty()) {
                     val newProd = newProducts.first()
                     item(span = { GridItemSpan(2) }) {
-                        RectangularProductCardHomePage(
-                            productID = newProd.productId,
-                            productName = "${newProd.brand} ${newProd.name}",
-                            mainImgUrl = "",
-                            price = newProd.price,
-                            onClick = {
-                                navController.navigate(KickifyRoute.ProductDetails(newProd.productId))
-                            }
-                        )
+                        products.onSuccess { list ->
+                            val image = list.find {
+                                it.second.productId == newProd.productId && it.second.number == 1
+                            }?.second
+
+                            RectangularProductCardHomePage(
+                                productID = newProd.productId,
+                                productName = "${newProd.brand} ${newProd.name}",
+                                mainImgUrl = image?.url ?: "",
+                                price = newProd.price,
+                                onClick = {
+                                    navController.navigate(KickifyRoute.ProductDetails(newProd.productId))
+                                }
+                            )
+                        }
                     }
                 }
             }.onFailure {
@@ -166,15 +168,20 @@ fun HomeScreen(
             }
             discountedProducts.onSuccess { discounted ->
                 items(discounted.take(2)) { prod ->
-                    SquareProductCardHomePage(
-                        productID = prod.productId,
-                        productName = "${prod.brand} ${prod.name}",
-                        mainImgUrl = "",
-                        price = prod.price,
-                        onClick = {
-                            navController.navigate(KickifyRoute.ProductDetails(prod.productId))
-                        }
-                    )
+                    products.onSuccess { list ->
+                        val image = list.find {
+                            it.second.productId == prod.productId && it.second.number == 1
+                        }?.second
+                        SquareProductCardHomePage(
+                            productID = prod.productId,
+                            productName = "${prod.brand} ${prod.name}",
+                            mainImgUrl = image?.url ?: "",
+                            price = prod.price,
+                            onClick = {
+                                navController.navigate(KickifyRoute.ProductDetails(prod.productId))
+                            }
+                        )
+                    }
                 }
             }.onFailure {
                 item(span = { GridItemSpan(2) }) {
