@@ -47,26 +47,28 @@ import it.unibo.kickify.R
 fun CartItem(
     itemName: String, price: Double,
     size: Int, productColor: String,
-    imageUrl: String
+    imageUrl: String, quantity: Int,
+    onChangeQuantity: (Int) -> Unit,
+    onDelete: () -> Unit
 ){
-    Card(
-        modifier = Modifier.height(110.dp)
-            .padding(horizontal = 12.dp).fillMaxWidth(),
-    ) {
+    var qty by remember { mutableIntStateOf(quantity) }
+
+    Card(modifier = Modifier.padding(horizontal = 12.dp)) {
         Row(
-            modifier = Modifier.fillMaxSize().padding(end = 6.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = "",
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .size(90.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .padding(6.dp)
-            )
+            Column(modifier = Modifier.fillMaxWidth(fraction = 0.35f)) {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = "",
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier.size(110.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .padding(6.dp)
+                )
+            }
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.Start
@@ -75,48 +77,67 @@ fun CartItem(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
-                        .padding(vertical = 6.dp)
+                        .padding(vertical = 6.dp, horizontal = 8.dp)
                 ){
-                    Text(
-                        itemName,
-                        style = MaterialTheme.typography.bodyMedium,
+                    Text(itemName,
+                        style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center
                     )
-                    Spacer(Modifier.width(12.dp))
-                    Text("Size: $size")
+                    Text("${stringResource(R.string.size)}: $size",
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center
+                    )
                 }
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
+                    horizontalArrangement = Arrangement.Start,
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(vertical = 6.dp, horizontal = 8.dp)
                 ){
-                    Text(
-                        "€$price",
-                        style = MaterialTheme.typography.bodyMedium
+                    ProductPriceText(
+                        price = price,
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Start
                     )
-                    Spacer(Modifier.width(10.dp))
+                    Spacer(Modifier.width(20.dp))
                     ShoesColorIndicator( getColorFromString(productColor) )
                 }
-                Spacer(Modifier.height(5.dp))
-                QuantityManager()
+
+                QuantityManagerRow(
+                    onChangeQuantity = {
+                        onChangeQuantity(it)
+                        qty = it
+                    },
+                    onDelete = onDelete,
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(vertical = 6.dp, horizontal = 8.dp)
+                )
             }
-            Spacer(Modifier.width(12.dp))
         }
     }
 }
 
 @Composable
-fun QuantityManager(){
+fun QuantityManagerRow(
+    onChangeQuantity: (Int) -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier
+){
     var quantity by remember { mutableIntStateOf(1) }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier
     ){
         FilledIconButton(
-            onClick = { if(quantity >= 2) quantity-=1 },
+            onClick = {
+                if(quantity >= 2) quantity-=1
+                onChangeQuantity(quantity)
+            },
             enabled = quantity >= 2 ,
-            modifier = Modifier.size(18.dp),
+            modifier = Modifier.size(28.dp),
         ) {
             Icon(Icons.Outlined.Remove, contentDescription = "")
         }
@@ -124,15 +145,21 @@ fun QuantityManager(){
         Text(text=quantity.toString())
 
         FilledIconButton(
-            modifier = Modifier.size(18.dp),
-            onClick = { if(quantity <= 9) quantity += 1 },
-            enabled = quantity <= 9
+            onClick = {
+                if(quantity <= 9) quantity += 1
+                onChangeQuantity(quantity)
+            },
+            enabled = quantity <= 9,
+            modifier = Modifier.size(28.dp),
         ) {
             Icon(Icons.Outlined.Add, contentDescription = "")
         }
 
         Spacer(Modifier.width(18.dp))
-        IconButton(onClick = {  }) {
+        IconButton(
+            onClick = { onDelete() },
+            modifier = Modifier.size(28.dp)
+        ) {
             Icon(Icons.Outlined.Delete, contentDescription = "")
         }
     }
@@ -140,7 +167,7 @@ fun QuantityManager(){
 
 @Composable
 fun CartAndCheckoutResume(subTotal: Double, shipping: Double, total: Double,
-    onButtonClickAction: () -> Unit
+                          onButtonClickAction: () -> Unit
 ){
     Card(
         modifier = Modifier.height(180.dp).fillMaxWidth()

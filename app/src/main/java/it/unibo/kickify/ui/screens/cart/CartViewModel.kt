@@ -8,7 +8,7 @@ import it.unibo.kickify.data.repositories.SettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class CartViewModel(
@@ -34,34 +34,61 @@ class CartViewModel(
     private val _total = MutableStateFlow(0.0)
     val total: StateFlow<Double> = _total.asStateFlow()
 
-    fun loadCart() {
-        _isLoading.value = true
-        _errorMessage.value = null
+    private var email = MutableStateFlow("")
 
+    init {
         viewModelScope.launch {
-            try {
-                val email = settingsRepository.userID.first()
-                if (email.isNotEmpty()) {
-                    val cartResult = appRepository.getCart(email)
-                    if (cartResult.isSuccess) {
-                        val cartItemsResult = appRepository.getCartItems(email)
-                        if (cartItemsResult.isSuccess) {
-                            val items = cartItemsResult.getOrNull() ?: emptyList()
-                            _cartItems.value = items
-                            calculateTotals()
-                        } else {
-                            _errorMessage.value = cartItemsResult.exceptionOrNull()?.message
-                        }
+            _isLoading.value = true
+            settingsRepository.userID.collectLatest { userid ->
+                email.value = userid
+
+                if(userid.isNotEmpty()){
+                    loadCartInternal(userid)
+                } else {
+                    _cartItems.value = emptyList()
+                    _subTotal.value = 0.0
+                    _total.value = 0.0
+                }
+                _isLoading.value = false
+            }
+        }
+    }
+
+    private suspend fun loadCartInternal(email: String) {
+        _errorMessage.value = null
+        _isLoading.value = true
+
+        try {
+            if (email.isNotEmpty()) {
+                val cartResult = appRepository.getCart(email)
+                if (cartResult.isSuccess) {
+                    val cartItemsResult = appRepository.getCartItems(email)
+                    if (cartItemsResult.isSuccess) {
+                        val items = cartItemsResult.getOrNull() ?: emptyList()
+                        _cartItems.value = items
+                        calculateTotals()
                     } else {
-                        _errorMessage.value = cartResult.exceptionOrNull()?.message
+                        _errorMessage.value = cartItemsResult.exceptionOrNull()?.message
                     }
                 } else {
-                    _errorMessage.value = "Utente non autenticato"
+                    _errorMessage.value = cartResult.exceptionOrNull()?.message
                 }
-            } catch (e: Exception) {
-                _errorMessage.value = e.message
-            } finally {
-                _isLoading.value = false
+            } else {
+                _errorMessage.value = "Email utente non disponibile per caricare il carrello."
+            }
+        } catch (e: Exception) {
+            _errorMessage.value = "Errore durante il caricamento del carrello: ${e.message}"
+        } finally {
+            _isLoading.value = false
+        }
+    }
+
+    fun loadCart() {
+        viewModelScope.launch {
+            if (email.value.isNotEmpty()) {
+                loadCartInternal(email.value)
+            } else {
+                _errorMessage.value = "Impossibile ricaricare il carrello: utente non autenticato."
             }
         }
     }
@@ -70,9 +97,8 @@ class CartViewModel(
         _isLoading.value = true
         viewModelScope.launch {
             try {
-                val email = settingsRepository.userID.first()
-                if (email.isNotEmpty()) {
-                    val result = appRepository.removeFromCart(email, productId, color, size)
+                if (email.value.isNotEmpty()) {
+                    val result = appRepository.removeFromCart(email.value, productId, color, size)
                     if (result.isSuccess) {
                         loadCart()
                     } else {
@@ -96,12 +122,11 @@ class CartViewModel(
         _isLoading.value = true
         viewModelScope.launch {
             try {
-                val email = settingsRepository.userID.first()
-                if (email.isNotEmpty()) {
+                if (email.value.isNotEmpty()) {
                     // Prima rimuove l'item, poi lo aggiunge con nuova quantità
-                    val removeResult = appRepository.removeFromCart(email, productId, color, size)
+                    val removeResult = appRepository.removeFromCart(email.value, productId, color, size)
                     if (removeResult.isSuccess) {
-                        val addResult = appRepository.addToCart(email, productId, color, size, newQuantity)
+                        val addResult = appRepository.addToCart(email.value, productId, color, size, newQuantity)
                         if (addResult.isSuccess) {
                             loadCart()
                         } else {
@@ -120,11 +145,12 @@ class CartViewModel(
     }
 
     private fun calculateTotals() {
-        val subtotal = _cartItems.value.sumOf { cartItem ->
-            cartItem.prezzo.times(cartItem.cartProduct.quantity)
+        var sum = 0.0
+        _cartItems.value.forEach { cartItem ->
+            sum += cartItem.prezzo * cartItem.cartProduct.quantity
         }
-        _subTotal.value = subtotal
-        _total.value = subtotal + _shippingCost.value
+        _subTotal.value = sum
+        _total.value = sum + _shippingCost.value
     }
 
     fun dismissError() {
