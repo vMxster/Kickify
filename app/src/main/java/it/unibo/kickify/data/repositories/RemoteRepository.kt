@@ -145,7 +145,8 @@ class RemoteRepository(
         try {
             val params = mapOf("action" to "getVersions")
             val response = makeRequest("product_handler.php", params)
-            val jsonArray = JSONArray(response)
+            val jsonObject = JSONObject(response)
+            val jsonArray = jsonObject.getJSONArray("versions")
             val versions = RemoteResponseParser.parseVersions(jsonArray)
             Result.success(versions)
         } catch (e: Exception) {
