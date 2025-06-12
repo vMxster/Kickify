@@ -293,15 +293,16 @@ class RemoteResponseParser {
             return notifications
         }
 
-        fun parseProductHistory(jsonArray: JSONArray): List<HistoryProduct> {
+        fun parseProductHistory(jsonObject: JSONObject): List<HistoryProduct> {
             val historyProducts = mutableListOf<HistoryProduct>()
-            for (i in 0 until jsonArray.length()) {
-                val productJson = jsonArray.getJSONObject(i)
+            val historyArray = jsonObject.getJSONArray("history")
+            for (i in 0 until historyArray.length()) {
+                val productJson = historyArray.getJSONObject(i)
                 historyProducts.add(
                     HistoryProduct(
                         productId = productJson.getInt("ID_Prodotto"),
                         price = productJson.getDouble("Prezzo"),
-                        modifyDate = productJson.getString("Data_Aggiornamento")
+                        modifyDate = productJson.getString("Data_Modifica"),
                     )
                 )
             }

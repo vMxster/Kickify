@@ -100,6 +100,7 @@ class ProductsViewModel(
 
             val jobs = mutableListOf<Job>()
             jobs.add(launch { loadVersions() })
+            jobs.add(launch { loadProductsHistory() })
             jobs.add(launch { loadPopularProducts() })
             jobs.add(launch { loadNewProducts() })
             jobs.add(launch { loadDiscountedProducts() })

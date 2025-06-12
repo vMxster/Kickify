@@ -113,9 +113,13 @@ class RemoteRepository(
                 "last_access" to lastAccess
             )
             val response = makeRequest("product_handler.php", params)
-            val jsonArray = JSONArray(response)
-            val history = RemoteResponseParser.parseProductHistory(jsonArray)
-            Result.success(history)
+            val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
+            Result.success(
+                RemoteResponseParser.parseProductHistory(jsonObject)
+            )
         } catch (e: Exception) {
             Log.e(tag, "Errore durante il recupero della cronologia dei prodotti", e)
             Result.failure(e)
