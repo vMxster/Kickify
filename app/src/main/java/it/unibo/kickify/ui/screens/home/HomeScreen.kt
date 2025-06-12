@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
-import it.unibo.kickify.data.database.Product
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.HomeScreenBrandsSection
@@ -32,31 +32,27 @@ import it.unibo.kickify.ui.screens.products.ProductsViewModel
 fun HomeScreen(
     navController: NavController,
     productsViewModel: ProductsViewModel
-){
+) {
     val isLoading by productsViewModel.isLoading.collectAsStateWithLifecycle()
 
+    val products by productsViewModel.products.collectAsStateWithLifecycle()
     val popularProducts by productsViewModel.popularProducts.collectAsStateWithLifecycle()
     val newProducts by productsViewModel.newProducts.collectAsStateWithLifecycle()
     val discountedProducts by productsViewModel.discountedProducts.collectAsStateWithLifecycle()
+    val prodVariants by productsViewModel.productVariants.collectAsStateWithLifecycle()
 
     val brands = mapOf(
         "Adidas" to R.drawable.adidas,
         "Nike" to R.drawable.nike,
-        "Puma" to R.drawable.puma)
+        "Puma" to R.drawable.puma
+    )
 
-    var populars : List<Product> = listOf()
-    var newProds : List<Product> = listOf()
-    var discounted : List<Product> = listOf()
-
-    LaunchedEffect(popularProducts, newProducts, discountedProducts) {
-        popularProducts.onSuccess { populars = it }
-            .onFailure { println("popular prod error ${it.message}") }
-
-        newProducts.onSuccess { newProds = it }
-            .onFailure { println("new prod error ${it.message}") }
-
-        discountedProducts.onSuccess { discounted = it }
-            .onFailure { println("discount prod error ${it.message}") }
+    LaunchedEffect(popularProducts, newProducts, discountedProducts, prodVariants, products) {
+        println("\npopulars: $popularProducts")
+        println("new: $newProducts")
+        println("discounted: $discountedProducts")
+        println("variants: $prodVariants")
+        println("products: $products")
     }
 
     ScreenTemplate(
@@ -109,19 +105,24 @@ fun HomeScreen(
                     }
                 )
             }
-            items(populars.take(2)) { prod ->
-                SquareProductCardHomePage(
-                    productID = prod.productId,
-                    productName = "${prod.brand} ${prod.name}",
-                    mainImgUrl = "",
-                    price = prod.price,
-                    onClick = {
-                        navController.navigate(KickifyRoute.ProductDetails(prod.productId))
-                    }
-                )
+            popularProducts.onSuccess { populars ->
+                items(populars.take(2)) { prod ->
+                    SquareProductCardHomePage(
+                        productID = prod.productId,
+                        productName = "${prod.brand} ${prod.name}",
+                        mainImgUrl = "",
+                        price = prod.price,
+                        onClick = {
+                            navController.navigate(KickifyRoute.ProductDetails(prod.productId))
+                        }
+                    )
+                }
+            }.onFailure {
+                item(span = { GridItemSpan(2) }) {
+                    Text(stringResource(R.string.homescreen_noPopularShoes),
+                        modifier = Modifier.padding(horizontal = 12.dp))
+                }
             }
-
-            val newProd = newProds.firstOrNull()
 
             item(span = { GridItemSpan(2) }) {
                 val categ = stringResource(R.string.homescreen_novelties)
@@ -132,17 +133,25 @@ fun HomeScreen(
                     }
                 )
             }
-            item(span = { GridItemSpan(2) }) {
-                if (newProd != null) {
-                    RectangularProductCardHomePage(
-                        productID = newProd.productId,
-                        productName = "${newProd.brand} ${newProd.name}",
-                        mainImgUrl = "",
-                        price = newProd.price,
-                        onClick = {
-                            navController.navigate(KickifyRoute.ProductDetails(newProd.productId))
-                        }
-                    )
+            newProducts.onSuccess { newProducts ->
+                if (newProducts.isNotEmpty()) {
+                    val newProd = newProducts.first()
+                    item(span = { GridItemSpan(2) }) {
+                        RectangularProductCardHomePage(
+                            productID = newProd.productId,
+                            productName = "${newProd.brand} ${newProd.name}",
+                            mainImgUrl = "",
+                            price = newProd.price,
+                            onClick = {
+                                navController.navigate(KickifyRoute.ProductDetails(newProd.productId))
+                            }
+                        )
+                    }
+                }
+            }.onFailure {
+                item(span = { GridItemSpan(2) }) {
+                    Text(stringResource(R.string.homescreen_noNovelties),
+                        modifier = Modifier.padding(horizontal = 12.dp))
                 }
             }
 
@@ -155,16 +164,23 @@ fun HomeScreen(
                     }
                 )
             }
-            items(discounted.take(2)) { prod ->
-                SquareProductCardHomePage(
-                    productID = prod.productId,
-                    productName = "${prod.brand} ${prod.name}",
-                    mainImgUrl = "",
-                    price = prod.price,
-                    onClick = {
-                        navController.navigate(KickifyRoute.ProductDetails(prod.productId))
-                    }
-                )
+            discountedProducts.onSuccess { discounted ->
+                items(discounted.take(2)) { prod ->
+                    SquareProductCardHomePage(
+                        productID = prod.productId,
+                        productName = "${prod.brand} ${prod.name}",
+                        mainImgUrl = "",
+                        price = prod.price,
+                        onClick = {
+                            navController.navigate(KickifyRoute.ProductDetails(prod.productId))
+                        }
+                    )
+                }
+            }.onFailure {
+                item(span = { GridItemSpan(2) }) {
+                    Text(stringResource(R.string.homescreen_noDiscountedShoes),
+                        modifier = Modifier.padding(horizontal = 12.dp))
+                }
             }
         }
     }
