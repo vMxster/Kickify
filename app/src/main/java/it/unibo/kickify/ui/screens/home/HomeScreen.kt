@@ -26,7 +26,7 @@ import it.unibo.kickify.ui.composables.RectangularProductCardHomePage
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.composables.SearchRoundedTextField
 import it.unibo.kickify.ui.composables.SquareProductCardHomePage
-import it.unibo.kickify.ui.screens.productList.ProductsViewModel
+import it.unibo.kickify.ui.screens.products.ProductsViewModel
 
 @Composable
 fun HomeScreen(

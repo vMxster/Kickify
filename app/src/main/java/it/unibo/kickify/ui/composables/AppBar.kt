@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
-import it.unibo.kickify.ui.screens.productList.FilterScreen
+import it.unibo.kickify.ui.screens.products.FilterScreen
 import it.unibo.kickify.ui.theme.BluePrimary
 import kotlinx.coroutines.launch
 

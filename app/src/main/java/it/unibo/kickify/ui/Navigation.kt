@@ -35,9 +35,9 @@ import it.unibo.kickify.ui.screens.onboard.OnboardingScreen
 import it.unibo.kickify.ui.screens.orders.MyOrdersScreen
 import it.unibo.kickify.ui.screens.orders.OrderDetailsScreen
 import it.unibo.kickify.ui.screens.orders.OrdersViewModel
-import it.unibo.kickify.ui.screens.productDetails.ProductDetailsScreen
-import it.unibo.kickify.ui.screens.productList.ProductListScreen
-import it.unibo.kickify.ui.screens.productList.ProductsViewModel
+import it.unibo.kickify.ui.screens.products.ProductDetailsScreen
+import it.unibo.kickify.ui.screens.products.ProductListScreen
+import it.unibo.kickify.ui.screens.products.ProductsViewModel
 import it.unibo.kickify.ui.screens.profile.EditProfileScreen
 import it.unibo.kickify.ui.screens.profile.EditProfileSections
 import it.unibo.kickify.ui.screens.profile.ProfileScreen

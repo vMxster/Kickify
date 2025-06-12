@@ -33,7 +33,7 @@ import it.unibo.kickify.ui.screens.forgotPassword.ForgotPasswordOTPViewModel
 import it.unibo.kickify.ui.screens.login.LoginViewModel
 import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
 import it.unibo.kickify.ui.screens.orders.OrdersViewModel
-import it.unibo.kickify.ui.screens.productList.ProductsViewModel
+import it.unibo.kickify.ui.screens.products.ProductsViewModel
 import it.unibo.kickify.ui.screens.profile.ProfileViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.screens.wishlist.WishlistViewModel

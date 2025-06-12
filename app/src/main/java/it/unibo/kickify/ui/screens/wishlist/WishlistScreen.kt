@@ -21,7 +21,7 @@ import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ProductCardWishlistPage
 import it.unibo.kickify.ui.composables.ScreenTemplate
-import it.unibo.kickify.ui.screens.productList.ProductsViewModel
+import it.unibo.kickify.ui.screens.products.ProductsViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 
 @Composable

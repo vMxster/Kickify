@@ -1,4 +1,4 @@
-package it.unibo.kickify.ui.screens.productDetails
+package it.unibo.kickify.ui.screens.products
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,7 +33,6 @@ import it.unibo.kickify.ui.composables.ReviewCard
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.composables.SectionTitle
 import it.unibo.kickify.ui.composables.SizesList
-import it.unibo.kickify.ui.screens.productList.ProductsViewModel
 
 @Composable
 fun ProductDetailsScreen(

@@ -1,4 +1,4 @@
-package it.unibo.kickify.ui.screens.productList
+package it.unibo.kickify.ui.screens.products
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
