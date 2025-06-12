@@ -53,7 +53,7 @@ fun WishlistScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
             modifier = Modifier.fillMaxSize()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp).padding(top = 10.dp)
         ){
             val prodList = products.getOrNull() ?: emptyList()
 
