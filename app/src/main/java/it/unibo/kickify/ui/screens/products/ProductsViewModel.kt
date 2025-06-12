@@ -12,9 +12,10 @@ import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.data.database.Version
 import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.utils.DatabaseReadyManager
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class ProductsViewModel(
@@ -68,15 +69,9 @@ class ProductsViewModel(
 
     init {
         viewModelScope.launch {
-            databaseReadyManager.isDatabaseReady.collect { isReady ->
+            databaseReadyManager.isDatabaseReady.collectLatest { isReady ->
                 if (isReady) {
-                    loadProducts()
-                    launch { loadVersions() }
-                    launch { loadProductsHistory() }
-                    launch { loadPopularProducts() }
-                    launch { loadNewProducts() }
-                    launch { loadDiscountedProducts() }
-                    this.cancel()
+                    loadAllInitialData()
                 }
             }
         }
@@ -98,33 +93,41 @@ class ProductsViewModel(
         }
     }
 
-    private fun loadProducts() {
+    private fun loadAllInitialData() {
         _isLoading.value = true
         viewModelScope.launch {
-            val result = repository.getProducts()
-            if (result.isSuccess) {
-                val mapValues = result.getOrNull() ?: emptyMap()
-                val listValues = mapValues.map { (product, image) -> Pair(product, image) }
-                _products.value = Result.success(listValues)
-            } else {
-                _products.value = Result.failure(result.exceptionOrNull() ?: Exception("Errore caricamento prodotti"))
-            }
+            launch { loadProducts() }.join()
+
+            val jobs = mutableListOf<Job>()
+            jobs.add(launch { loadVersions() })
+            jobs.add(launch { loadPopularProducts() })
+            jobs.add(launch { loadNewProducts() })
+            jobs.add(launch { loadDiscountedProducts() })
+            jobs.forEach { it.join() }
+
+            _isLoading.value = false
         }
-        _isLoading.value = false
     }
 
-    private fun loadVersions() {
-        _isLoading.value = true
-        viewModelScope.launch {
-            val result = repository.getVersions()
-            if (result.isSuccess) {
-                val mapValues = result.getOrNull() ?: emptyMap()
-                _productVariants.value = Result.success(mapValues)
-            } else {
-                _products.value = Result.failure(result.exceptionOrNull() ?: Exception("Errore caricamento prodotti"))
-            }
+    private suspend fun loadProducts() {
+        val result = repository.getProducts()
+        if (result.isSuccess) {
+            val mapValues = result.getOrNull() ?: emptyMap()
+            val listValues = mapValues.map { (product, image) -> Pair(product, image) }
+            _products.value = Result.success(listValues)
+        } else {
+            _products.value = Result.failure(result.exceptionOrNull() ?: Exception("Errore caricamento prodotti"))
         }
-        _isLoading.value = false
+    }
+
+    private suspend fun loadVersions() {
+        val result = repository.getVersions()
+        if (result.isSuccess) {
+            val mapValues = result.getOrNull() ?: emptyMap()
+            _productVariants.value = Result.success(mapValues)
+        } else {
+            _productVariants.value = Result.failure(result.exceptionOrNull() ?: Exception("Errore caricamento varianti"))
+        }
     }
 
     private fun loadPopularProducts() {
