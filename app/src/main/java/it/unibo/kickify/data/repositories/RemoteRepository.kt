@@ -322,6 +322,26 @@ class RemoteRepository(
         }
     }
 
+    suspend fun isInWishlist(email: String, productId: Int): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val params = mapOf(
+                "action" to "isInWishlist",
+                "user_email" to email,
+                "productId" to productId.toString()
+            )
+            val response = makeRequest("wishlist_handler.php", params)
+            val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
+            val isInWishlist = jsonObject.optBoolean("isInWishlist", false)
+            Result.success(isInWishlist)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante il controllo della wishlist", e)
+            Result.failure(e)
+        }
+    }
+
     // NOTIFICHE
     suspend fun getNotifications(email: String, lastAccess: String): Result<List<Notification>> = withContext(Dispatchers.IO) {
         try {

@@ -58,7 +58,7 @@ fun WishlistScreen(
             modifier = Modifier.fillMaxSize()
                 .padding(horizontal = 16.dp).padding(top = 10.dp)
         ){
-            val prodList = products.getOrNull() ?: emptyList()
+            val prodList = products.getOrNull() ?: emptyMap()
 
             if (wishlistState.isEmpty()) {
                 Text(stringResource(R.string.emptyWishlist))
@@ -70,14 +70,16 @@ fun WishlistScreen(
                 ) {
                     items(wishlistState.size) { index ->
                         val prodID = wishlistState[index].productId
-                        prodList.firstOrNull { it.first.productId == prodID }.let {
-                            val prodInfo = it?.first
-                            val prodImg = it?.second
+                        val entry = prodList.entries.firstOrNull { entry -> entry.key.productId == prodID }
+
+                        if (entry != null) {
+                            val prodInfo = entry.key
+                            val prodImg = entry.value
 
                             ProductCardWishlistPage(
-                                mainImgUrl = prodImg?.url ?: "",
-                                productName = "${prodInfo?.brand} ${prodInfo?.name}",
-                                price = prodInfo?.price ?: 0.0,
+                                mainImgUrl = prodImg.url ?: "",
+                                productName = "${prodInfo.brand} ${prodInfo.name}",
+                                price = prodInfo.price ?: 0.0,
                                 onClick = {
                                     navController.navigate(KickifyRoute.ProductDetails(prodID))
                                 },

@@ -61,6 +61,18 @@ try {
                 }
                 break;
 
+            case "isInWishlist":
+                $email = $_POST["user_email"];
+                $productId = $_POST["productId"];
+
+                $isInWishlist = $dbh->isInWishlist($email, $productId);
+                
+                $response = [
+                    "success" => true,
+                    "isInWishlist" => $isInWishlist
+                ];
+                break;
+
             default:
                 throw new Exception("Invalid action");
         }

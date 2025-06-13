@@ -123,10 +123,32 @@ class CartViewModel(
         viewModelScope.launch {
             try {
                 if (email.value.isNotEmpty()) {
+                    // Converti la stringa del colore in un formato accettabile
+                    val processedColor = if (color.startsWith("Color(")) {
+                        // Estrai i valori RGBA dalla stringa "Color(r, g, b, a, ...)"
+                        val components = color.substringAfter("Color(").substringBefore(")").split(",")
+                        val r = components.getOrNull(0)?.trim()?.toFloatOrNull() ?: 0f
+                        val g = components.getOrNull(1)?.trim()?.toFloatOrNull() ?: 0f
+                        val b = components.getOrNull(2)?.trim()?.toFloatOrNull() ?: 0f
+
+                        // Mappa per colori
+                        when {
+                            r > 0.8f && g < 0.3f && b < 0.3f -> "Red"
+                            r < 0.3f && g > 0.8f && b < 0.3f -> "Green"
+                            r < 0.3f && g < 0.3f && b > 0.8f -> "Blue"
+                            r > 0.8f && g > 0.8f && b < 0.3f -> "Yellow"
+                            r > 0.8f && g > 0.8f && b > 0.8f -> "White"
+                            r < 0.3f && g < 0.3f && b < 0.3f -> "Black"
+                            else -> color
+                        }
+                    } else {
+                        color
+                    }
+
                     // Prima rimuove l'item, poi lo aggiunge con nuova quantità
-                    val removeResult = appRepository.removeFromCart(email.value, productId, color, size)
+                    val removeResult = appRepository.removeFromCart(email.value, productId, processedColor, size)
                     if (removeResult.isSuccess) {
-                        val addResult = appRepository.addToCart(email.value, productId, color, size, newQuantity)
+                        val addResult = appRepository.addToCart(email.value, productId, processedColor, size, newQuantity)
                         if (addResult.isSuccess) {
                             loadCart()
                         } else {

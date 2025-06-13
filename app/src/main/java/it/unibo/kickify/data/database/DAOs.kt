@@ -25,6 +25,7 @@ interface ProductDao {
         SELECT * FROM PRODOTTO p 
         JOIN IMMAGINE i ON p.ID_Prodotto = i.ID_Prodotto 
         WHERE p.ID_Prodotto = :productId
+        ORDER BY i.Numero
     """)
     suspend fun getProductImages(productId: Int): List<Image>
 
@@ -137,32 +138,29 @@ interface ProductDao {
     suspend fun insertProductsHistory(remoteHistory: List<HistoryProduct>)
 
     @Query("""
-        SELECT * FROM PRODOTTO 
-        WHERE ID_Prodotto IN (
-            SELECT ID_Prodotto FROM PRODOTTO_ORDINE 
-            GROUP BY ID_Prodotto
-            ORDER BY SUM(Quantita) DESC
-        )
+        SELECT p.* FROM PRODOTTO p 
+        JOIN PRODOTTO_ORDINE po ON p.ID_Prodotto = po.ID_Prodotto 
+        GROUP BY p.ID_Prodotto 
+        ORDER BY SUM(po.Quantita) DESC
     """)
     suspend fun getPopularProducts(): List<Product>
 
     @Query("""
         SELECT * FROM PRODOTTO 
-        WHERE ID_Prodotto IN (
-            SELECT ID_Prodotto FROM PRODOTTO 
-            ORDER BY Data_Aggiunta DESC
-        )
+        ORDER BY Data_Aggiunta DESC
     """)
     suspend fun getNewProducts(): List<Product>
 
     @Query("""
-        SELECT p.* FROM PRODOTTO p
-        JOIN PRODOTTO_STORICO ps ON p.ID_Prodotto = ps.ID_Prodotto
-        WHERE ps.Data_Modifica = (
-            SELECT MAX(ps2.Data_Modifica) FROM PRODOTTO_STORICO ps2
-            WHERE ps2.ID_Prodotto = ps.ID_Prodotto
-        )
-        AND p.Prezzo < ps.Prezzo
+        SELECT p.* FROM PRODOTTO p 
+        JOIN (
+            SELECT ps.ID_Prodotto, MAX(ps.Data_Modifica) as ultima_modifica 
+            FROM PRODOTTO_STORICO ps 
+            GROUP BY ps.ID_Prodotto 
+        ) ultime ON p.ID_Prodotto = ultime.ID_Prodotto 
+        JOIN PRODOTTO_STORICO ps ON ps.ID_Prodotto = ultime.ID_Prodotto 
+            AND ps.Data_Modifica = ultime.ultima_modifica 
+        WHERE p.Prezzo < ps.Prezzo
     """)
     suspend fun getDiscountedProducts(): List<Product>
 
@@ -301,10 +299,10 @@ interface ProductCartDao {
     suspend fun updateCartItemQuantity(cartId: Int?, productId: Int, color: String, size: Double, quantity: Int): Int
 
     @Query("""
-        DELETE FROM comprendere 
-        WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
-        AND Colore = :color AND Taglia = :size
-    """)
+    DELETE FROM comprendere 
+    WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
+    AND Colore = :color AND Taglia = :size
+""")
     suspend fun removeFromCart(cartId: Int, productId: Int, color: String, size: Double): Int
 
     @Query("""

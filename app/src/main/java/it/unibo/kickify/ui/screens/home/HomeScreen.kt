@@ -101,9 +101,9 @@ fun HomeScreen(
             popularProducts.onSuccess { populars ->
                 items(populars.take(2)) { prod ->
                     products.onSuccess { list ->
-                        val image = list.find {
-                            it.second.productId == prod.productId && it.second.number == 1
-                        }?.second
+                        val image = list.entries.firstOrNull { entry ->
+                            entry.key.productId == prod.productId && entry.value.number == 1
+                        }?.value
 
                         SquareProductCardHomePage(
                             productID = prod.productId,
@@ -137,9 +137,9 @@ fun HomeScreen(
                     val newProd = newProducts.first()
                     item(span = { GridItemSpan(2) }) {
                         products.onSuccess { list ->
-                            val image = list.find {
-                                it.second.productId == newProd.productId && it.second.number == 1
-                            }?.second
+                            val image = list.entries.firstOrNull { entry ->
+                                entry.key.productId == newProd.productId && entry.value.number == 1
+                            }?.value
 
                             RectangularProductCardHomePage(
                                 productID = newProd.productId,
@@ -172,9 +172,9 @@ fun HomeScreen(
             discountedProducts.onSuccess { discounted ->
                 items(discounted.take(2)) { prod ->
                     products.onSuccess { list ->
-                        val image = list.find {
-                            it.second.productId == prod.productId && it.second.number == 1
-                        }?.second
+                        val image = list.entries.firstOrNull { entry ->
+                            entry.key.productId == prod.productId && entry.value.number == 1
+                        }?.value
                         SquareProductCardHomePage(
                             productID = prod.productId,
                             productName = "${prod.brand} ${prod.name}",

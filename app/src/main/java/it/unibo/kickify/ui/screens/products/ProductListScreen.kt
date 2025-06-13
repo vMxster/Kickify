@@ -53,16 +53,16 @@ fun ProductListScreen(
             productList.onSuccess { list ->
                 if (list.isEmpty()) {
                     Text(stringResource(R.string.errorLoadingData))
-
                 } else {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         horizontalArrangement = Arrangement.spacedBy(20.dp)
                     ) {
-                        items(list.size) { index ->
-                            val prod = list[index].first
-                            val img = list[index].second
+                        items(list.entries.size) { index ->
+                            val entry = list.entries.elementAt(index)
+                            val prod = entry.key
+                            val img = entry.value
 
                             ProductCardShoesPage(
                                 productName = "${prod.brand} ${prod.name}",

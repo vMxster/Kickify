@@ -75,8 +75,8 @@ fun CartScreen(
                 cartItems.forEach { item ->
                     var imgUrl = ""
                     productImages.onSuccess { l ->
-                        val img = l.find { it.first.productId == item.cartProduct.productId }
-                        imgUrl = img?.second?.url ?: ""
+                        val img = l.entries.firstOrNull { entry -> entry.key.productId == item.cartProduct.productId }
+                        imgUrl = img?.value?.url ?: ""
                     }
                     CartItem(
                         itemName = item.nome,

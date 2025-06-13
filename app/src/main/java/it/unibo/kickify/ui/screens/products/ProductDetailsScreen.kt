@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -55,9 +56,10 @@ fun ProductDetailsScreen(
     val productImages by productsViewModel.productImages.collectAsStateWithLifecycle()
     val isLoading by productsViewModel.isLoading.collectAsStateWithLifecycle()
 
-    val list = productList.getOrNull() ?: emptyList()
-    val prodInfo = list.firstOrNull { pair -> pair.first.productId == productId }
-    val product = prodInfo?.first
+    val list = productList.getOrNull() ?: emptyMap()
+    val prodInfo = list.entries.firstOrNull { entry -> entry.key.productId == productId }
+    val product = prodInfo?.key
+    val isInWishlist by productsViewModel.isInWishlist.collectAsStateWithLifecycle()
     var mainImageIndex by remember { mutableIntStateOf(1) }
 
     var reviews: List<ReviewWithUserInfo> = listOf()
@@ -77,6 +79,7 @@ fun ProductDetailsScreen(
         productsViewModel.getReviewsOfProduct(productId)
         productsViewModel.loadProductDetails(productId)
         productsViewModel.getProductImages(productId)
+        productsViewModel.isInWishlist(productId)
     }
 
     ScreenTemplate(
@@ -99,7 +102,9 @@ fun ProductDetailsScreen(
         },
         showModalDrawer = true,
         showLoadingOverlay = isLoading,
-        achievementsViewModel = achievementsViewModel
+        achievementsViewModel = achievementsViewModel,
+        isInWishlist = isInWishlist,
+        onToggleWishlist = { productsViewModel.toggleWishlist(productId) }
     ) {
         Column(
             modifier = Modifier.fillMaxSize()

@@ -18,7 +18,6 @@ import it.unibo.kickify.data.repositories.RemoteRepository
 import it.unibo.kickify.data.repositories.SettingsRepository
 import it.unibo.kickify.data.repositories.local.CartRepository
 import it.unibo.kickify.data.repositories.local.ImageRepository
-import it.unibo.kickify.data.repositories.local.NotificationRepository
 import it.unibo.kickify.data.repositories.local.OAuthUserRepository
 import it.unibo.kickify.data.repositories.local.OrderRepository
 import it.unibo.kickify.data.repositories.local.ProductCartRepository
@@ -26,7 +25,6 @@ import it.unibo.kickify.data.repositories.local.ProductRepository
 import it.unibo.kickify.data.repositories.local.ReviewRepository
 import it.unibo.kickify.data.repositories.local.UserRepository
 import it.unibo.kickify.data.repositories.local.VersionRepository
-import it.unibo.kickify.data.repositories.local.WishlistRepository
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.cart.CartViewModel
 import it.unibo.kickify.ui.screens.forgotPassword.ForgotPasswordOTPViewModel
@@ -82,9 +80,7 @@ val appModule = module {
     single { UserRepository(userDao = get<KickifyDatabase>().userDao()) }
     single { CartRepository(cartDao = get<KickifyDatabase>().cartDao()) }
     single { OrderRepository(orderDao = get<KickifyDatabase>().orderDao()) }
-    single { WishlistRepository(wishlistDao = get<KickifyDatabase>().wishlistDao()) }
     single { ReviewRepository(reviewDao = get<KickifyDatabase>().reviewDao()) }
-    single { NotificationRepository(notificationDao = get<KickifyDatabase>().notificationDao()) }
     single { VersionRepository(versionDao = get<KickifyDatabase>().versionDao()) }
     single { SettingsRepository(dataStore = get()) }
     single { AchievementsRepository(dataStore = get()) }
@@ -96,8 +92,7 @@ val appModule = module {
             get(), get(), get(),
             get(), get(), get(),
             get(), get(), get(),
-            get(), get(), get(),
-            get(), get())
+            get(), get(), get())
     }
 
     viewModel { SettingsViewModel(get(), get()) }

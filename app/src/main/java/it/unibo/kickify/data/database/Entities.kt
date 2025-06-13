@@ -163,7 +163,7 @@ data class Cart(
     val modifyDate: String, // Formato ISO timestamp
 
     @ColumnInfo(name = "Valore_Totale")
-    val totalValue: Double
+    val totalValue: Double = 0.0
 )
 
 @Entity(

@@ -42,7 +42,7 @@ SELECT
 FROM PRODOTTO p
 CROSS JOIN (
     SELECT 'Blue' as Colore UNION
-    SELECT 'Purple' UNION
+    SELECT 'Yellow' UNION
     SELECT 'Red' UNION
     SELECT 'Green' UNION
     SELECT 'White' UNION
@@ -71,7 +71,7 @@ SELECT
 FROM PRODOTTO p
 CROSS JOIN (
     SELECT 'Blue' as Colore UNION
-    SELECT 'Purple' UNION
+    SELECT 'Yellow' UNION
     SELECT 'Red' UNION
     SELECT 'Green' UNION
     SELECT 'White' UNION
@@ -100,7 +100,7 @@ SELECT
 FROM PRODOTTO p
 CROSS JOIN (
     SELECT 'Blue' as Colore UNION
-    SELECT 'Purple' UNION
+    SELECT 'Yellow' UNION
     SELECT 'Red' UNION
     SELECT 'Green' UNION
     SELECT 'White' UNION

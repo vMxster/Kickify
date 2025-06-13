@@ -1,5 +1,6 @@
 package it.unibo.kickify.ui.screens.products
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import it.unibo.kickify.data.database.CompleteProduct
@@ -24,8 +25,8 @@ class ProductsViewModel(
 ) : ViewModel() {
 
     // Prodotti generici
-    private val _products = MutableStateFlow<Result<List<Pair<Product, Image>>>>(Result.success(emptyList()))
-    val products: StateFlow<Result<List<Pair<Product, Image>>>> = _products
+    private val _products = MutableStateFlow<Result<Map<Product, Image>>>(Result.success(emptyMap()))
+    val products: StateFlow<Result<Map<Product, Image>>> = _products
 
     // Prodotti Popolari
     private val _popularProducts = MutableStateFlow<Result<List<Product>>>(Result.success(emptyList()))
@@ -67,6 +68,10 @@ class ProductsViewModel(
     private val _searchResults = MutableStateFlow<Result<List<ProductWithImage>>>(Result.success(emptyList()))
     val searchResults: StateFlow<Result<List<ProductWithImage>>> = _searchResults
 
+    // Stato per il Prodotto in Wishlist
+    private val _isInWishlist = MutableStateFlow(false)
+    val isInWishlist: StateFlow<Boolean> = _isInWishlist
+
     init {
         viewModelScope.launch {
             databaseReadyManager.isDatabaseReady.collectLatest { isReady ->
@@ -88,7 +93,7 @@ class ProductsViewModel(
                     }
                 }
             } catch (e: Exception) {
-                _products.value = Result.failure(e)
+                _productHistory.value = Result.failure(e)
             }
         }
     }
@@ -114,8 +119,7 @@ class ProductsViewModel(
         val result = repository.getProducts()
         if (result.isSuccess) {
             val mapValues = result.getOrNull() ?: emptyMap()
-            val listValues = mapValues.map { (product, image) -> Pair(product, image) }
-            _products.value = Result.success(listValues)
+            _products.value = Result.success(mapValues)
         } else {
             _products.value = Result.failure(result.exceptionOrNull() ?: Exception("Errore caricamento prodotti"))
         }
@@ -221,6 +225,36 @@ class ProductsViewModel(
                 _searchResults.value = Result.failure(e)
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+
+    fun isInWishlist(productId: Int) {
+        viewModelScope.launch {
+            try {
+                val result = repository.isInWishlist(productId)
+                _isInWishlist.value = if (result.isSuccess) {
+                    result.getOrNull() ?: false
+                } else {
+                    false
+                }
+            } catch (e: Exception) {
+                _isInWishlist.value = false
+            }
+        }
+    }
+
+    fun toggleWishlist(productId: Int) {
+        viewModelScope.launch {
+            try {
+                if (_isInWishlist.value) {
+                    repository.removeFromWishlist(productId)
+                } else {
+                    repository.addToWishlist(productId)
+                }
+                _isInWishlist.value = !_isInWishlist.value
+            } catch (e: Exception) {
+                Log.e("ProductsViewModel", "Errore durante la modifica della wishlist: ${e.message}")
             }
         }
     }

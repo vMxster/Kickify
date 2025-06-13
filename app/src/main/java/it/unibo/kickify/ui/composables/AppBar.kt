@@ -16,7 +16,6 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -49,7 +48,9 @@ fun AppBar(
     title: String = "",
     onNavigationMenuClick: () -> Unit,
     unreadNotificationsCount: Int,
-    markAllNotificationsAsRead: () -> Unit
+    markAllNotificationsAsRead: () -> Unit,
+    isInWishlist: Boolean = false,
+    onToggleWishlist: (() -> Unit)? = null
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
@@ -162,15 +163,20 @@ fun AppBar(
             }
 
             if(title == "Details"){
-                var checked by remember { mutableStateOf(false) }
-                IconToggleButton(
-                    checked = checked,
-                    onCheckedChange = { checked = it }
+                println("Stato attuale wishlist: $isInWishlist")
+
+                IconButton(
+                    onClick = {
+                        println("Click sul pulsante wishlist")
+                        onToggleWishlist?.invoke()
+                    }
                 ) {
                     Icon(
-                        imageVector = if(checked) Icons.Outlined.Favorite
+                        imageVector = if (isInWishlist) Icons.Outlined.Favorite
                         else Icons.Outlined.FavoriteBorder,
-                        contentDescription = "",
+                        contentDescription = if (isInWishlist)
+                            "Rimuovi dai preferiti"
+                        else "Aggiungi ai preferiti",
                         tint = Color.Red
                     )
                 }

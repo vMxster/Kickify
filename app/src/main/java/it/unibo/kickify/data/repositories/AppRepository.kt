@@ -16,16 +16,13 @@ import it.unibo.kickify.data.database.OrderProductDetails
 import it.unibo.kickify.data.database.Product
 import it.unibo.kickify.data.database.ProductDetails
 import it.unibo.kickify.data.database.ProductWithImage
-import it.unibo.kickify.data.database.Review
 import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.data.database.User
 import it.unibo.kickify.data.database.UserOAuth
 import it.unibo.kickify.data.database.WishlistProduct
 import it.unibo.kickify.data.database.Version
-import it.unibo.kickify.data.models.NotificationType
 import it.unibo.kickify.data.repositories.local.CartRepository
 import it.unibo.kickify.data.repositories.local.ImageRepository
-import it.unibo.kickify.data.repositories.local.NotificationRepository
 import it.unibo.kickify.data.repositories.local.OAuthUserRepository
 import it.unibo.kickify.data.repositories.local.OrderRepository
 import it.unibo.kickify.data.repositories.local.ProductCartRepository
@@ -33,13 +30,11 @@ import it.unibo.kickify.data.repositories.local.ProductRepository
 import it.unibo.kickify.data.repositories.local.ReviewRepository
 import it.unibo.kickify.data.repositories.local.UserRepository
 import it.unibo.kickify.data.repositories.local.VersionRepository
-import it.unibo.kickify.data.repositories.local.WishlistRepository
 import it.unibo.kickify.utils.ImageStorageManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 class AppRepository(
     private val context: Context,
@@ -48,9 +43,7 @@ class AppRepository(
     private val userRepository: UserRepository,
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
-    private val wishlistRepository: WishlistRepository,
     private val reviewRepository: ReviewRepository,
-    private val notificationRepository: NotificationRepository,
     private val imageRepository: ImageRepository,
     private val productCartRepository: ProductCartRepository,
     private val versionRepository: VersionRepository,
@@ -303,13 +296,18 @@ class AppRepository(
     }
 
     suspend fun removeFromCart(email: String, productId: Int, color: String, size: Double): Result<Boolean> {
-        val cart = cartRepository.getCartByEmail(email)
-        val result = remoteRepository.removeFromCart(email, productId, color, size)
-        if (result.isSuccess && result.getOrNull() == true && cart != null) {
-            productCartRepository.removeFromCart(cart.cartId, productId, color, size)
-            cartRepository.updateCartTotal(cart.cartId)
+        return try {
+            val cart = cartRepository.getCartByEmail(email)
+            val result = remoteRepository.removeFromCart(email, productId, color, size)
+            if (result.isSuccess && result.getOrNull() == true && cart != null) {
+                productCartRepository.removeFromCart(cart.cartId, productId, color, size)
+                cartRepository.updateCartTotal(cart.cartId)
+            }
+            result
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in removeFromCart", e)
+            Result.failure(e)
         }
-        return result
     }
 
     // WISHLIST
@@ -318,16 +316,7 @@ class AppRepository(
             val remoteResult = remoteRepository.getWishlistItems(email)
             if (remoteResult.isSuccess) {
                 val remoteWishlist = remoteResult.getOrNull() ?: emptyList()
-                if (remoteWishlist.isNotEmpty()) {
-                    for (item in remoteWishlist) {
-                        //wishlistRepository.addToWishlist(email, item.productId)
-                    }
-                }
                 return@withContext Result.success(remoteWishlist)
-                /*Result.success(
-                    //wishlistRepository.getWishlistItems(email)
-                    remoteWishlist
-                )*/
             } else {
                 Result.failure(Exception("Nessun Articolo nella wishlist"))
             }
@@ -337,28 +326,29 @@ class AppRepository(
         }
     }
 
-    suspend fun addToWishlist(email: String, productId: Int): Result<Boolean> {
-        val result = remoteRepository.addToWishlist(email, productId)
-        if (result.isSuccess && result.getOrNull() == true) {
-            wishlistRepository.addToWishlist(email, productId)
-        }
-        return result
+    suspend fun addToWishlist(productId: Int): Result<Boolean> {
+        return remoteRepository.addToWishlist(
+            settingsRepository.userID.first(),
+            productId
+        )
     }
 
-    suspend fun removeFromWishlist(email: String, productId: Int): Result<Boolean> {
-        val result = remoteRepository.removeFromWishlist(email, productId)
-        if (result.isSuccess && result.getOrNull() == true) {
-            wishlistRepository.removeFromWishlist(email, productId)
-        }
-        return result
+    suspend fun removeFromWishlist(productId: Int): Result<Boolean> {
+        return remoteRepository.removeFromWishlist(
+            settingsRepository.userID.first(),
+            productId
+        )
     }
 
-    suspend fun clearWishlist(email: String): Result<Boolean> {
-        val result = remoteRepository.clearWishlist(email)
-        if (result.isSuccess && result.getOrNull() == true) {
-            wishlistRepository.clearWishlist(email)
+    suspend fun isInWishlist(productId: Int): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            remoteRepository.isInWishlist(
+                settingsRepository.userID.first(),
+                productId)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore in isInWishlist", e)
+            Result.failure(e)
         }
-        return result
     }
 
     // NOTIFICHE
@@ -367,47 +357,17 @@ class AppRepository(
             val remoteResult = remoteRepository.getNotifications(email, lastAccess.first())
             if (remoteResult.isSuccess) {
                 val remoteNotifications = remoteResult.getOrNull() ?: emptyList()
-                if (remoteNotifications.isNotEmpty()) {
-                    for (notification in remoteNotifications) {
-                        //notificationRepository.addNotification(notification)
-                    }
-                }
                 return@withContext Result.success(remoteNotifications)
             }
-            Result.success(
-                notificationRepository.getUserNotifications(email)
-            )
+            return@withContext Result.success(emptyList())
         } catch (e: Exception) {
             Log.e(tag, "Errore in getNotifications", e)
             Result.failure(e)
         }
     }
 
-    suspend fun createNotification(email: String, message: String, type: NotificationType): Result<Boolean> {
-        val result = remoteRepository.createNotification(email, message, type.internalName)
-        if (result.isSuccess && result.getOrNull() == true) {
-            notificationRepository.createNotification(Notification(
-                email = email,
-                message = message,
-                type = type.internalName,
-                date = LocalDateTime.now().toString(),
-                state = "Unread",
-                notificationId = 0
-            ))
-        }
-        return result
-    }
-
     suspend fun markNotificationsAsRead(email: String, notificationIds: List<Int>): Result<Boolean> {
-        val result = remoteRepository.markNotificationsAsRead(email, notificationIds.toTypedArray())
-        if (result.isSuccess && result.getOrNull() == true) {
-            notificationRepository.markNotificationsAsRead(email, notificationIds)
-        }
-        return result
-    }
-
-    suspend fun getUnreadNotificationsCount(email: String): Int {
-        return notificationRepository.getUnreadNotificationsCount(email)
+        return remoteRepository.markNotificationsAsRead(email, notificationIds.toTypedArray())
     }
 
     // ORDINI

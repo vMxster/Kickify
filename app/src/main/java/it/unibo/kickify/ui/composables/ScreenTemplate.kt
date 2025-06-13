@@ -73,6 +73,8 @@ fun ScreenTemplate(
     snackBarHostState: SnackbarHostState = remember { SnackbarHostState() },
     showLoadingOverlay: Boolean = false,
     achievementsViewModel: AchievementsViewModel,
+    isInWishlist: Boolean = false,
+    onToggleWishlist: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -127,7 +129,9 @@ fun ScreenTemplate(
                         unreadNotificationsCount = unreadNotifications,
                         markAllNotificationsAsRead = {
                             notificationViewModel.markAllNotificationsAsRead(email)
-                        }
+                        },
+                        isInWishlist = isInWishlist,
+                        onToggleWishlist = onToggleWishlist
                     )
                 }
             },

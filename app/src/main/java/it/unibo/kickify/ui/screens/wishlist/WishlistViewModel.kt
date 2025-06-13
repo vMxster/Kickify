@@ -50,7 +50,7 @@ class WishlistViewModel(
 
     fun addToWishlist(email: String, prodId: Int){
         viewModelScope.launch {
-            val result = repository.addToWishlist(email, prodId)
+            val result = repository.addToWishlist(prodId)
             if (result.isSuccess) {
                 fetchWishlist(email)
             }
@@ -59,7 +59,7 @@ class WishlistViewModel(
 
     fun removeFromWishlist(email: String, prodId: Int) {
         viewModelScope.launch {
-            val result = repository.removeFromWishlist(email, prodId)
+            val result = repository.removeFromWishlist(prodId)
             if (result.isSuccess) {
                 fetchWishlist(email)
             }
