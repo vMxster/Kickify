@@ -46,13 +46,15 @@ import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.PaymentMethodRow
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 
 @Composable
 fun ProfileScreen(
     navController: NavController,
     settingsViewModel: SettingsViewModel,
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    achievementsViewModel: AchievementsViewModel
 ){
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -86,7 +88,8 @@ fun ProfileScreen(
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true,
-        showLoadingOverlay = isLoading
+        showLoadingOverlay = isLoading,
+        achievementsViewModel = achievementsViewModel
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

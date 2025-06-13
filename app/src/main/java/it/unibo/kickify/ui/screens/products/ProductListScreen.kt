@@ -21,11 +21,13 @@ import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ProductCardShoesPage
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 
 @Composable
 fun ProductListScreen(
     navController: NavController,
     productsViewModel: ProductsViewModel,
+    achievementsViewModel: AchievementsViewModel,
     title: String? = null
 ) {
     val titleString = title ?: stringResource(R.string.allShoes)
@@ -39,7 +41,8 @@ fun ProductListScreen(
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true,
-        showLoadingOverlay = isLoading
+        showLoadingOverlay = isLoading,
+        achievementsViewModel = achievementsViewModel
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -77,7 +80,7 @@ fun ProductListScreen(
                 }
             }.onFailure { e ->
                 Text(stringResource(R.string.errorLoadingData) +
-                "\n${e.message}")
+                        "\n${e.message}")
             }
         }
     }

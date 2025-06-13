@@ -28,13 +28,15 @@ import it.unibo.kickify.ui.composables.OrderCardContainer
 import it.unibo.kickify.ui.composables.OrderItem
 import it.unibo.kickify.ui.composables.OrdersTitleLine
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 
 @Composable
 fun MyOrdersScreen(
     navController: NavController,
     settingsViewModel: SettingsViewModel,
-    ordersViewModel: OrdersViewModel
+    ordersViewModel: OrdersViewModel,
+    achievementsViewModel: AchievementsViewModel
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -55,7 +57,8 @@ fun MyOrdersScreen(
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true,
-        showLoadingOverlay = isLoading
+        showLoadingOverlay = isLoading,
+        achievementsViewModel = achievementsViewModel
     ) {
 
         // show error if present

@@ -21,6 +21,7 @@ import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ProductCardWishlistPage
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.products.ProductsViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 
@@ -29,7 +30,8 @@ fun WishlistScreen(
     navController: NavController,
     settingsViewModel: SettingsViewModel,
     wishlistViewModel: WishlistViewModel,
-    productsViewModel: ProductsViewModel
+    productsViewModel: ProductsViewModel,
+    achievementsViewModel: AchievementsViewModel
 ){
     val isLoading by wishlistViewModel.isLoading.collectAsStateWithLifecycle()
     val wishlistState by wishlistViewModel.wishlistState.collectAsStateWithLifecycle()
@@ -47,7 +49,8 @@ fun WishlistScreen(
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true,
-        showLoadingOverlay = isLoading
+        showLoadingOverlay = isLoading,
+        achievementsViewModel = achievementsViewModel
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

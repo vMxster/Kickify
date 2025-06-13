@@ -40,12 +40,14 @@ import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import kotlinx.coroutines.delay
 
 @Composable
 fun OTPScreen(
     navController: NavController,
-    forgotPasswordOTPViewModel: ForgotPasswordOTPViewModel
+    forgotPasswordOTPViewModel: ForgotPasswordOTPViewModel,
+    achievementsViewModel: AchievementsViewModel
 ) {
     val otpLength = 6
     val focusManager = LocalFocusManager.current
@@ -85,7 +87,8 @@ fun OTPScreen(
         showTopAppBar = true,
         bottomAppBarContent = { },
         showModalDrawer = false,
-        showLoadingOverlay = isLoading
+        showLoadingOverlay = isLoading,
+        achievementsViewModel = achievementsViewModel
     ) {
         val otpScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)

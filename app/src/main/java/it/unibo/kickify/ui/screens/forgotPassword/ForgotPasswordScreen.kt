@@ -36,12 +36,14 @@ import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.utils.LoginRegisterUtils
 
 @Composable
 fun ForgotPasswordScreen(
     navController: NavController,
-    forgotPasswordOTPViewModel: ForgotPasswordOTPViewModel
+    forgotPasswordOTPViewModel: ForgotPasswordOTPViewModel,
+    achievementsViewModel: AchievementsViewModel
 ) {
     val ctx = LocalContext.current
 
@@ -79,7 +81,8 @@ fun ForgotPasswordScreen(
         showTopAppBar = true,
         bottomAppBarContent = { },
         showModalDrawer = false,
-        showLoadingOverlay = isLoading
+        showLoadingOverlay = isLoading,
+        achievementsViewModel = achievementsViewModel
     ) {
         val forgotScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)

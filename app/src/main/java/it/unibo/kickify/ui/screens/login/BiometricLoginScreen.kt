@@ -28,9 +28,13 @@ import it.unibo.kickify.authentication.BiometricAuthManager
 import it.unibo.kickify.authentication.rememberBiometricAuthManager
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 
 @Composable
-fun BiometricLoginScreen(navController: NavController) {
+fun BiometricLoginScreen(
+    navController: NavController,
+    achievementsViewModel: AchievementsViewModel
+) {
     var authenticationStatus by remember { mutableStateOf(BiometricAuthStatus.IDLE) }
     val context = LocalContext.current
 
@@ -84,6 +88,7 @@ fun BiometricLoginScreen(navController: NavController) {
         showTopAppBar = true,
         bottomAppBarContent = { },
         showModalDrawer = false,
+        achievementsViewModel = achievementsViewModel
     ) {
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp),

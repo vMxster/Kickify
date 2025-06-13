@@ -38,6 +38,7 @@ import it.unibo.kickify.ui.composables.ReviewCard
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.composables.SectionTitle
 import it.unibo.kickify.ui.composables.SizesList
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.cart.CartViewModel
 
 @Composable
@@ -45,6 +46,7 @@ fun ProductDetailsScreen(
     navController: NavController,
     productsViewModel: ProductsViewModel,
     cartViewModel: CartViewModel,
+    achievementsViewModel: AchievementsViewModel,
     productId: Int
 ) {
     val productDetails by productsViewModel.productDetails.collectAsStateWithLifecycle()
@@ -96,7 +98,8 @@ fun ProductDetailsScreen(
             )
         },
         showModalDrawer = true,
-        showLoadingOverlay = isLoading
+        showLoadingOverlay = isLoading,
+        achievementsViewModel = achievementsViewModel
     ) {
         Column(
             modifier = Modifier.fillMaxSize()

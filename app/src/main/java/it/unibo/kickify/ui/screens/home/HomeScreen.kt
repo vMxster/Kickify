@@ -25,12 +25,14 @@ import it.unibo.kickify.ui.composables.RectangularProductCardHomePage
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.composables.SearchRoundedTextField
 import it.unibo.kickify.ui.composables.SquareProductCardHomePage
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.products.ProductsViewModel
 
 @Composable
 fun HomeScreen(
     navController: NavController,
-    productsViewModel: ProductsViewModel
+    productsViewModel: ProductsViewModel,
+    achievementsViewModel: AchievementsViewModel
 ) {
     val isLoading by productsViewModel.isLoading.collectAsStateWithLifecycle()
 
@@ -51,7 +53,8 @@ fun HomeScreen(
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true,
-        showLoadingOverlay = isLoading
+        showLoadingOverlay = isLoading,
+        achievementsViewModel = achievementsViewModel
     ) {
 
         LazyVerticalGrid(

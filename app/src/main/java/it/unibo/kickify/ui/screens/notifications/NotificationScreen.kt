@@ -24,6 +24,7 @@ import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.NotificationItem
 import it.unibo.kickify.ui.composables.NotificationTitleLine
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.theme.BluePrimary
 import kotlinx.coroutines.launch
@@ -34,7 +35,8 @@ import java.time.format.DateTimeFormatter
 fun NotificationScreen(
     navController: NavController,
     notificationViewModel: NotificationViewModel,
-    settingsViewModel: SettingsViewModel
+    settingsViewModel: SettingsViewModel,
+    achievementsViewModel: AchievementsViewModel
 ){
     val isLoading by notificationViewModel.isLoading.collectAsStateWithLifecycle()
     val errorMessage by notificationViewModel.errorMessage.collectAsStateWithLifecycle()
@@ -61,7 +63,8 @@ fun NotificationScreen(
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true,
-        showLoadingOverlay = isLoading
+        showLoadingOverlay = isLoading,
+        achievementsViewModel = achievementsViewModel
     ) {
         Column(
             modifier = Modifier.fillMaxSize()

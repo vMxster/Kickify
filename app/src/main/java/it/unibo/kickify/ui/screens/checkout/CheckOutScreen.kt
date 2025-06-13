@@ -29,20 +29,23 @@ import it.unibo.kickify.ui.composables.CartAndCheckoutResume
 import it.unibo.kickify.ui.composables.DialogWithImage
 import it.unibo.kickify.ui.composables.InformationCard
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 @Composable
 fun CheckOutScreen(
-    navController: NavController
+    navController: NavController,
+    achievementsViewModel: AchievementsViewModel
 ){
     ScreenTemplate(
         screenTitle = stringResource(R.string.checkoutScreen_title),
         navController = navController,
         showTopAppBar = true,
         bottomAppBarContent = { },
-        showModalDrawer = false
+        showModalDrawer = false,
+        achievementsViewModel = achievementsViewModel
     ) {
         var showLoading: Boolean by rememberSaveable { mutableStateOf(false) }
         var showDialog by rememberSaveable { mutableStateOf(false) }

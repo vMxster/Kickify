@@ -60,6 +60,7 @@ import it.unibo.kickify.R
 import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.theme.MediumGray
 import it.unibo.kickify.utils.LoginRegisterUtils
@@ -69,7 +70,8 @@ import org.koin.compose.koinInject
 @Composable
 fun RegisterScreen(
     navController: NavController,
-    settingsViewModel: SettingsViewModel
+    settingsViewModel: SettingsViewModel,
+    achievementsViewModel: AchievementsViewModel
 ) {
     val ctx = LocalContext.current
     ScreenTemplate(
@@ -77,7 +79,8 @@ fun RegisterScreen(
         navController = navController,
         showTopAppBar = true,
         bottomAppBarContent = { },
-        showModalDrawer = false
+        showModalDrawer = false,
+        achievementsViewModel = achievementsViewModel
     ) {
         val registerScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)

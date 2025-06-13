@@ -69,6 +69,7 @@ import it.unibo.kickify.camerax.CameraXUtils
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.theme.BluePrimary
 import it.unibo.kickify.ui.theme.GhostWhite
@@ -87,7 +88,8 @@ fun EditProfileScreen(
     navController: NavController,
     section: EditProfileSections,
     cameraXUtils: CameraXUtils,
-    settingsViewModel: SettingsViewModel
+    settingsViewModel: SettingsViewModel,
+    achievementsViewModel: AchievementsViewModel
 ) {
     val ctx = LocalContext.current
 
@@ -157,7 +159,8 @@ fun EditProfileScreen(
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true,
         snackBarHostState = snackBarHostState,
-        showLoadingOverlay = isLoadingSettings || isLoadingProfile
+        showLoadingOverlay = isLoadingSettings || isLoadingProfile,
+        achievementsViewModel = achievementsViewModel
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

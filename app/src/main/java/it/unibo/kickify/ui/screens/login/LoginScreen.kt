@@ -55,30 +55,31 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import it.unibo.kickify.R
-import it.unibo.kickify.ui.KickifyRoute
-import it.unibo.kickify.ui.composables.ScreenTemplate
-import it.unibo.kickify.ui.screens.register.LoginRegisterMethodDividerRow
-import it.unibo.kickify.ui.screens.settings.SettingsViewModel
-import it.unibo.kickify.ui.theme.MediumGray
-import it.unibo.kickify.utils.LoginRegisterUtils
-import kotlinx.coroutines.launch
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
-import androidx.credentials.exceptions.NoCredentialException
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import it.unibo.kickify.R
+import it.unibo.kickify.ui.KickifyRoute
+import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
+import it.unibo.kickify.ui.screens.register.LoginRegisterMethodDividerRow
+import it.unibo.kickify.ui.screens.settings.SettingsViewModel
+import it.unibo.kickify.ui.theme.MediumGray
+import it.unibo.kickify.utils.LoginRegisterUtils
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
     navController: NavController,
     settingsViewModel: SettingsViewModel,
     loginViewModel: LoginViewModel,
+    achievementsViewModel: AchievementsViewModel,
     onLoginSuccess: () -> Unit
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
@@ -197,7 +198,8 @@ fun LoginScreen(
         bottomAppBarContent = { },
         showModalDrawer = false,
         snackBarHostState = snackBarHostState,
-        showLoadingOverlay = isLoading
+        showLoadingOverlay = isLoading,
+        achievementsViewModel = achievementsViewModel
     ) {
         val loginScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)

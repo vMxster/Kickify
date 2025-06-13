@@ -24,13 +24,15 @@ import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.CartAndCheckoutResume
 import it.unibo.kickify.ui.composables.CartItem
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.products.ProductsViewModel
 
 @Composable
 fun CartScreen(
     navController: NavController,
     cartViewModel: CartViewModel,
-    productsViewModel: ProductsViewModel
+    productsViewModel: ProductsViewModel,
+    achievementsViewModel: AchievementsViewModel
 ){
     val cartItems by cartViewModel.cartItems.collectAsStateWithLifecycle()
     val subTotal by cartViewModel.subTotal.collectAsStateWithLifecycle()
@@ -59,7 +61,8 @@ fun CartScreen(
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true,
         showLoadingOverlay = isLoading,
-        snackBarHostState = snackBarHostState
+        snackBarHostState = snackBarHostState,
+        achievementsViewModel = achievementsViewModel
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),

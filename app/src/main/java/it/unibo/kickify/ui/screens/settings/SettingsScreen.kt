@@ -49,7 +49,6 @@ import it.unibo.kickify.authentication.BiometricAuthManager
 import it.unibo.kickify.data.models.Language
 import it.unibo.kickify.data.models.Theme
 import it.unibo.kickify.ui.KickifyRoute
-import it.unibo.kickify.ui.composables.AchievementDialog
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.composables.SettingsItemWithLeadingIcon
@@ -76,9 +75,6 @@ fun SettingsScreen(
     val username by settingsViewModel.userName.collectAsStateWithLifecycle()
     val userLoggedIn by settingsViewModel.isUserLoggedIn.collectAsStateWithLifecycle()
 
-    val lastUnlockedAchievement by achievementsViewModel.lastUnlockedAchievement.collectAsStateWithLifecycle()
-    val showAchievementDialog by achievementsViewModel.showAchievementDialog.collectAsStateWithLifecycle()
-
     LaunchedEffect(userid, username, userLoggedIn) {
         delay(1000) // wait settings to be loaded
         if(userid == "" && username == "" && !userLoggedIn){
@@ -89,26 +85,13 @@ fun SettingsScreen(
         }
     }
 
-    if(lastUnlockedAchievement != null){
-        AchievementDialog(
-            displayDialog = showAchievementDialog,
-            achievement = lastUnlockedAchievement!!,
-            onDismissRequest = {
-                achievementsViewModel.dismissUnlockedAchievementDialog()
-            },
-            goToAchievementsPage = {
-                achievementsViewModel.dismissUnlockedAchievementDialog()
-                navController.navigate(KickifyRoute.Achievements)
-            }
-        )
-    }
-
     ScreenTemplate(
         screenTitle = stringResource(R.string.settings_title),
         navController = navController,
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
-        showModalDrawer = true
+        showModalDrawer = true,
+        achievementsViewModel = achievementsViewModel
     ) {
         Column(
             modifier = Modifier.fillMaxSize()
@@ -166,6 +149,7 @@ fun SettingsScreen(
                     if(enabled) {
                         if (BiometricAuthManager.canAuthenticate(ctx)) {
                             settingsViewModel.setBiometricLogin(true)
+                            achievementsViewModel.achieveAchievement(5)
                         }
                     } else {
                         settingsViewModel.setBiometricLogin(false)

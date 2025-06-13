@@ -29,11 +29,13 @@ import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.composables.PageIndicator
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun OnboardingScreen(
     navController: NavController,
+    achievementsViewModel: AchievementsViewModel,
     onReachedLastPage: () -> Unit
 ) {
     val totalPages = 3
@@ -45,7 +47,8 @@ fun OnboardingScreen(
         navController = navController,
         showTopAppBar = true,
         bottomAppBarContent = { },
-        showModalDrawer = false
+        showModalDrawer = false,
+        achievementsViewModel = achievementsViewModel
     ) {
         Column(
             modifier = Modifier.fillMaxSize()

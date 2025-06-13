@@ -24,10 +24,12 @@ import it.unibo.kickify.ui.composables.OrderItem
 import it.unibo.kickify.ui.composables.OrdersTitleLine
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.composables.StepProgressBar
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 
 @Composable
 fun OrderDetailsScreen(
     navController: NavController,
+    achievementsViewModel: AchievementsViewModel,
     orderID: String
 ) {
 
@@ -36,7 +38,8 @@ fun OrderDetailsScreen(
         navController = navController,
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
-        showModalDrawer = true
+        showModalDrawer = true,
+        achievementsViewModel = achievementsViewModel
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
