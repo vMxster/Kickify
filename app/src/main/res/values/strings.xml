@@ -52,9 +52,7 @@
     <string name="settings_notifications">Notifications</string>
     <string name="settings_shippingAddress">Shipping Address</string>
     <string name="payment">Payment</string>
-    <string name="currentlyUnavailableFeature">Currently unavailable feauture</string>
-    <string name="settings_deleteAccount">Delete Account</string>
-    <string name="settings_deleteAccountConfirmMessage">Are you sure you want to delete your account?\nIt will disabled for 30 days, then will be definively deleted.</string>
+    <string name="currentlyUnavailableFeature">Currently unavailable feature</string>
     <string name="settings_cancel">Cancel</string>
     <string name="caution">Caution!</string>
     <string name="settings_appSettingsTitle">App Settings</string>
