@@ -54,7 +54,8 @@ fun AchievementsScreen(
         navController = navController,
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
-        showModalDrawer = true
+        showModalDrawer = true,
+        achievementsViewModel = achievementsViewModel
     ) {
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -84,8 +85,7 @@ fun AchievementsScreen(
                     )
                 }
                 item {
-                    Text(
-                        text =
+                    Text(text =
                             if(unlockedSecretAchievements.isEmpty())
                                 stringResource(R.string.allSecretAchievementsUnlocked)
                             else pluralStringResource(

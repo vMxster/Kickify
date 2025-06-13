@@ -127,15 +127,15 @@ fun KickifyNavGraph(
         }
     ) {
         composable<KickifyRoute.Home> {
-            HomeScreen(navController, productsViewModel)
+            HomeScreen(navController, productsViewModel, achievementsViewModel)
         }
 
         composable<KickifyRoute.Cart> {
-            CartScreen(navController, cartViewModel, productsViewModel)
+            CartScreen(navController, cartViewModel, productsViewModel, achievementsViewModel)
         }
 
         composable<KickifyRoute.Checkout> {
-            CheckOutScreen(navController)
+            CheckOutScreen(navController, achievementsViewModel)
         }
 
         composable<KickifyRoute.Login> {
@@ -143,6 +143,7 @@ fun KickifyNavGraph(
                 navController = navController,
                 settingsViewModel = settingsViewModel,
                 loginViewModel = loginViewModel,
+                achievementsViewModel = achievementsViewModel,
                 onLoginSuccess = {
                     achievementsViewModel.achieveAchievement(1)
                     navController.navigate(KickifyRoute.Home) {
@@ -153,24 +154,25 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.ForgotPassword> {
-            ForgotPasswordScreen(navController, forgotPasswordOTPViewModel)
+            ForgotPasswordScreen(navController, forgotPasswordOTPViewModel, achievementsViewModel)
         }
 
         composable<KickifyRoute.OTPScreen> {
-            OTPScreen(navController, forgotPasswordOTPViewModel)
+            OTPScreen(navController, forgotPasswordOTPViewModel, achievementsViewModel)
         }
 
         composable<KickifyRoute.ResetPasswordScreen> {
-            ResetPasswordScreen(navController, forgotPasswordOTPViewModel)
+            ResetPasswordScreen(navController, forgotPasswordOTPViewModel, achievementsViewModel)
         }
 
         composable<KickifyRoute.Notifications> {
-            NotificationScreen(navController, notificationViewModel, settingsViewModel)
+            NotificationScreen(navController, notificationViewModel, settingsViewModel, achievementsViewModel)
         }
 
         composable<KickifyRoute.Onboard> {
             OnboardingScreen(
                 navController,
+                achievementsViewModel,
                 onReachedLastPage = {
                     navController.navigate(KickifyRoute.Login) {
                         popUpTo(KickifyRoute.Onboard) { inclusive = true }
@@ -181,24 +183,25 @@ fun KickifyNavGraph(
 
         composable<KickifyRoute.ProductDetails> { backStackEntry ->
             val route = backStackEntry.toRoute<KickifyRoute.ProductDetails>()
-            ProductDetailsScreen(navController, productsViewModel, cartViewModel, route.productId)
+            ProductDetailsScreen(navController, productsViewModel, cartViewModel,
+                achievementsViewModel, route.productId)
         }
 
         composable<KickifyRoute.ProductList> {
-            ProductListScreen(navController, productsViewModel)
+            ProductListScreen(navController, productsViewModel, achievementsViewModel)
         }
 
         composable<KickifyRoute.ProductListWithCategory> { backStackEntry ->
             val route = backStackEntry.toRoute<KickifyRoute.ProductListWithCategory>()
-            ProductListScreen(navController, productsViewModel, route.category)
+            ProductListScreen(navController, productsViewModel, achievementsViewModel, route.category)
         }
 
         composable<KickifyRoute.Profile> {
-            ProfileScreen(navController, settingsViewModel, profileViewModel)
+            ProfileScreen(navController, settingsViewModel, profileViewModel, achievementsViewModel)
         }
 
         composable<KickifyRoute.Register> {
-            RegisterScreen(navController, settingsViewModel)
+            RegisterScreen(navController, settingsViewModel, achievementsViewModel)
         }
 
         composable<KickifyRoute.Settings> {
@@ -206,16 +209,17 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.Wishlist> {
-            WishlistScreen(navController, settingsViewModel, wishlistViewModel, productsViewModel)
+            WishlistScreen(navController, settingsViewModel, wishlistViewModel, productsViewModel,
+                achievementsViewModel)
         }
 
         composable<KickifyRoute.MyOrders> {
-            MyOrdersScreen(navController, settingsViewModel, ordersViewModel)
+            MyOrdersScreen(navController, settingsViewModel, ordersViewModel, achievementsViewModel)
         }
 
         composable<KickifyRoute.OrderDetails> { backStackEntry ->
             val route = backStackEntry.toRoute<KickifyRoute.OrderDetails>()
-            OrderDetailsScreen(navController, route.orderID.toString())
+            OrderDetailsScreen(navController, achievementsViewModel, route.orderID.toString())
         }
 
         composable<KickifyRoute.TakeProfilePhoto> {
@@ -228,11 +232,12 @@ fun KickifyNavGraph(
 
         composable<KickifyRoute.EditProfile> { backStackEntry ->
             val route = backStackEntry.toRoute<KickifyRoute.EditProfile>()
-            EditProfileScreen(navController, route.section, cameraXUtils, settingsViewModel)
+            EditProfileScreen(navController, route.section, cameraXUtils, settingsViewModel,
+                achievementsViewModel)
         }
 
         composable<KickifyRoute.BiometricLogin> {
-            BiometricLoginScreen(navController)
+            BiometricLoginScreen(navController, achievementsViewModel)
         }
     }
 }

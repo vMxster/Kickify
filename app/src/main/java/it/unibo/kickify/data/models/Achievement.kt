@@ -1,11 +1,14 @@
 package it.unibo.kickify.data.models
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+
 data class Achievement(
     val id: Int,
-    val titleResId: Int,
-    val descriptionResId: Int,
-    val resourceIconID: Int,
+    @StringRes val titleResId: Int,
+    @StringRes val descriptionResId: Int,
+    @DrawableRes val resourceIconID: Int,
     val secretAchievement: Boolean,
-    var achieved: Boolean,
-    var achievedDate: String?
+    val achieved: Boolean,
+    val achievedDate: String?
 )

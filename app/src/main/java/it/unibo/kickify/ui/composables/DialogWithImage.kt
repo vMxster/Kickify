@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,6 +26,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import it.unibo.kickify.R
@@ -81,7 +81,6 @@ fun DialogWithImage(
 
 @Composable
 fun AchievementDialog(
-    displayDialog: Boolean,
     achievement: Achievement,
     onDismissRequest: () -> Unit,
     goToAchievementsPage: () -> Unit
@@ -89,64 +88,64 @@ fun AchievementDialog(
     val configuration = LocalConfiguration.current
     val screenHeightDp = configuration.screenHeightDp.dp * 60/100
 
-    if (displayDialog) {
-        Dialog(onDismissRequest = onDismissRequest) {
-            Card(
-                modifier = Modifier.fillMaxWidth()
-                    .height(screenHeightDp)
-                    .padding(16.dp),
-                shape = RoundedCornerShape(16.dp)
+    Dialog(onDismissRequest = onDismissRequest) {
+        Card(
+            modifier = Modifier.fillMaxWidth()
+                .height(screenHeightDp)
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.SpaceBetween,
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.Top
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.Top
-                    ) {
-                        IconButton(
-                            onClick = { onDismissRequest() },
-                            modifier = Modifier.padding(8.dp),
-                        ) {
-                            Icon(
-                                Icons.Outlined.Close,
-                                contentDescription = stringResource(R.string.close)
-                            )
-                        }
-                    }
-                    Image(
-                        painter = painterResource(achievement.resourceIconID),
-                        contentDescription = "",
-                        contentScale = ContentScale.FillHeight,
-                        modifier = Modifier.fillMaxWidth().height(150.dp),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
-                    )
-                    Text(
-                        text = stringResource(R.string.unlockedSecretAchievement),
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                    Text(
-                        text = stringResource(achievement.titleResId),
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                    Spacer(Modifier.height(6.dp))
-                    Text(
-                        text = stringResource(achievement.descriptionResId),
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                    Spacer(Modifier.height(10.dp))
-                    Button(
-                        onClick = { goToAchievementsPage() },
+                    IconButton(
+                        onClick = { onDismissRequest() },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text(stringResource(R.string.allAchievements))
+                        Icon(
+                            Icons.Outlined.Close,
+                            contentDescription = stringResource(R.string.close)
+                        )
                     }
+                }
+                Image(
+                    painter = painterResource(achievement.resourceIconID),
+                    contentDescription = "",
+                    contentScale = ContentScale.FillHeight,
+                    modifier = Modifier.fillMaxWidth().height(150.dp),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
+                )
+                Text(
+                    text = if(achievement.secretAchievement) stringResource(R.string.unlockedSecretAchievement)
+                    else stringResource(R.string.unlockedAchievement),
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+                Text(
+                    text = stringResource(achievement.titleResId),
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+                Text(
+                    text = stringResource(achievement.descriptionResId),
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+                Button(
+                    onClick = { goToAchievementsPage() },
+                    modifier = Modifier.padding(8.dp),
+                ) {
+                    Text(stringResource(R.string.allAchievements))
                 }
             }
         }

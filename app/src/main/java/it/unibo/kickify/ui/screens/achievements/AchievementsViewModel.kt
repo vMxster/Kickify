@@ -43,15 +43,6 @@ class AchievementsViewModel(
         ),
         Achievement(
             id = 3,
-            titleResId = R.string.achievement_1stShareLink,
-            descriptionResId = R.string.achievement_1stShareLink_descr,
-            resourceIconID = R.drawable.ach_share,
-            secretAchievement = false,
-            achieved = false,
-            achievedDate = null
-        ),
-        Achievement(
-            id = 4,
             titleResId = R.string.achievement_1stOrder,
             descriptionResId = R.string.achievement_1stOrder_descr,
             resourceIconID = R.drawable.ach_order,
@@ -60,10 +51,19 @@ class AchievementsViewModel(
             achievedDate = null
         ),
         Achievement(
-            id = 5,
+            id = 4,
             titleResId = R.string.achievement_1stItemInWishlist,
             descriptionResId = R.string.achievement_1stItemInWishlist_descr,
             resourceIconID = R.drawable.ach_wishlist,
+            secretAchievement = false,
+            achieved = false,
+            achievedDate = null
+        ),
+        Achievement(
+            id = 5,
+            titleResId = R.string.achievement_enableBiometricLogin,
+            descriptionResId = R.string.achievement_enableBiometricLogin_descr,
+            resourceIconID = R.drawable.ach_biometric,
             secretAchievement = false,
             achieved = false,
             achievedDate = null
@@ -81,7 +81,16 @@ class AchievementsViewModel(
             id = 7,
             titleResId = R.string.achievement_romaCaputMundi,
             descriptionResId = R.string.achievement_romaCaputMundi_descr,
-            resourceIconID = R.drawable.review_light,
+            resourceIconID = R.drawable.ach_roma,
+            secretAchievement = true,
+            achieved = false,
+            achievedDate = null
+        ),
+        Achievement(
+            id = 8,
+            titleResId = R.string.achievement_androidLikeEasterEgg,
+            descriptionResId = R.string.achievement_androidLikeEasterEgg_descr,
+            resourceIconID = R.drawable.ach_android,
             secretAchievement = true,
             achieved = false,
             achievedDate = null
@@ -123,6 +132,8 @@ class AchievementsViewModel(
 
     fun achieveAchievement(achievementId: Int) {
         viewModelScope.launch {
+            var newlyUnlockedAchievement: Achievement? = null
+
             _achievements.update { currentAchievements ->
                 val updatedList = currentAchievements.toMutableList()
                 val achievementIndex = updatedList.indexOfFirst { it.id == achievementId }
@@ -137,16 +148,21 @@ class AchievementsViewModel(
                         )
                         updatedList[achievementIndex] = updatedAchievement
                         repository.saveAchievementState(updatedAchievement)
-                        _lastUnlockedAchievement.value = updatedAchievement
-                        _showAchievementDialog.value = true
 
-                        notificationMgr.sendNotification(
-                            notificationTitle = application.getString(R.string.unlockedAchievement),
-                            notificationMessage = application.getString(updatedAchievement.titleResId)
-                        )
+                        newlyUnlockedAchievement = updatedAchievement
                     }
                 }
                 updatedList
+            }
+
+            if (newlyUnlockedAchievement != null) {
+                _lastUnlockedAchievement.value = newlyUnlockedAchievement
+                _showAchievementDialog.value = true
+
+                notificationMgr.sendNotification(
+                    notificationTitle = application.getString(R.string.unlockedAchievement),
+                    notificationMessage = application.getString(newlyUnlockedAchievement!!.titleResId)
+                )
             }
         }
     }

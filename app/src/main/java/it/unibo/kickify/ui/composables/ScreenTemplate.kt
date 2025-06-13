@@ -39,8 +39,10 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,6 +54,7 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
+import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.cart.CartViewModel
 import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
@@ -69,6 +72,7 @@ fun ScreenTemplate(
     showModalDrawer: Boolean,
     snackBarHostState: SnackbarHostState = remember { SnackbarHostState() },
     showLoadingOverlay: Boolean = false,
+    achievementsViewModel: AchievementsViewModel,
     content: @Composable () -> Unit
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -86,10 +90,24 @@ fun ScreenTemplate(
     val wishlistViewModel = koinViewModel<WishlistViewModel>()
     val wishlistItems by wishlistViewModel.wishlistState.collectAsStateWithLifecycle()
 
+    val achievements by achievementsViewModel.achievements.collectAsStateWithLifecycle()
+    val showAchievementDialog by achievementsViewModel.showAchievementDialog.collectAsStateWithLifecycle()
+    val lastUnlockedAchievement by achievementsViewModel.lastUnlockedAchievement.collectAsStateWithLifecycle()
+
     LaunchedEffect(email) {
         notificationViewModel.getNotifications(email)
         wishlistViewModel.fetchWishlist(email)
         cartViewModel.loadCart()
+    }
+
+    LaunchedEffect(showAchievementDialog) {
+        println("\nshowachievement: $showAchievementDialog")
+    }
+    LaunchedEffect( lastUnlockedAchievement) {
+        println("last unloked $lastUnlockedAchievement")
+    }
+    LaunchedEffect(achievements) {
+        println("achivements now unlocked: ${achievements.filter { it.achieved }.map { it.id }}")
     }
 
     val scaffoldContent: @Composable () -> Unit = {
@@ -146,7 +164,7 @@ fun ScreenTemplate(
             drawerState = drawerState,
             drawerContent = {
                 ModalDrawerSheet(drawerState) {
-                    SideMenuContent{
+                    SideMenuContent(achievementsViewModel){
 
                         val navBackStackEntry by navController.currentBackStackEntryAsState()
                         val currentDestination = navBackStackEntry?.destination
@@ -223,6 +241,25 @@ fun ScreenTemplate(
     } else {
         scaffoldContent()
     }
+
+    AnimatedVisibility(
+        visible = showAchievementDialog && lastUnlockedAchievement != null,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        lastUnlockedAchievement?.let { achievement ->
+            AchievementDialog(
+                achievement = achievement,
+                onDismissRequest = {
+                    achievementsViewModel.dismissUnlockedAchievementDialog()
+                },
+                goToAchievementsPage = {
+                    achievementsViewModel.dismissUnlockedAchievementDialog()
+                    navController.navigate(KickifyRoute.Achievements)
+                }
+            )
+        }
+    }
 }
 
 @Composable
@@ -233,17 +270,28 @@ fun SideMenuSimpleCounter(count: Int){
 }
 
 @Composable
-fun SideMenuContent(navigationDrawerItems: @Composable () -> Unit) {
+fun SideMenuContent(
+    achievementsViewModel: AchievementsViewModel,
+    navigationDrawerItems: @Composable () -> Unit
+) {
     Column(
         modifier = Modifier
             .padding(vertical = 6.dp)
             .padding(horizontal = 8.dp)
             .verticalScroll(rememberScrollState())
     ) {
+        var clickCount by remember { mutableIntStateOf(0) }
+
         Spacer(Modifier.height(12.dp))
         Text(
             stringResource(R.string.app_name),
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(16.dp)
+                .clickable {
+                    clickCount++
+                    if(clickCount == 10){
+                        achievementsViewModel.achieveAchievement(8)
+                    }
+                },
             style = MaterialTheme.typography.titleLarge
         )
 
