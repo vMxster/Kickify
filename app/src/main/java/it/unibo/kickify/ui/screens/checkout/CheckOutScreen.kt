@@ -86,11 +86,11 @@ fun CheckOutScreen(
                     mainMessage = stringResource(R.string.cartscreen_paymentSuccessful),
                     dismissButtonText = stringResource(R.string.cartscreen_backToShopping),
                     onDismissRequest = {
+                        achievementsViewModel.achieveAchievement(3)
                         navController.navigate(KickifyRoute.Home) {
                             popUpTo(KickifyRoute.Home) { inclusive = true }
                         }
                     },
-
                 )
             }
         }

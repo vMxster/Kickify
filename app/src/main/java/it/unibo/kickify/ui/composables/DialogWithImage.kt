@@ -2,6 +2,7 @@ package it.unibo.kickify.ui.composables
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -100,11 +101,16 @@ fun AchievementDialog(
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.Top
-                ) {
+                Box(modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.TopEnd
+                ){
+                    Image(
+                        painter = painterResource(achievement.resourceIconID),
+                        contentDescription = "",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxWidth().height(190.dp).padding(top = 10.dp),
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
+                    )
                     IconButton(
                         onClick = { onDismissRequest() },
                         modifier = Modifier.padding(8.dp),
@@ -115,13 +121,9 @@ fun AchievementDialog(
                         )
                     }
                 }
-                Image(
-                    painter = painterResource(achievement.resourceIconID),
-                    contentDescription = "",
-                    contentScale = ContentScale.FillHeight,
-                    modifier = Modifier.fillMaxWidth().height(150.dp),
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
-                )
+
+                //}
+
                 Text(
                     text = if(achievement.secretAchievement) stringResource(R.string.unlockedSecretAchievement)
                     else stringResource(R.string.unlockedAchievement),
