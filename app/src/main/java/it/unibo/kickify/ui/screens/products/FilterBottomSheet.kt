@@ -50,14 +50,32 @@ import it.unibo.kickify.ui.theme.BluePrimary
 fun FilterScreen(
     onDismissRequest: () -> Unit,
     sheetState: SheetState,
-    onApplyFilter: () -> Unit,
-    onResetFilter: () -> Unit
+    onApplyFilter: (FilterState) -> Unit,
+    onResetFilter: () -> Unit,
+    initialFilterState: FilterState
 ){
+    // Gestione dello stato interno dei filtri
+    var priceRange by remember(initialFilterState) { mutableStateOf(initialFilterState.priceRange) }
+    var selectedBrands by remember(initialFilterState) { mutableStateOf(initialFilterState.selectedBrands) }
+    var selectedColors by remember(initialFilterState) { mutableStateOf(initialFilterState.selectedColors) }
+    var selectedSizes by remember(initialFilterState) { mutableStateOf(initialFilterState.selectedSizes) }
+    var selectedGender by remember(initialFilterState) { mutableStateOf(initialFilterState.selectedGender) }
+    var orderBy by remember(initialFilterState) { mutableStateOf(initialFilterState.orderBy) }
+
     ModalBottomSheet(
         onDismissRequest = { onDismissRequest() },
         sheetState = sheetState
     ){
         val sizeList = listOf(37, 38, 39, 40, 41, 42, 43, 44, 45, 46)
+        val brandsList = listOf("Adidas", "Nike", "Puma")
+        val colorList = listOf(
+            Color.Black,
+            Color.Blue,
+            Color.Green,
+            Color(0xFF800080), // Viola
+            Color.Red,
+            Color.White
+        )
 
         Column(
             verticalArrangement = Arrangement.Center,
@@ -66,46 +84,107 @@ fun FilterScreen(
                 .padding(horizontal = 12.dp, vertical = 8.dp)
                 .verticalScroll(rememberScrollState())
         ){
-            FilterTitleRow(onResetFilter = onResetFilter)
+            FilterTitleRow(onResetFilter = {
+                // Reset dei filtri locali
+                priceRange = 40f..500f
+                selectedBrands = emptySet()
+                selectedColors = emptySet()
+                selectedSizes = emptySet()
+                selectedGender = null
+                orderBy = OrderBy.NONE
+                onResetFilter()
+            })
             Spacer(Modifier.height(8.dp))
 
             FilterGroupTitle(stringResource(R.string.filterBottomSheet_orderBy))
+            val orderOptions = listOf(
+                OrderBy.NONE to stringResource(R.string.filterBottomSheet_none),
+                OrderBy.PRICE_LOW_HIGH to stringResource(R.string.filterBottomSheet_priceLowHigh),
+                OrderBy.PRICE_HIGH_LOW to stringResource(R.string.filterBottomSheet_priceHighLow),
+                OrderBy.ALPHABETICAL to stringResource(R.string.filterBottomSheet_alphabetical)
+            )
+
+            val orderTexts = orderOptions.map { it.second }
             FilterButtonGroup(
-                options = listOf(
-                    stringResource(R.string.filterBottomSheet_priceLowHigh),
-                    stringResource(R.string.filterBottomSheet_priceHighLow),
-                    stringResource(R.string.filterBottomSheet_alphabetical),
-                    stringResource(R.string.filterBottomSheet_reviewsLowHigh),
-                    stringResource(R.string.filterBottomSheet_reviewsHighLow)),
-                onSelectedChanged = { }
+                options = orderTexts,
+                initialSelectedIndex = orderOptions.indexOfFirst { it.first == orderBy },
+                onSelectedChanged = { index ->
+                    orderBy = orderOptions[index].first
+                }
             )
             Spacer(Modifier.height(8.dp))
 
             FilterGroupTitle(stringResource(R.string.filterBottomSheet_gender))
-            GenderGroup()
+            GenderGroup(
+                selectedGender = selectedGender,
+                onGenderSelected = { gender ->
+                    selectedGender = if (selectedGender == gender) null else gender
+                }
+            )
             Spacer(Modifier.height(8.dp))
 
             FilterGroupTitle(stringResource(R.string.brand))
-            BrandsGroup(listOf("Adidas", "Nike", "Puma"))
+            BrandsGroup(
+                brandsList = brandsList,
+                selectedBrands = selectedBrands,
+                onBrandSelected = { brand ->
+                    selectedBrands = if (selectedBrands.contains(brand)) {
+                        selectedBrands - brand
+                    } else {
+                        selectedBrands + brand
+                    }
+                }
+            )
             Spacer(Modifier.height(8.dp))
 
             FilterGroupTitle(stringResource(R.string.color))
-            val purple = Color(0xFF800080)
             ColorGroup(
-                listOf(Color.Black, Color.Blue, Color.Green,
-                    purple, Color.Red, Color.White)
+                colorList = colorList,
+                selectedColors = selectedColors,
+                onColorSelected = { colorStr ->
+                    selectedColors = if (selectedColors.contains(colorStr)) {
+                        selectedColors - colorStr
+                    } else {
+                        selectedColors + colorStr
+                    }
+                }
             )
             Spacer(Modifier.height(8.dp))
 
             FilterGroupTitle(stringResource(R.string.size))
-            SizeGroup(sizeList)
+            SizeGroup(
+                sizeList = sizeList,
+                selectedSizes = selectedSizes,
+                onSizeSelected = { size ->
+                    selectedSizes = if (selectedSizes.contains(size)) {
+                        selectedSizes - size
+                    } else {
+                        selectedSizes + size
+                    }
+                }
+            )
             Spacer(Modifier.height(8.dp))
 
             FilterGroupTitle(stringResource(R.string.price))
-            PriceSlider(minValue = 40, maxValue = 500)
+            PriceSlider(
+                minValue = 40,
+                maxValue = 500,
+                initialPriceRange = priceRange,
+                onRangeChange = { range -> priceRange = range }
+            )
             Spacer(Modifier.height(8.dp))
 
-            ApplyFilterButton(onClick = { onApplyFilter() })
+            ApplyFilterButton(onClick = {
+                val newFilterState = FilterState(
+                    priceRange = priceRange,
+                    selectedBrands = selectedBrands,
+                    selectedColors = selectedColors,
+                    selectedSizes = selectedSizes,
+                    selectedGender = selectedGender,
+                    orderBy = orderBy
+                )
+                onApplyFilter(newFilterState)
+            })
         }
     }
 }
@@ -129,28 +208,32 @@ fun ApplyFilterButton(onClick: () -> Unit){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PriceSlider(minValue: Int, maxValue: Int) {
-    val rangeSliderState =
-        rememberRangeSliderState(
-            activeRangeStart = minValue.toFloat(),
-            activeRangeEnd = maxValue.toFloat(),
-            valueRange = minValue.toFloat()..maxValue.toFloat(),
-            onValueChangeFinished = {
-                // launch some business logic update with the state you hold
-                // viewModel.updateSelectedSliderValue(sliderPosition)
-            }
-        )
+fun PriceSlider(
+    minValue: Int,
+    maxValue: Int,
+    initialPriceRange: ClosedFloatingPointRange<Float>,
+    onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit
+) {
+    var currentRange by remember { mutableStateOf(initialPriceRange) }
+
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-        val rangeStart = "%.0f".format(rangeSliderState.activeRangeStart)
-        val rangeEnd = "%.0f".format(rangeSliderState.activeRangeEnd)
+        val rangeStart = "%.0f".format(currentRange.start)
+        val rangeEnd = "%.0f".format(currentRange.endInclusive)
+
         RangeSlider(
-            state = rangeSliderState,
+            value = currentRange,
+            onValueChange = { range ->
+                currentRange = range
+                onRangeChange(range)
+            },
+            valueRange = minValue.toFloat()..maxValue.toFloat(),
             colors = SliderDefaults.colors(
                 thumbColor = MaterialTheme.colorScheme.primary,
                 activeTrackColor = MaterialTheme.colorScheme.primary,
                 inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
             )
         )
+
         Row (
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -186,9 +269,10 @@ fun FilterTitleRow(onResetFilter: () -> Unit){
 @Composable
 fun FilterButtonGroup(
     options: List<String>,
+    initialSelectedIndex: Int = 0,
     onSelectedChanged: (Int) -> Unit
 ) {
-    var selectedIndex by remember { mutableIntStateOf(0) }
+    var selectedIndex by remember { mutableIntStateOf(initialSelectedIndex) }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -237,35 +321,54 @@ fun FilterGroupTitle(title: String){
 }
 
 @Composable
-fun BrandsGroup(brandsList: List<String>){
+fun BrandsGroup(
+    brandsList: List<String>,
+    selectedBrands: Set<String>,
+    onBrandSelected: (String) -> Unit
+){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
     ) {
-        brandsList.forEach {
-            SingleOptionSelectableButton(it)
+        brandsList.forEach { brand ->
+            SingleOptionSelectableButton(
+                shownText = brand,
+                isSelected = selectedBrands.contains(brand),
+                onClick = { onBrandSelected(brand) }
+            )
             Spacer(Modifier.width(10.dp))
         }
     }
 }
 
 @Composable
-fun GenderGroup(){
+fun GenderGroup(
+    selectedGender: ShopCategory?,
+    onGenderSelected: (ShopCategory) -> Unit
+){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
     ) {
-        ShopCategory.entries.forEach {
-            SingleOptionSelectableButton(it.toString())
+        ShopCategory.entries.forEach { category ->
+            SingleOptionSelectableButton(
+                shownText = category.toString(),
+                isSelected = selectedGender == category,
+                onClick = { onGenderSelected(category) }
+            )
             Spacer(Modifier.width(10.dp))
         }
     }
 }
 
 @Composable
-fun ColorGroup(colorList: List<Color>){
+fun ColorGroup(
+    colorList: List<Color>,
+    selectedColors: Set<String>,
+    onColorSelected: (String) -> Unit
+){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -273,14 +376,23 @@ fun ColorGroup(colorList: List<Color>){
             .horizontalScroll(rememberScrollState())
     ) {
         for (color in colorList) {
-            SingleColorSelectableButton(color)
+            val colorString = color.toString()
+            SingleColorSelectableButton(
+                color = color,
+                isSelected = selectedColors.contains(colorString),
+                onClick = { onColorSelected(colorString) }
+            )
             Spacer(Modifier.width(14.dp))
         }
     }
 }
 
 @Composable
-fun SizeGroup(sizeList: List<Int>){
+fun SizeGroup(
+    sizeList: List<Int>,
+    selectedSizes: Set<Int>,
+    onSizeSelected: (Int) -> Unit
+){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -288,7 +400,11 @@ fun SizeGroup(sizeList: List<Int>){
             .horizontalScroll(rememberScrollState())
     ) {
         for (size in sizeList){
-            SingleSizeButton(size.toString())
+            SingleSizeButton(
+                shownText = size.toString(),
+                isSelected = selectedSizes.contains(size),
+                onClick = { onSizeSelected(size) }
+            )
             Spacer(Modifier.width(10.dp))
         }
     }
@@ -296,14 +412,16 @@ fun SizeGroup(sizeList: List<Int>){
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun SingleSizeButton(shownText: String){
-    var selected by remember { mutableStateOf(false) }
-
+fun SingleSizeButton(
+    shownText: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+){
     Button(
-        onClick = { selected = !selected },
+        onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (selected) BluePrimary else MaterialTheme.colorScheme.background,
-            contentColor = if(selected) Color.White else MaterialTheme.colorScheme.onSurface
+            containerColor = if (isSelected) BluePrimary else MaterialTheme.colorScheme.background,
+            contentColor = if(isSelected) Color.White else MaterialTheme.colorScheme.onSurface
         ),
         contentPadding = ButtonDefaults.ExtraSmallContentPadding,
         shape = CircleShape,
@@ -314,14 +432,16 @@ fun SingleSizeButton(shownText: String){
 }
 
 @Composable
-fun SingleOptionSelectableButton(shownText: String){
-    var selected by remember { mutableStateOf(false) }
-
+fun SingleOptionSelectableButton(
+    shownText: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+){
     Button(
-        onClick = { selected = !selected },
+        onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (selected) BluePrimary else MaterialTheme.colorScheme.background,
-            contentColor = if(selected) Color.White else MaterialTheme.colorScheme.onSurface
+            containerColor = if (isSelected) BluePrimary else MaterialTheme.colorScheme.background,
+            contentColor = if(isSelected) Color.White else MaterialTheme.colorScheme.onSurface
         )
     ){
         Text(text = shownText, fontSize = 18.sp)
@@ -330,13 +450,15 @@ fun SingleOptionSelectableButton(shownText: String){
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun SingleColorSelectableButton(color: Color){
-    var selected by remember { mutableStateOf(false) }
-
+fun SingleColorSelectableButton(
+    color: Color,
+    isSelected: Boolean,
+    onClick: () -> Unit
+){
     Button(
-        onClick = { selected = !selected },
+        onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (selected) BluePrimary else MaterialTheme.colorScheme.background,
+            containerColor = if (isSelected) BluePrimary else MaterialTheme.colorScheme.background,
         ),
         contentPadding = ButtonDefaults.ExtraSmallContentPadding
     ){

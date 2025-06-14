@@ -85,6 +85,7 @@
     <string name="homescreen_novelties">Novelties</string>
     <string name="homescreen_discounted">Discounted</string>
     <string name="homescreen_noPopularShoes">No popular shoes found</string>
+    <string name="noPopularShoesError">No shoes found that respect the filters</string>
     <string name="homescreen_noNovelties">No novelties found</string>
     <string name="homescreen_noDiscountedShoes">No discounted shoes found</string>
     <string name="homescreen_allshoes">All shoes</string>
@@ -154,8 +155,7 @@
     <string name="filterBottomSheet_priceLowHigh">Price Low To High</string>
     <string name="filterBottomSheet_priceHighLow">Price High To Low</string>
     <string name="filterBottomSheet_alphabetical">Alphabetical</string>
-    <string name="filterBottomSheet_reviewsLowHigh">Reviews Low To High</string>
-    <string name="filterBottomSheet_reviewsHighLow">Reviews High to Low</string>
+    <string name="filterBottomSheet_none">None</string>
     <string name="notificationManager_channelVisibleName">Generic notifications</string>
     <string name="notificationManager_channelVisibleDescription">All notifications about offers, your orders…</string>
     <string name="notificationManager_NOpermissionMessage">Notifications disabled.</string>

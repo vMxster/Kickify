@@ -11,6 +11,7 @@ import it.unibo.kickify.data.database.ProductDetails
 import it.unibo.kickify.data.database.ProductWithImage
 import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.data.database.Version
+import it.unibo.kickify.data.models.ShopCategory
 import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.utils.DatabaseReadyManager
 import kotlinx.coroutines.Job
@@ -76,12 +77,68 @@ class ProductsViewModel(
     private val _isInWishlist = MutableStateFlow(false)
     val isInWishlist: StateFlow<Boolean> = _isInWishlist
 
+    private val _filterState = MutableStateFlow(FilterState())
+    val filterState: StateFlow<FilterState> = _filterState.asStateFlow()
+
+    private val _filteredProducts = MutableStateFlow<Result<Map<Product, Image>>>(Result.success(emptyMap()))
+    val filteredProducts: StateFlow<Result<Map<Product, Image>>> = _filteredProducts
+
     init {
         viewModelScope.launch {
             databaseReadyManager.isDatabaseReady.collectLatest { isReady ->
                 if (isReady) {
                     loadAllInitialData()
                 }
+            }
+        }
+    }
+
+    // Metodo per aggiornare i filtri
+    fun updateFilters(newFilterState: FilterState) {
+        _filterState.value = newFilterState
+        applyFilters()
+    }
+
+    // Metodo per resettare i filtri
+    fun resetFilters() {
+        _filterState.value = FilterState()
+        _filteredProducts.value = _products.value
+    }
+
+    // Applica i filtri alla lista di prodotti
+    private fun applyFilters() {
+        viewModelScope.launch {
+            val filter = _filterState.value
+            _products.value.onSuccess { productMap ->
+                val filteredMap = productMap.filter { (product, _) ->
+                    val priceInRange = product.price >= filter.priceRange.start &&
+                            product.price <= filter.priceRange.endInclusive
+
+                    val brandMatch = filter.selectedBrands.isEmpty() ||
+                            filter.selectedBrands.contains(product.brand)
+
+                    val genderMatch = filter.selectedGender == null ||
+                            product.genre == filter.selectedGender.toString()
+
+                    priceInRange && brandMatch && genderMatch
+                }
+
+                // Ordinamento
+                val sortedMap = when(filter.orderBy) {
+                    OrderBy.PRICE_LOW_HIGH -> filteredMap.toList()
+                        .sortedBy { it.first.price }
+                        .toMap()
+                    OrderBy.PRICE_HIGH_LOW -> filteredMap.toList()
+                        .sortedByDescending { it.first.price }
+                        .toMap()
+                    OrderBy.ALPHABETICAL -> filteredMap.toList()
+                        .sortedBy { "${it.first.brand} ${it.first.name}" }
+                        .toMap()
+                    else -> filteredMap
+                }
+                _filteredProducts.value = Result.success(sortedMap)
+            }.onFailure {
+                _filteredProducts.value = _products.value
             }
         }
     }
@@ -290,4 +347,20 @@ class ProductsViewModel(
             }
         }
     }
+}
+
+data class FilterState(
+    val priceRange: ClosedFloatingPointRange<Float> = 40f..500f,
+    val selectedBrands: Set<String> = emptySet(),
+    val selectedColors: Set<String> = emptySet(),
+    val selectedSizes: Set<Int> = emptySet(),
+    val selectedGender: ShopCategory? = null,
+    val orderBy: OrderBy = OrderBy.NONE
+)
+
+enum class OrderBy {
+    NONE,
+    PRICE_LOW_HIGH,
+    PRICE_HIGH_LOW,
+    ALPHABETICAL
 }

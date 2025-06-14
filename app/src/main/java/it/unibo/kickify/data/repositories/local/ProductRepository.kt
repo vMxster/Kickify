@@ -11,7 +11,7 @@ class ProductRepository(private val productDao: ProductDao) {
         productDao.getVariantsByProductId(productId)
 
     suspend fun getProductImages(productId: Int): List<Image> =
-        productDao.getProductImages(productId)
+        productDao.getProductImages(productId).sortedBy { it.number }
 
     suspend fun getProductsWithImage(): Map<Product, Image> =
         productDao.getProductsWithImage()

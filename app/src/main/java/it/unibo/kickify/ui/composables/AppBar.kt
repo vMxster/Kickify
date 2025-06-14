@@ -38,6 +38,7 @@ import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.screens.products.FilterScreen
+import it.unibo.kickify.ui.screens.products.FilterState
 import it.unibo.kickify.ui.theme.BluePrimary
 import kotlinx.coroutines.launch
 
@@ -50,7 +51,9 @@ fun AppBar(
     unreadNotificationsCount: Int,
     markAllNotificationsAsRead: () -> Unit,
     isInWishlist: Boolean = false,
-    onToggleWishlist: (() -> Unit)? = null
+    onToggleWishlist: (() -> Unit)? = null,
+    onApplyFilter: ((FilterState) -> Unit)? = null,
+    onResetFilter: (() -> Unit)? = null
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
@@ -76,7 +79,10 @@ fun AppBar(
 
         navigationIcon = {
             if (navController.previousBackStackEntry != null) {
-                IconButton(onClick = { navController.navigateUp() }) {
+                IconButton(onClick = {
+                    onResetFilter?.invoke()
+                    navController.navigateUp()
+                }) {
                     Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Go Back")
                 }
             } else if(title != ""){
@@ -142,8 +148,9 @@ fun AppBar(
                         }
                     },
                     sheetState = sheetState,
-                    onApplyFilter = {
-                        /* TODO items filter */
+                    initialFilterState = FilterState(),
+                    onApplyFilter = { newFilterState ->
+                        onApplyFilter?.invoke(newFilterState)
                         coroutineScope.launch {
                             showSheet = false
                             sheetState.hide()

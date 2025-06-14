@@ -57,6 +57,7 @@ import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.cart.CartViewModel
 import it.unibo.kickify.ui.screens.notifications.NotificationViewModel
+import it.unibo.kickify.ui.screens.products.FilterState
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.screens.wishlist.WishlistViewModel
 import it.unibo.kickify.ui.theme.BluePrimary
@@ -75,6 +76,8 @@ fun ScreenTemplate(
     achievementsViewModel: AchievementsViewModel,
     isInWishlist: Boolean = false,
     onToggleWishlist: (() -> Unit)? = null,
+    onApplyFilter: ((FilterState) -> Unit)? = null,
+    onResetFilter: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -123,7 +126,9 @@ fun ScreenTemplate(
                         onToggleWishlist = {
                             onToggleWishlist?.invoke()
                             achievementsViewModel.achieveAchievement(4)
-                        }
+                        },
+                        onApplyFilter = onApplyFilter,
+                        onResetFilter = onResetFilter,
                     )
                 }
             },
