@@ -51,14 +51,7 @@ fun BiometricLoginScreen(
 
             override fun onBiometricAuthError(errorCode: Int, errString: CharSequence) {
                 authenticationStatus = BiometricAuthStatus.ERROR
-                /*if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON || errorCode == BiometricPrompt.ERROR_USER_CANCELED) {
-                    navController.navigate(KickifyRoute.Login) {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                        launchSingleTop = true
-                    }
-                } else {
-                   // other error types
-                }*/
+                // an error occurs
             }
 
             override fun onBiometricAuthFailed() {
@@ -119,10 +112,7 @@ fun BiometricLoginScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = {
-                        navController.navigate(KickifyRoute.Login) {
-                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                            launchSingleTop = true
-                        }
+                        navController.navigate(KickifyRoute.Login) { launchSingleTop = true }
                     }) {
                         Text(stringResource(R.string.biometricAuthLoginWithEmailAndPsw))
                     }
@@ -131,8 +121,6 @@ fun BiometricLoginScreen(
                         if (BiometricAuthManager.canAuthenticate(context)) {
                             authenticationStatus = BiometricAuthStatus.PENDING
                             biometricAuthManager.authenticate()
-                        } else {
-                            // if cannot authenticate
                         }
                     }) {
                         Text(stringResource(R.string.biometricAuthRetry))
