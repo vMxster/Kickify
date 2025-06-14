@@ -34,13 +34,14 @@ class CartViewModel(
     private val _total = MutableStateFlow(0.0)
     val total: StateFlow<Double> = _total.asStateFlow()
 
-    private var email = MutableStateFlow("")
+    private var _email = MutableStateFlow("")
+    val email: StateFlow<String> = _email.asStateFlow()
 
     init {
         viewModelScope.launch {
             _isLoading.value = true
             settingsRepository.userID.collectLatest { userid ->
-                email.value = userid
+                _email.value = userid
 
                 if(userid.isNotEmpty()){
                     loadCartInternal(userid)
@@ -85,8 +86,8 @@ class CartViewModel(
 
     fun loadCart() {
         viewModelScope.launch {
-            if (email.value.isNotEmpty()) {
-                loadCartInternal(email.value)
+            if (_email.value.isNotEmpty()) {
+                loadCartInternal(_email.value)
             } else {
                 _errorMessage.value = "Impossibile ricaricare il carrello: utente non autenticato."
             }
@@ -97,8 +98,8 @@ class CartViewModel(
         _isLoading.value = true
         viewModelScope.launch {
             try {
-                if (email.value.isNotEmpty()) {
-                    val result = appRepository.removeFromCart(email.value, productId, color, size)
+                if (_email.value.isNotEmpty()) {
+                    val result = appRepository.removeFromCart(_email.value, productId, color, size)
                     if (result.isSuccess) {
                         loadCart()
                     } else {
@@ -122,7 +123,7 @@ class CartViewModel(
         _isLoading.value = true
         viewModelScope.launch {
             try {
-                if (email.value.isNotEmpty()) {
+                if (_email.value.isNotEmpty()) {
                     // Converti la stringa del colore in un formato accettabile
                     val processedColor = if (color.startsWith("Color(")) {
                         // Estrai i valori RGBA dalla stringa "Color(r, g, b, a, ...)"
@@ -146,9 +147,9 @@ class CartViewModel(
                     }
 
                     // Prima rimuove l'item, poi lo aggiunge con nuova quantità
-                    val removeResult = appRepository.removeFromCart(email.value, productId, processedColor, size)
+                    val removeResult = appRepository.removeFromCart(_email.value, productId, processedColor, size)
                     if (removeResult.isSuccess) {
-                        val addResult = appRepository.addToCart(email.value, productId, processedColor, size, newQuantity)
+                        val addResult = appRepository.addToCart(_email.value, productId, processedColor, size, newQuantity)
                         if (addResult.isSuccess) {
                             loadCart()
                         } else {

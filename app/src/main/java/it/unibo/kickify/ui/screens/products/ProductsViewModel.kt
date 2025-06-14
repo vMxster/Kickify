@@ -16,6 +16,7 @@ import it.unibo.kickify.utils.DatabaseReadyManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -64,6 +65,9 @@ class ProductsViewModel(
     // Stati di caricamento
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
     private val _searchResults = MutableStateFlow<Result<List<ProductWithImage>>>(Result.success(emptyList()))
     val searchResults: StateFlow<Result<List<ProductWithImage>>> = _searchResults
@@ -208,6 +212,34 @@ class ProductsViewModel(
                 _productReviews.value = result
             } catch (e: Exception) {
                 _productReviews.value = Result.failure(e)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun addReviewOfProduct(email: String, productId: Int, rating: Double, comment: String){
+        _isLoading.value = true
+        viewModelScope.launch {
+            try {
+                val result = repository.addReview(email, productId, rating, comment)
+                getReviewsOfProduct(productId)
+            } catch (e: Exception){
+                _errorMessage.value = "Error adding review. Retry later."
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun deleteReviewOfProduct(email: String, productId: Int){
+        _isLoading.value = true
+        viewModelScope.launch {
+            try {
+                val result = repository.deleteReview(email, productId)
+                getReviewsOfProduct(productId)
+            } catch (e: Exception){
+                _errorMessage.value = "Error deleting the review. Retry later."
             } finally {
                 _isLoading.value = false
             }

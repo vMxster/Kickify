@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.StarHalf
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.StarOutline
@@ -25,6 +26,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -87,17 +90,29 @@ fun ProductLongDescription(
 
 @Composable
 fun SectionTitle(
-    title: String
+    title: String,
+    buttonIcon: ImageVector? = null,
+    iconDescription: String? = null,
+    onButtonClick: () -> Unit = {}
 ){
     Spacer(Modifier.height(10.dp))
-    Text(
-        text = title,
-        modifier = Modifier.fillMaxWidth()
-            .padding(vertical = 6.dp),
-        style = MaterialTheme.typography.bodyLarge,
-        fontSize = 20.sp,
-        fontWeight = FontWeight.Bold
-    )
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyLarge,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
+        if(buttonIcon != null){
+            IconButton(onClick = onButtonClick) {
+                Icon(buttonIcon, contentDescription = iconDescription)
+            }
+        }
+    }
 }
 
 @Composable
@@ -304,7 +319,10 @@ private fun RatingStars(
 }
 
 @Composable
-fun ReviewCard(reviewWithUserInfo: ReviewWithUserInfo) {
+fun ReviewCard(
+    reviewWithUserInfo: ReviewWithUserInfo,
+    deleteReviewAction: () -> Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(8.dp),
         shape = RoundedCornerShape(8.dp)
@@ -312,7 +330,11 @@ fun ReviewCard(reviewWithUserInfo: ReviewWithUserInfo) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Icon(
                     imageVector = Icons.Outlined.Person,
                     contentDescription = "",
@@ -324,6 +346,10 @@ fun ReviewCard(reviewWithUserInfo: ReviewWithUserInfo) {
                     text = "${reviewWithUserInfo.name} ${reviewWithUserInfo.surname}",
                     style = MaterialTheme.typography.bodyLarge
                 )
+                Spacer(modifier = Modifier.width(8.dp))
+                IconButton(onClick = deleteReviewAction) {
+                    Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.prodDetails_deleteReview))
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
