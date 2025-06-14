@@ -175,7 +175,7 @@ fun FullscreenImageDialog(
             AsyncImage(
                 model = imgUrl,
                 contentDescription = "$productName image",
-                contentScale = ContentScale.Fit,
+                contentScale = ContentScale.FillWidth,
                 modifier = Modifier
                     .fillMaxSize()
                     .clickable { onDismissRequest() }

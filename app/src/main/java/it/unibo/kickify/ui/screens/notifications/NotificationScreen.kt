@@ -20,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.NotificationType
+import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.NotificationItem
 import it.unibo.kickify.ui.composables.NotificationTitleLine
@@ -73,14 +74,34 @@ fun NotificationScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
+            // extract the product code inside notification to navigate to that product's page
+            fun extractNumberAndGetString(inputString: String): Pair<Int?, String> {
+                val startIndex = inputString.indexOf('[')
+                val endIndex = inputString.indexOf(']')
+
+                if (startIndex != -1 && endIndex != -1 && startIndex < endIndex) {
+                    val numberString = inputString.substring(startIndex + 1, endIndex)
+                    val number = numberString.toIntOrNull()
+
+                    val cleanedString = inputString.substring(0, startIndex) +
+                            inputString.substring(endIndex + 1)
+
+                    return Pair(number, cleanedString.trim())
+                }
+                return Pair(null, inputString)
+            }
+
             if(errorMessage == null){
                 val notificationGrouped = notificationList.groupBy { convertDateFormat(it.date) }
                 for ((date, notifications) in notificationGrouped.entries){
                     NotificationTitleLine(date)
                     for(n in notifications) {
+                        val updatedMsg = extractNumberAndGetString(n.message)
+                        val productId = updatedMsg.first
+                        val msg = updatedMsg.second
                         NotificationItem(
                             notificationType = NotificationType.getTypeFromString(n.type),
-                            notificationText = n.message,
+                            notificationText = msg,
                             colorDot = if (n.state == "Unread") BluePrimary else Color.Gray,
                             onClick = {
                                 coroutineScope.launch {
@@ -89,6 +110,9 @@ fun NotificationScreen(
                                         notificationIds = listOf(n.notificationId)
                                     )
                                     notificationViewModel.getNotifications(email)
+                                    if(productId != null){
+                                        navController.navigate(KickifyRoute.ProductDetails(productId))
+                                    }
                                 }
                             }
                         )

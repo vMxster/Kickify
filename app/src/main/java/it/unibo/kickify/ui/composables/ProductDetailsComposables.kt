@@ -18,7 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.StarHalf
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.Button
@@ -333,13 +332,6 @@ fun ReviewCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.Person,
-                    contentDescription = "",
-                    modifier = Modifier.
-                    size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "${reviewWithUserInfo.name} ${reviewWithUserInfo.surname}",
                     style = MaterialTheme.typography.bodyLarge
