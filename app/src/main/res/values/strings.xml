@@ -122,6 +122,8 @@
     <string name="prodDetails_typeInComment">Type in a comment</string>
     <string name="prodDetails_typeinValidRating">Type in a valid number between 0.0 and 5.0</string>
     <string name="prodDetails_deleteReview">Delete review</string>
+    <string name="prodDetails_selectSizeAndColor">Select size and color before adding product to cart.</string>
+    <string name="prodDetails_addedToCart">Product added to cart.</string>
     <string name="price">Price</string>
     <string name="prodDetails_addToCart">Add To Cart</string>
     <string name="color">Color</string>

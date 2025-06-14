@@ -17,11 +17,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,6 +46,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -122,6 +125,8 @@ fun ProductDetailsScreen(
         val sheetState = rememberModalBottomSheetState()
         var showBottomSheet by remember { mutableStateOf(false) }
         var showFullscreenImage by remember { mutableStateOf(false) }
+        var showAddtoCartDialog by remember { mutableStateOf(false) }
+        var addToCartDialogMessage by remember { mutableStateOf("") }
 
         val mainImg = productImages.find { it.number == mainImageIndex }
 
@@ -197,6 +202,35 @@ fun ProductDetailsScreen(
                     onColorSelected = { color -> selectedColor = color }
                 )
 
+                if(showAddtoCartDialog) {
+                    Dialog(
+                        onDismissRequest = { showAddtoCartDialog = false }
+                    ) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(10.dp),
+                                verticalArrangement = Arrangement.SpaceBetween,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                Text(addToCartDialogMessage,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                )
+                                TextButton(
+                                    onClick = { showAddtoCartDialog = false }
+                                ) {
+                                    Text(stringResource(R.string.ok))
+                                }
+                            }
+                        }
+                    }
+                }
+
+                val cartErrMsg = stringResource(R.string.prodDetails_selectSizeAndColor)
+                val cartOkMsg = stringResource(R.string.prodDetails_addedToCart)
                 ProductDetailsFooter(product?.price ?: 0.0,
                     addProductToCartAction = {
                         if(selectedColor != null && selectedSize != null) {
@@ -206,7 +240,12 @@ fun ProductDetailsScreen(
                                 size = selectedSize!!.toDouble(),
                                 newQuantity = 1
                             )
+                            cartViewModel.loadCart()
+                            addToCartDialogMessage = cartOkMsg
+                        } else {
+                            addToCartDialogMessage = cartErrMsg
                         }
+                        showAddtoCartDialog = true
                     }
                 )
 
