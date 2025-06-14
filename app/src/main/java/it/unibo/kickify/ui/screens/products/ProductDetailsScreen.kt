@@ -1,5 +1,6 @@
 package it.unibo.kickify.ui.screens.products
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -44,12 +46,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import it.unibo.kickify.R
 import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.data.database.Version
+import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ColorsList
+import it.unibo.kickify.ui.composables.FullscreenImageDialog
 import it.unibo.kickify.ui.composables.ProductDetailsFooter
-import it.unibo.kickify.ui.composables.ProductImage
 import it.unibo.kickify.ui.composables.ProductLongDescription
 import it.unibo.kickify.ui.composables.ProductName
 import it.unibo.kickify.ui.composables.ProductPhotoGallery
@@ -108,20 +112,7 @@ fun ProductDetailsScreen(
         screenTitle = stringResource(R.string.details),
         navController = navController,
         showTopAppBar = true,
-        bottomAppBarContent = {
-            ProductDetailsFooter(product?.price ?: 0.0,
-                addProductToCart = {
-                    if(selectedColor != null && selectedSize != null) {
-                        cartViewModel.updateQuantity(
-                            productId = productId,
-                            color = selectedColor.toString(),
-                            size = selectedSize!!.toDouble(),
-                            newQuantity = 1
-                        )
-                    }
-                }
-            )
-        },
+        bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true,
         showLoadingOverlay = isLoading,
         achievementsViewModel = achievementsViewModel,
@@ -130,7 +121,17 @@ fun ProductDetailsScreen(
     ) {
         val sheetState = rememberModalBottomSheetState()
         var showBottomSheet by remember { mutableStateOf(false) }
+        var showFullscreenImage by remember { mutableStateOf(false) }
 
+        val mainImg = productImages.find { it.number == mainImageIndex }
+
+        if(showFullscreenImage){
+            FullscreenImageDialog(
+                imgUrl = mainImg?.url ?: "",
+                productName = product?.name ?: "",
+                onDismissRequest = { showFullscreenImage = false }
+            )
+        }
         Column(
             modifier = Modifier.fillMaxSize()
                 .padding(horizontal = 16.dp, vertical = 10.dp)
@@ -142,11 +143,12 @@ fun ProductDetailsScreen(
                 Text(stringResource(R.string.errorLoadingData))
 
             } else {
-                val mainImg = productImages.find { it.number == mainImageIndex }
-                ProductImage(
-                    imgUrl = mainImg?.url ?: "",
-                    productName = product?.name ?: "",
+                AsyncImage(
+                    model = mainImg?.url ?: "",
+                    contentDescription = product?.name ?: "",
+                    contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxWidth()
+                        .clickable { showFullscreenImage = true }
                 )
 
                 ProductName(
@@ -195,6 +197,19 @@ fun ProductDetailsScreen(
                     onColorSelected = { color -> selectedColor = color }
                 )
 
+                ProductDetailsFooter(product?.price ?: 0.0,
+                    addProductToCartAction = {
+                        if(selectedColor != null && selectedSize != null) {
+                            cartViewModel.updateQuantity(
+                                productId = productId,
+                                color = selectedColor.toString(),
+                                size = selectedSize!!.toDouble(),
+                                newQuantity = 1
+                            )
+                        }
+                    }
+                )
+
                 SectionTitle(
                     title = stringResource(R.string.prodDetails_reviews),
                     buttonIcon = Icons.Outlined.Add,
@@ -204,12 +219,17 @@ fun ProductDetailsScreen(
                 if(reviews.isNotEmpty()){
                     reviews.forEach { r ->
                         ReviewCard(r,
-                            deleteReviewAction = { productsViewModel.deleteReviewOfProduct(email, productId)}
+                            // user can delete only their reviews
+                            showDeleteButton = r.review.email == email,
+                            deleteReviewAction = {
+                                productsViewModel.deleteReviewOfProduct(email, productId)
+                            }
                         )
                     }
                 } else {
                     Text(stringResource(R.string.prodDetails_noReviewsFound))
                 }
+                Spacer(Modifier.height(10.dp))
 
                 if (showBottomSheet) {
                     ModalBottomSheet(

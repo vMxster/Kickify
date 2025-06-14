@@ -258,7 +258,7 @@ fun SizesList(
 @Composable
 fun ProductDetailsFooter(
     price: Double,
-    addProductToCart: () -> Unit
+    addProductToCartAction: () -> Unit
 ){
     Row(
         modifier = Modifier.fillMaxWidth()
@@ -275,10 +275,7 @@ fun ProductDetailsFooter(
 
         Button(
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = BluePrimary
-            ),
-            onClick = { addProductToCart() }
+            onClick = { addProductToCartAction() }
         ) {
             Text(
                 text = stringResource(R.string.prodDetails_addToCart)
@@ -321,6 +318,7 @@ private fun RatingStars(
 @Composable
 fun ReviewCard(
     reviewWithUserInfo: ReviewWithUserInfo,
+    showDeleteButton: Boolean,
     deleteReviewAction: () -> Unit
 ) {
     Card(
@@ -346,9 +344,14 @@ fun ReviewCard(
                     text = "${reviewWithUserInfo.name} ${reviewWithUserInfo.surname}",
                     style = MaterialTheme.typography.bodyLarge
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                IconButton(onClick = deleteReviewAction) {
-                    Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.prodDetails_deleteReview))
+                if(showDeleteButton) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(onClick = deleteReviewAction) {
+                        Icon(
+                            Icons.Outlined.Delete,
+                            contentDescription = stringResource(R.string.prodDetails_deleteReview)
+                        )
+                    }
                 }
             }
 

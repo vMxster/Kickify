@@ -1,6 +1,7 @@
 package it.unibo.kickify.ui.composables
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import coil.compose.AsyncImage
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.Achievement
 
@@ -86,8 +89,7 @@ fun AchievementDialog(
     onDismissRequest: () -> Unit,
     goToAchievementsPage: () -> Unit
 ) {
-    val configuration = LocalConfiguration.current
-    val screenHeightDp = configuration.screenHeightDp.dp * 60/100
+    val screenHeightDp = LocalConfiguration.current.screenHeightDp.dp * 60/100
 
     Dialog(onDismissRequest = onDismissRequest) {
         Card(
@@ -122,8 +124,6 @@ fun AchievementDialog(
                     }
                 }
 
-                //}
-
                 Text(
                     text = if(achievement.secretAchievement) stringResource(R.string.unlockedSecretAchievement)
                     else stringResource(R.string.unlockedAchievement),
@@ -150,6 +150,36 @@ fun AchievementDialog(
                     Text(stringResource(R.string.allAchievements))
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun FullscreenImageDialog(
+    imgUrl: String,
+    productName: String,
+    onDismissRequest: () -> Unit,
+) {
+    val screenHeightDp = LocalConfiguration.current.screenHeightDp.dp * 60/100
+
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth()
+                .height(screenHeightDp)
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            AsyncImage(
+                model = imgUrl,
+                contentDescription = "$productName image",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable { onDismissRequest() }
+            )
         }
     }
 }
