@@ -120,7 +120,10 @@ fun ScreenTemplate(
                             notificationViewModel.markAllNotificationsAsRead(email)
                         },
                         isInWishlist = isInWishlist,
-                        onToggleWishlist = onToggleWishlist
+                        onToggleWishlist = {
+                            onToggleWishlist?.invoke()
+                            achievementsViewModel.achieveAchievement(4)
+                        }
                     )
                 }
             },
