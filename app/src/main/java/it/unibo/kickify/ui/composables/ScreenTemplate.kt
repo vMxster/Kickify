@@ -92,7 +92,6 @@ fun ScreenTemplate(
     val wishlistViewModel = koinViewModel<WishlistViewModel>()
     val wishlistItems by wishlistViewModel.wishlistState.collectAsStateWithLifecycle()
 
-    val achievements by achievementsViewModel.achievements.collectAsStateWithLifecycle()
     val showAchievementDialog by achievementsViewModel.showAchievementDialog.collectAsStateWithLifecycle()
     val lastUnlockedAchievement by achievementsViewModel.lastUnlockedAchievement.collectAsStateWithLifecycle()
 
@@ -100,16 +99,6 @@ fun ScreenTemplate(
         notificationViewModel.getNotifications(email)
         wishlistViewModel.fetchWishlist(email)
         cartViewModel.loadCart()
-    }
-
-    LaunchedEffect(showAchievementDialog) {
-        println("\nshowachievement: $showAchievementDialog")
-    }
-    LaunchedEffect( lastUnlockedAchievement) {
-        println("last unloked $lastUnlockedAchievement")
-    }
-    LaunchedEffect(achievements) {
-        println("achivements now unlocked: ${achievements.filter { it.achieved }.map { it.id }}")
     }
 
     val scaffoldContent: @Composable () -> Unit = {
