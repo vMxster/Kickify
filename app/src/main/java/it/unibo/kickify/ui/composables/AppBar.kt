@@ -127,6 +127,7 @@ fun AppBar(
                 || title.contains(stringResource(R.string.shopCategory_women))
                 || title.contains(stringResource(R.string.shopCategory_kids))
                 || title.startsWith(stringResource(R.string.brand))
+                || title == stringResource(R.string.allShoes)
             ){
                 IconButton(
                     onClick = {

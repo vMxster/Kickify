@@ -3,6 +3,7 @@ package it.unibo.kickify.ui.composables
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -189,6 +190,11 @@ fun ColorsList(
     ){
         for ((colorString, available) in colorAvailability.entries){
             val color = parseColorName(colorString)
+            val borderColor = if (selectedColor == color) BluePrimary else {
+                if (color == Color.White && !isSystemInDarkTheme()) Color.Black
+                else if (color == Color.White && isSystemInDarkTheme()) Color.White
+                else Color.Transparent
+            }
 
             if(available) { // if color is available
                 Button(
@@ -202,8 +208,8 @@ fun ColorsList(
                     shape = CircleShape,
                     modifier = Modifier.size(44.dp)
                         .border(
-                            width = 4.dp,
-                            color = if (selectedColor == color) BluePrimary else Color.Transparent,
+                            width = 3.dp,
+                            color = borderColor,
                             shape = CircleShape
                         )
                 ) { }

@@ -72,8 +72,8 @@
     <string name="lang_it" translatable="false">Italiano</string>
     <string name="lang_es" translatable="false">Español</string>
     <string name="lang_la" translatable="false">Latinum</string>
-    <string name="shopCategory_men">Men</string>
-    <string name="shopCategory_women">Women</string>
+    <string name="shopCategory_men">Man</string>
+    <string name="shopCategory_women">Woman</string>
     <string name="shopCategory_kids">Kids</string>
     <string name="allShoes">All Shoes</string>
     <string name="mensShoes">Men\'s Shoes</string>
