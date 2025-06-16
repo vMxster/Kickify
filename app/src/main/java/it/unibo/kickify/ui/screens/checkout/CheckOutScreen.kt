@@ -5,15 +5,22 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Phone
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -22,14 +29,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
+import it.unibo.kickify.data.database.Address
+import it.unibo.kickify.data.models.PaymentMethods
 import it.unibo.kickify.ui.KickifyRoute
+import it.unibo.kickify.ui.composables.AddressOnMapBox
+import it.unibo.kickify.ui.composables.AddressSelectorDialog
 import it.unibo.kickify.ui.composables.CartAndCheckoutResume
+import it.unibo.kickify.ui.composables.CheckOutInformationRow
 import it.unibo.kickify.ui.composables.DialogWithImage
-import it.unibo.kickify.ui.composables.InformationCard
+import it.unibo.kickify.ui.composables.InformationSectionTitle
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.composables.getAddressText
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
+import it.unibo.kickify.ui.screens.cart.CartViewModel
+import it.unibo.kickify.ui.screens.profile.ProfileViewModel
+import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -37,18 +54,42 @@ import kotlinx.coroutines.withContext
 @Composable
 fun CheckOutScreen(
     navController: NavController,
-    achievementsViewModel: AchievementsViewModel
+    achievementsViewModel: AchievementsViewModel,
+    profileViewModel: ProfileViewModel,
+    settingsViewModel: SettingsViewModel,
+    cartViewModel: CartViewModel
 ){
+    val userEmail by settingsViewModel.userId.collectAsStateWithLifecycle()
+    val user by profileViewModel.user.collectAsStateWithLifecycle()
+    val addrList by profileViewModel.addressList.collectAsStateWithLifecycle()
+    val isLoadingProfile by profileViewModel.isLoading.collectAsStateWithLifecycle()
+    val isLoadingCart by cartViewModel.isLoading.collectAsStateWithLifecycle()
+    val subtotal by cartViewModel.subTotal.collectAsStateWithLifecycle()
+    val shipping by cartViewModel.shippingCost.collectAsStateWithLifecycle()
+    val totalCost by cartViewModel.total.collectAsStateWithLifecycle()
+
+    LaunchedEffect(userEmail) {
+        profileViewModel.getUserAddress(userEmail)
+        profileViewModel.getProfile(userEmail)
+    }
+
     ScreenTemplate(
         screenTitle = stringResource(R.string.checkoutScreen_title),
         navController = navController,
         showTopAppBar = true,
         bottomAppBarContent = { },
         showModalDrawer = false,
-        achievementsViewModel = achievementsViewModel
+        achievementsViewModel = achievementsViewModel,
+        showLoadingOverlay = isLoadingCart || isLoadingProfile
     ) {
         var showLoading: Boolean by rememberSaveable { mutableStateOf(false) }
         var showDialog by rememberSaveable { mutableStateOf(false) }
+
+        var showAddressSelectorDialog by rememberSaveable { mutableStateOf(false) }
+        var showPaymentMethodSelectorDialog by rememberSaveable { mutableStateOf(false) }
+
+        var selectedAddress by remember { mutableStateOf<Address?>(null) }
+        var selectedPaymentMethod by remember { mutableStateOf<PaymentMethods?>(null) }
 
         LoadingAnimation(
             isLoading = showLoading,
@@ -60,26 +101,85 @@ fun CheckOutScreen(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.padding(horizontal = 10.dp)
-                    .padding(vertical = 8.dp)
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
+                    .padding(horizontal = 10.dp, vertical = 6.dp)
             ) {
-                InformationCard(
-                    emailAddress = "mario.rossi@gmail.com",
-                    phoneNr = "+39 1234567890",
-                    shippingAddress = "Viale europa 638 47521 Cesena Italia",
-                    payMethod = "paypal",
-                    paymentDetails = "mario.rossi@gmail.com"
-                )
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 6.dp)
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Spacer(Modifier.height(10.dp))
+                        InformationSectionTitle(stringResource(R.string.checkoutScreen_contactInformation))
+
+                        Spacer(Modifier.height(6.dp))
+                        CheckOutInformationRow(
+                            leadingIcon = Icons.Outlined.Email,
+                            primaryText = user?.email ?: "-",
+                            secondaryText = stringResource(R.string.checkoutScreen_email),
+                            showEditButton = false
+                        )
+                        CheckOutInformationRow(
+                            leadingIcon = Icons.Outlined.Phone,
+                            primaryText = user?.phone ?: "-",
+                            secondaryText = stringResource(R.string.phone),
+                            showEditButton = false
+                        )
+                        CheckOutInformationRow(
+                            leadingIcon = null,
+                            primaryText = selectedAddress?.let { getAddressText(it) }
+                                ?: stringResource(R.string.noShippingAddressSelected),
+                            secondaryText = stringResource(R.string.address),
+                            showEditButton = true,
+                            onEditInformation = { showAddressSelectorDialog = true }
+                        )
+
+                        Spacer(Modifier.height(10.dp))
+                        AddressOnMapBox(
+                            address = "tmp address", zoomLevel = 18.0,
+                            showAddressLabelIfAvailable = false
+                        )
+
+                        Spacer(Modifier.height(10.dp))
+                        InformationSectionTitle(stringResource(R.string.paymentMethod))
+
+                        Spacer(Modifier.height(6.dp))
+                        CheckOutInformationRow(
+                            leadingIcon = null, //paymentMethodIcon(payMethod),
+                            primaryText = "pay moethod", //payMethod,
+                            secondaryText = "payment details", // paymentDetails,
+                            showEditButton = true,
+                            onEditInformation = { }
+                        )
+                    }
+                }
+
                 CartAndCheckoutResume(
-                    subTotal = 287.97,
-                    shipping = 10.00,
-                    total = (287.97 + 10.00),
+                    subTotal = subtotal,
+                    shipping = shipping,
+                    total = totalCost,
+                    checkoutButtonEnabled = true,
                     onButtonClickAction = {
                         showLoading = true
                     }
                 )
             }
+
+            if(showAddressSelectorDialog){
+                AddressSelectorDialog(
+                    items = addrList,
+                    onDismissRequest = { showAddressSelectorDialog = false },
+                    onConfirm = { selectedAddr ->
+                        showAddressSelectorDialog = false
+                        selectedAddress = selectedAddr
+                    },
+                    onCancel = { showAddressSelectorDialog = false}
+                )
+            }
+
             if(showDialog){
                 DialogWithImage(
                     imageVector = Icons.Outlined.Check,

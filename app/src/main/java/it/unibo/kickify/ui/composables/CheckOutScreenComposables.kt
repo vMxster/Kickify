@@ -1,29 +1,39 @@
 package it.unibo.kickify.ui.composables
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Map
-import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -35,8 +45,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import io.ktor.client.HttpClient
 import it.unibo.kickify.R
+import it.unibo.kickify.data.database.Address
 import it.unibo.kickify.data.models.PaymentMethods
 import it.unibo.kickify.data.models.PaymentMethods.AMEX
 import it.unibo.kickify.data.models.PaymentMethods.MAESTRO
@@ -49,71 +61,6 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @Composable
-fun InformationCard(
-    emailAddress: String,
-    phoneNr: String,
-    shippingAddress: String,
-    payMethod: String,
-    paymentDetails: String
-){
-    Card(
-        modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .padding(vertical = 6.dp)
-            .fillMaxWidth()
-    ) {
-        Column(
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.Start
-        ) {
-            Spacer(Modifier.height(10.dp))
-            InformationSectionTitle(stringResource(R.string.checkoutScreen_contactInformation))
-
-            Spacer(Modifier.height(6.dp))
-            CheckOutInformationRow(
-                leadingIcon = Icons.Outlined.Email,
-                primaryText = emailAddress,
-                secondaryText = stringResource(R.string.checkoutScreen_email),
-                showEditButton = true,
-                onEditInformation = {}
-            )
-            CheckOutInformationRow(
-                leadingIcon = Icons.Outlined.Phone,
-                primaryText = phoneNr,
-                secondaryText = stringResource(R.string.phone),
-                showEditButton = true,
-                onEditInformation = {}
-            )
-            CheckOutInformationRow(
-                leadingIcon = null,
-                primaryText = shippingAddress,
-                secondaryText = stringResource(R.string.address),
-                showEditButton = true,
-                onEditInformation = {}
-            )
-
-            Spacer(Modifier.height(10.dp))
-            AddressOnMapBox(
-                address = shippingAddress, zoomLevel = 18.0,
-                showAddressLabelIfAvailable = false
-            )
-
-            Spacer(Modifier.height(10.dp))
-            InformationSectionTitle(stringResource(R.string.paymentMethod))
-
-            Spacer(Modifier.height(6.dp))
-            CheckOutInformationRow(
-                leadingIcon = paymentMethodIcon(payMethod),
-                primaryText = payMethod,
-                secondaryText = paymentDetails,
-                showEditButton = true,
-                onEditInformation = { }
-            )
-        }
-    }
-}
-
-@Composable
 fun CheckOutInformationRow(
     leadingIcon: ImageVector?,
     primaryText: String,
@@ -122,10 +69,9 @@ fun CheckOutInformationRow(
     /** action to execute when the edit button is clicked, by default does nothing */
     onEditInformation: () -> Unit = {}
 ){
-    Row (modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 10.dp)
-        .padding(vertical = 10.dp),
+    Row (
+        modifier = Modifier.fillMaxWidth()
+            .padding(horizontal = 10.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ){
@@ -149,21 +95,20 @@ fun CheckOutInformationRow(
             Text(text = secondaryText)
         }
         if(showEditButton){
-            Icon(Icons.Outlined.Edit, contentDescription = "Edit $secondaryText",
-                Modifier.clickable { onEditInformation() }
-            )
+            IconButton(onClick = onEditInformation) {
+                Icon(Icons.Outlined.Edit, contentDescription = "Edit $secondaryText")
+            }
         }
     }
 }
 
 @Composable
-fun InformationSectionTitle(
-    sectionTitle: String
-){
-    Row (modifier = Modifier
-        .padding(horizontal = 10.dp),
+fun InformationSectionTitle(sectionTitle: String){
+    Row (
+        modifier = Modifier.padding(horizontal = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start){
+        horizontalArrangement = Arrangement.Start
+    ){
         Text(
             text = sectionTitle,
             style = MaterialTheme.typography.bodyMedium,
@@ -239,7 +184,7 @@ fun PaymentMethodRow(
     emailAddress: String
 ){
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).padding(vertical = 6.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ){
@@ -258,6 +203,87 @@ fun PaymentMethodRow(
             } else {
                 Text("$paymentMethod **** $endingCardNumber")
                 Text("${stringResource(R.string.cardExpires)} $cardExpires")
+            }
+        }
+    }
+}
+
+fun getAddressText(address: Address): String {
+    return "${address.street} ${address.civic}, ${address.cap}, ${address.city}"
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddressSelectorDialog(
+    items: List<Address>,
+    onDismissRequest: () -> Unit,
+    onConfirm: (Address) -> Unit,
+    onCancel: () -> Unit
+){
+    var expanded by remember { mutableStateOf(false) }
+    val textFieldState = rememberTextFieldState("")
+    var selectedIndex by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(selectedIndex) {
+        textFieldState.setTextAndPlaceCursorAtEnd( getAddressText(items[selectedIndex]) )
+    }
+
+    Dialog(onDismissRequest = onDismissRequest) {
+        Card(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.chooseShippingAddress),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                ExposedDropdownMenuBox(
+                    modifier = Modifier.fillMaxWidth(),
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it }
+                ) {
+                    TextField(
+                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                        state = textFieldState,
+                        readOnly = true,
+                        lineLimits = TextFieldLineLimits.MultiLine(1, 5),
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    )
+                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        items.forEachIndexed { index, option ->
+                            DropdownMenuItem(
+                                text = { Text( getAddressText(option), style = MaterialTheme.typography.bodyLarge) },
+                                onClick = {
+                                    selectedIndex = index
+                                    expanded = false
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                            )
+                            HorizontalDivider(thickness = 3.dp, modifier = Modifier.padding(vertical = 6.dp))
+                        }
+                    }
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextButton(onClick = { onCancel() }) {
+                    Text(stringResource(R.string.cancel))
+                }
+
+                TextButton(onClick = { onConfirm(items[selectedIndex]) }) {
+                    Text(stringResource(R.string.confirm))
+                }
             }
         }
     }
