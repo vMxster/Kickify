@@ -1123,10 +1123,36 @@ class DatabaseHelper {
     
     // Add new user address
     public function addUserAddress($email, $via, $civico, $cap, $citta, $provincia, $nazione, $predefinito){
-        $query = "INSERT INTO INDIRIZZO (Email, Via, NumeroCivico, CAP, Citta, Provincia, Nazione, Predefinito) VALUES (?,?,?,?,?,?,?,?)";
-        $stmt = $this->db->prepare($query);
-        $stmt->bind_param("ssiisssi", $email, $via, $civico, $cap, $citta, $provincia, $nazione, $predefinito);
-        return $stmt->execute();
+        try{
+            $this->db->begin_transaction();
+
+            // when adding a new default address, check if there is already another default address
+            if($predefinito == 1){ 
+                $queryAlreadyDefaultAddress = "SELECT * FROM INDIRIZZO WHERE Predefinito = 1 and Email=?";
+                $stmtCheck = $this->db->prepare($queryAlreadyDefaultAddress);
+                $stmtCheck->bind_param("s", $email);
+                $stmtCheck->execute();
+
+                if ($stmtCheck->get_result()->num_rows > 0) { // if there is another default address, set it as not default
+                    $queryRemoveOtherDefaultAddress = "UPDATE INDIRIZZO SET Predefinito=0 WHERE Email=?";
+                    $stmtUpdate = $this->db->prepare($queryRemoveOtherDefaultAddress);
+                    $stmtUpdate->bind_param("s", $email);
+                    $stmtUpdate->execute();
+                }
+            }
+
+            // when adding a new non default address, previous check is not required
+            $query = "INSERT INTO INDIRIZZO (Email, Via, NumeroCivico, CAP, Citta, Provincia, Nazione, Predefinito) VALUES (?,?,?,?,?,?,?,?)";
+            $stmt = $this->db->prepare($query);
+            $stmt->bind_param("ssiisssi", $email, $via, $civico, $cap, $citta, $provincia, $nazione, $predefinito);
+            $stmt->execute();
+
+            $this->db->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->db->rollback();
+            return false;
+        }
     }
     
     // Remove user address
