@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material3.Card
@@ -184,7 +185,8 @@ fun PaymentMethodRow(
     paymentMethod: String,
     endingCardNumber: String,
     cardExpires: String,
-    emailAddress: String
+    emailAddress: String,
+    deleteAction: () -> Unit
 ){
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
@@ -207,6 +209,12 @@ fun PaymentMethodRow(
                 Text("$paymentMethod **** $endingCardNumber")
                 Text("${stringResource(R.string.cardExpires)} $cardExpires")
             }
+        }
+        IconButton(
+            onClick = { deleteAction() },
+            modifier = Modifier.padding(end = 8.dp)
+        ) {
+            Icon(Icons.Outlined.Delete, contentDescription = "")
         }
     }
 }

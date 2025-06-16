@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,7 +27,11 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
@@ -52,6 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -66,6 +72,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.camerax.CameraXUtils
+import it.unibo.kickify.data.models.PaymentMethodInfo
+import it.unibo.kickify.data.models.PaymentMethods
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ScreenTemplate
@@ -179,7 +187,7 @@ fun EditProfileScreen(
                 }
 
                 EditProfileSections.PAYMENT_METHOD -> {
-                    Text("payment method section")
+                    AddPaymentMethodSection(profileViewModel)
                 }
             }
         }
@@ -704,6 +712,202 @@ fun AddressContainer(
             modifier = Modifier.padding(end = 8.dp)
         ) {
             Icon(Icons.Outlined.Delete, contentDescription = "")
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddPaymentMethodSection(profileViewModel: ProfileViewModel){
+    var selectedMethodType by remember { mutableStateOf("CreditCard") }
+
+    // values for credit card
+    var creditCardBrand by remember { mutableStateOf("") }
+    var creditCardLast4 by remember { mutableStateOf("") }
+    var creditCardMonth by remember { mutableStateOf("") }
+    var creditCardYear by remember { mutableStateOf("") }
+
+    var paypalEmail by remember { mutableStateOf("") }
+
+    val coroutineScope = rememberCoroutineScope()
+
+    val cardBrands = remember { PaymentMethods.entries.filter { it != PaymentMethods.PAYPAL }.map { it.visibleName } }
+    var expanded by remember { mutableStateOf(false) }
+
+    val handleAddPaymentMethod: () -> Unit = {
+        coroutineScope.launch {
+            var isValid = false
+            var newPaymentMethod: PaymentMethodInfo? = null
+
+            if (selectedMethodType == "CreditCard") {
+                isValid = PaymentMethodInfo.validateCreditCard(creditCardBrand,
+                    creditCardLast4, creditCardMonth.toInt(), creditCardYear.toInt()
+                )
+                if (isValid) {
+                    newPaymentMethod = PaymentMethodInfo.CreditCard(
+                        brand = creditCardBrand,
+                        last4 = creditCardLast4,
+                        expirationMonth = creditCardMonth.toInt(),
+                        expirationYear = creditCardYear.toInt()
+                    )
+                }
+            } else { // PayPal
+                isValid = PaymentMethodInfo.validatePayPal(paypalEmail)
+                if (isValid) {
+                    newPaymentMethod = PaymentMethodInfo.PayPal(email = paypalEmail)
+                }
+            }
+
+            if (isValid && newPaymentMethod != null) {
+                try {
+                    profileViewModel.addPaymentMethod(newPaymentMethod)
+
+                } catch (e: Exception) {
+                    println("Errore durante il salvataggio: ${e.message}")
+                }
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier.padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(
+                onClick = { selectedMethodType = "CreditCard" },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (selectedMethodType == "CreditCard")
+                        MaterialTheme.colorScheme.primary else Color.LightGray
+                ),
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Carta di Credito")
+            }
+            Spacer(Modifier.width(8.dp))
+
+            Button(
+                onClick = { selectedMethodType = "PayPal" },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (selectedMethodType == "PayPal")
+                        MaterialTheme.colorScheme.primary else Color.LightGray
+                ),
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("PayPal")
+            }
+        }
+
+        if (selectedMethodType == "CreditCard") {
+            Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }
+                ) {
+                    OutlinedTextField(
+                        value = creditCardBrand,
+                        onValueChange = { },
+                        readOnly = true,
+                        shape = RoundedCornerShape(16.dp),
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        cardBrands.forEach { selectionOption ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    creditCardBrand = selectionOption
+                                    expanded = false
+                                },
+                                text = { Text(text = selectionOption) }
+                            )
+                        }
+                    }
+                }
+
+                OutlinedTextField(
+                    value = creditCardLast4,
+                    onValueChange = { newValue ->
+                        if (newValue.all { it.isDigit() } && newValue.length <= 4) {
+                            creditCardLast4 = newValue
+                        }
+                    },
+                    shape = RoundedCornerShape(16.dp),
+                    placeholder = { Text("Ultime 4 cifre") },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = creditCardMonth,
+                        onValueChange = { newValue ->
+                            if (newValue.all { it.isDigit() } && newValue.length <= 2) {
+                                creditCardMonth = newValue
+                            }
+                        },
+                        shape = RoundedCornerShape(16.dp),
+                        placeholder = { Text("Mese (MM)") },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Next
+                        ),
+                        modifier = Modifier.weight(1f),
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = creditCardYear,
+                        onValueChange = { newValue ->
+                            if (newValue.all { it.isDigit() } && newValue.length <= 4) {
+                                creditCardYear = newValue
+                            }
+                        },
+                        shape = RoundedCornerShape(16.dp),
+                        placeholder = { Text("Anno (AAAA)") },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Next
+                        ),
+                        modifier = Modifier.weight(1f),
+                        singleLine = true
+                    )
+                }
+            }
+        }
+
+        if (selectedMethodType == "PayPal") {
+            Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = paypalEmail,
+                    onValueChange = { paypalEmail = it },
+                    shape = RoundedCornerShape(16.dp),
+                    placeholder = { Text("Email PayPal") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        Button(
+            onClick = handleAddPaymentMethod,
+            modifier = Modifier.fillMaxWidth().height(50.dp)
+        ) {
+            Text("Aggiungi Metodo di Pagamento")
         }
     }
 }

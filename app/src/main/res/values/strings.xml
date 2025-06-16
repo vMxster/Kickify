@@ -147,6 +147,8 @@
     <string name="saveAddress">Save address</string>
     <string name="chooseShippingAddress">Choose shipping address</string>
     <string name="noShippingAddressSelected">No shipping address selected</string>
+    <string name="noAddressAddOne">No shipping address found. Add the first tapping on + button.</string>
+    <string name="noPaymentMethodsAddOne">No payment methods found. Add the first tapping on + button.</string>
     <string name="paymentMethod">Payment Method</string>
     <string name="cardExpires">Expires</string>
     <string name="checkoutScreen_email">Email</string>

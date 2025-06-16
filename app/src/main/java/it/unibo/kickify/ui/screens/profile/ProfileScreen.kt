@@ -42,6 +42,8 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.Language
+import it.unibo.kickify.data.models.PaymentMethodInfo
+import it.unibo.kickify.data.models.PaymentMethods
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.PaymentMethodRow
@@ -65,6 +67,7 @@ fun ProfileScreen(
 
     val user by profileViewModel.user.collectAsStateWithLifecycle()
     val addrList by profileViewModel.addressList.collectAsStateWithLifecycle()
+    val paymentMethodList by profileViewModel.paymentMethods.collectAsStateWithLifecycle()
     val errorMessage by profileViewModel.errorMessage.collectAsStateWithLifecycle()
     val isLoading by profileViewModel.isLoading.collectAsStateWithLifecycle()
 
@@ -160,8 +163,6 @@ fun ProfileScreen(
                 }
             }
 
-            val payMethods = listOf("Paypal", "Maestro")
-            val cardInfo = listOf(listOf("", "", "email@example.com"), listOf("1234", "01/29", ""))
             ProfileCardContainer(
                 cardTitle = stringResource(R.string.paymentMethod),
                 actionIcon = Icons.Outlined.Add,
@@ -169,8 +170,24 @@ fun ProfileScreen(
                     navController.navigate(KickifyRoute.EditProfile(EditProfileSections.PAYMENT_METHOD))
                 }
             ) {
-                for(i in payMethods.indices){
-                    PaymentMethodRow(payMethods[i], cardInfo[i][0], cardInfo[i][1], cardInfo[i][2])
+                for(method in paymentMethodList){
+                    if(method is PaymentMethodInfo.CreditCard){
+                        PaymentMethodRow(
+                            paymentMethod = method.brand,
+                            endingCardNumber = method.last4,
+                            cardExpires = "${method.expirationMonth}/${method.expirationYear}",
+                            emailAddress = "",
+                            deleteAction = { profileViewModel.deletePaymentMethod(method) }
+                        )
+                    } else if(method is PaymentMethodInfo.PayPal){
+                        PaymentMethodRow(
+                            paymentMethod = PaymentMethods.PAYPAL.toString(),
+                            endingCardNumber = "",
+                            cardExpires = "",
+                            emailAddress = method.email,
+                            deleteAction = { profileViewModel.deletePaymentMethod(method) }
+                        )
+                    }
                 }
             }
         }

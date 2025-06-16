@@ -102,7 +102,7 @@ val appModule = module {
     viewModel { WishlistViewModel(get()) }
     viewModel { NotificationViewModel(get()) }
     viewModel { ForgotPasswordOTPViewModel(get()) }
-    viewModel { ProfileViewModel(get()) }
+    viewModel { ProfileViewModel(get(), get()) }
     viewModel { OrdersViewModel(get()) }
     viewModel { CartViewModel(get(), get()) }
 }
