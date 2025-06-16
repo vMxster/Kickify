@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -35,7 +36,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,27 +66,25 @@ fun CheckOutInformationRow(
     primaryText: String,
     secondaryText: String,
     showEditButton: Boolean = true,
-    /** action to execute when the edit button is clicked, by default does nothing */
     onEditInformation: () -> Unit = {}
 ){
     Row (
         modifier = Modifier.fillMaxWidth()
-            .padding(horizontal = 10.dp, vertical = 10.dp),
+            .padding(horizontal = 10.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ){
         if(leadingIcon != null){
-            Image(leadingIcon,
+            Icon(leadingIcon,
                 contentDescription = "$secondaryText icon",
-                modifier = Modifier.padding(start = 8.dp)
+                modifier = Modifier.padding(horizontal = 8.dp).size(30.dp)
             )
         }
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start,
-            modifier = Modifier
-                .fillMaxWidth(fraction = 0.8f)
-                .padding(start = 8.dp)
+            modifier = Modifier.fillMaxWidth(fraction = 0.9f)
+                .padding(horizontal = 4.dp)
         ){
             Text(text = primaryText,
                 style = MaterialTheme.typography.bodyMedium,
@@ -96,7 +94,8 @@ fun CheckOutInformationRow(
         }
         if(showEditButton){
             IconButton(onClick = onEditInformation) {
-                Icon(Icons.Outlined.Edit, contentDescription = "Edit $secondaryText")
+                Icon(Icons.Outlined.Edit, contentDescription = "Edit $secondaryText",
+                    modifier = Modifier.size(30.dp))
             }
         }
     }
@@ -111,7 +110,7 @@ fun InformationSectionTitle(sectionTitle: String){
     ){
         Text(
             text = sectionTitle,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
     }
@@ -126,16 +125,20 @@ fun AddressOnMapBox(
     val ctx = LocalContext.current
     val osmDataSource = OSMDataSource(koinInject<HttpClient>())
     val coroutineScope = rememberCoroutineScope()
-    val defaultCoordinates = listOf(41.9028, 12.4964)
-    var foundOsmPlaceString: String by rememberSaveable { mutableStateOf("") }
-    var foundPlace by rememberSaveable { mutableStateOf(defaultCoordinates) }
+    val defaultCoordinates = Coordinates(41.9028, 12.4964)
+    var foundOsmPlaceString: String by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
+    var newCoord by remember { mutableStateOf(defaultCoordinates) }
+
+    LaunchedEffect(address) {
         coroutineScope.launch {
             val tmp = osmDataSource.searchPlaces(address).firstOrNull()
-            foundOsmPlaceString = tmp?.displayName ?: ctx.getString(R.string.unavailableAddress)
             if (tmp != null) {
-                foundPlace = listOf(tmp.latitude, tmp.longitude)
+                foundOsmPlaceString = tmp.displayName
+                newCoord = Coordinates(tmp.latitude, tmp.longitude)
+
+            } else {
+                foundOsmPlaceString = ctx.getString(R.string.unavailableAddress)
             }
         }
     }
@@ -146,8 +149,8 @@ fun AddressOnMapBox(
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         val mapBoxModifier = Modifier.fillMaxWidth().requiredHeight(180.dp)
-        if(foundPlace != defaultCoordinates) {
-            OSMmapBox(Coordinates(foundPlace[0], foundPlace[1]), zoomLevel, mapBoxModifier)
+        if(newCoord != defaultCoordinates) {
+            OSMMapBox(newCoord, zoomLevel, mapBoxModifier)
             if(showAddressLabelIfAvailable) {
                 Text(foundOsmPlaceString)
             }

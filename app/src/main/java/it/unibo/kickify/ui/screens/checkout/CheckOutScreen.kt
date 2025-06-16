@@ -91,6 +91,12 @@ fun CheckOutScreen(
         var selectedAddress by remember { mutableStateOf<Address?>(null) }
         var selectedPaymentMethod by remember { mutableStateOf<PaymentMethods?>(null) }
 
+        var enabledCheckoutButton by remember { mutableStateOf(false) }
+
+        LaunchedEffect(selectedPaymentMethod, selectedAddress) {
+            enabledCheckoutButton = selectedAddress != null && selectedPaymentMethod != null
+        }
+
         LoadingAnimation(
             isLoading = showLoading,
             onLoadingComplete = {
@@ -113,8 +119,8 @@ fun CheckOutScreen(
                         horizontalAlignment = Alignment.Start
                     ) {
                         Spacer(Modifier.height(10.dp))
-                        InformationSectionTitle(stringResource(R.string.checkoutScreen_contactInformation))
 
+                        InformationSectionTitle(stringResource(R.string.checkoutScreen_contactInformation))
                         Spacer(Modifier.height(6.dp))
                         CheckOutInformationRow(
                             leadingIcon = Icons.Outlined.Email,
@@ -128,28 +134,33 @@ fun CheckOutScreen(
                             secondaryText = stringResource(R.string.phone),
                             showEditButton = false
                         )
+                        Spacer(Modifier.height(10.dp))
+
+                        InformationSectionTitle(
+                            sectionTitle = if(selectedAddress == null) stringResource(R.string.chooseShippingAddress)
+                            else stringResource(R.string.settings_shippingAddress)
+                        )
+                        Spacer(Modifier.height(6.dp))
                         CheckOutInformationRow(
                             leadingIcon = null,
                             primaryText = selectedAddress?.let { getAddressText(it) }
                                 ?: stringResource(R.string.noShippingAddressSelected),
-                            secondaryText = stringResource(R.string.address),
+                            secondaryText = "",
                             showEditButton = true,
                             onEditInformation = { showAddressSelectorDialog = true }
                         )
-
-                        Spacer(Modifier.height(10.dp))
                         AddressOnMapBox(
-                            address = "tmp address", zoomLevel = 18.0,
+                            address = selectedAddress?.let { getAddressText(it) } ?: "",
+                            zoomLevel = 19.0,
                             showAddressLabelIfAvailable = false
                         )
-
                         Spacer(Modifier.height(10.dp))
-                        InformationSectionTitle(stringResource(R.string.paymentMethod))
 
+                        InformationSectionTitle(stringResource(R.string.paymentMethod))
                         Spacer(Modifier.height(6.dp))
                         CheckOutInformationRow(
                             leadingIcon = null, //paymentMethodIcon(payMethod),
-                            primaryText = "pay moethod", //payMethod,
+                            primaryText = "pay method", //payMethod,
                             secondaryText = "payment details", // paymentDetails,
                             showEditButton = true,
                             onEditInformation = { }
@@ -161,7 +172,7 @@ fun CheckOutScreen(
                     subTotal = subtotal,
                     shipping = shipping,
                     total = totalCost,
-                    checkoutButtonEnabled = true,
+                    checkoutButtonEnabled = enabledCheckoutButton,
                     onButtonClickAction = {
                         showLoading = true
                     }

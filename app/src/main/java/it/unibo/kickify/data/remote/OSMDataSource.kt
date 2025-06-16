@@ -1,9 +1,9 @@
 package it.unibo.kickify.data.remote
 
-import it.unibo.kickify.utils.Coordinates
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import it.unibo.kickify.utils.Coordinates
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -28,6 +28,7 @@ class OSMDataSource(
 
     suspend fun searchPlaces(query: String): List<OSMPlace> {
         val url = "$BASE_URL/?q=$query&format=json&limit=1"
+            .replace(" ", "+").replace(",", "")
         return httpClient.get(url).body()
     }
 
