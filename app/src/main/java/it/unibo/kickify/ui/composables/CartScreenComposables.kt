@@ -166,8 +166,10 @@ fun QuantityManagerRow(
 }
 
 @Composable
-fun CartAndCheckoutResume(subTotal: Double, shipping: Double, total: Double,
-                          onButtonClickAction: () -> Unit
+fun CartAndCheckoutResume(
+    subTotal: Double, shipping: Double, total: Double,
+    checkoutButtonEnabled: Boolean,
+    onButtonClickAction: () -> Unit
 ){
     Card(
         modifier = Modifier.height(180.dp).fillMaxWidth()
@@ -195,13 +197,9 @@ fun CartAndCheckoutResume(subTotal: Double, shipping: Double, total: Double,
                 modifier = Modifier.fillMaxWidth()
                     .padding(vertical = 6.dp)
             ){
-                Text(
-                    stringResource(R.string.shipping),
-                )
+                Text(stringResource(R.string.shipping),)
                 Spacer(Modifier.width(20.dp))
-                "%.2f".format(shipping)
-                Text("€%.2f".format(shipping)
-                )
+                Text("€%.2f".format(shipping))
             }
             Spacer(Modifier.width(30.dp))
             HorizontalDivider()
@@ -218,7 +216,8 @@ fun CartAndCheckoutResume(subTotal: Double, shipping: Double, total: Double,
             Row{
                 Button(
                     onClick = { onButtonClickAction() },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = checkoutButtonEnabled
                 ) {
                     Text(stringResource(R.string.cartscreen_checkOutBtn))
                 }

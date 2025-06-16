@@ -11,7 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -44,6 +46,8 @@ fun CartScreen(
 
     val snackBarHostState = remember { SnackbarHostState() }
 
+    var enableCheckOutBtn by remember { mutableStateOf(false) }
+
     // show error if present
     LaunchedEffect(errorMessage) {
         errorMessage?.let { message ->
@@ -52,6 +56,10 @@ fun CartScreen(
                 duration = SnackbarDuration.Long
             )
         }
+    }
+
+    LaunchedEffect(cartItems) {
+        enableCheckOutBtn = cartItems.isNotEmpty()
     }
 
     ScreenTemplate(
@@ -110,6 +118,7 @@ fun CartScreen(
                 subTotal = subTotal,
                 shipping = shippingCost,
                 total = total,
+                checkoutButtonEnabled = enableCheckOutBtn,
                 onButtonClickAction = { navController.navigate(KickifyRoute.Checkout) }
             )
         }

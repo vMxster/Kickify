@@ -135,7 +135,7 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.Checkout> {
-            CheckOutScreen(navController, achievementsViewModel)
+            CheckOutScreen(navController, achievementsViewModel, profileViewModel)
         }
 
         composable<KickifyRoute.Login> {
