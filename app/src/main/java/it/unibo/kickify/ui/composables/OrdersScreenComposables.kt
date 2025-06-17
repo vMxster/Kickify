@@ -94,7 +94,7 @@ fun OrderPaymentInfo(paymentMethod: PaymentMethods, totalPrice: Float) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Image(
-            paymentMethodIcon(paymentMethod.visibleName),
+            paymentMethodIcon(paymentMethod),
             contentDescription = "",
             modifier = Modifier.size(50.dp)
                 .padding(start = 6.dp)

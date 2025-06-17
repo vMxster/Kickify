@@ -50,11 +50,13 @@ import androidx.compose.ui.window.Dialog
 import io.ktor.client.HttpClient
 import it.unibo.kickify.R
 import it.unibo.kickify.data.database.Address
+import it.unibo.kickify.data.models.PaymentMethodInfo
 import it.unibo.kickify.data.models.PaymentMethods
 import it.unibo.kickify.data.models.PaymentMethods.AMEX
 import it.unibo.kickify.data.models.PaymentMethods.MAESTRO
 import it.unibo.kickify.data.models.PaymentMethods.MASTERCARD
 import it.unibo.kickify.data.models.PaymentMethods.PAYPAL
+import it.unibo.kickify.data.models.PaymentMethods.UNKNOWN
 import it.unibo.kickify.data.models.PaymentMethods.VISA
 import it.unibo.kickify.data.remote.OSMDataSource
 import it.unibo.kickify.utils.Coordinates
@@ -77,7 +79,7 @@ fun CheckOutInformationRow(
     ){
         if(leadingIcon != null){
             Icon(leadingIcon,
-                contentDescription = "$secondaryText icon",
+                contentDescription = "",
                 modifier = Modifier.padding(horizontal = 8.dp).size(30.dp)
             )
         }
@@ -165,18 +167,33 @@ fun AddressOnMapBox(
 }
 
 @Composable
-fun paymentMethodIcon(paymentMethod: String) : ImageVector {
-    val method = PaymentMethods.getFromString(paymentMethod)
-    return if (method != null) {
-        when (method) {
-            AMEX -> ImageVector.vectorResource(R.drawable.amex)
-            MAESTRO -> ImageVector.vectorResource(R.drawable.maestro)
-            MASTERCARD -> ImageVector.vectorResource(R.drawable.mastercard)
-            PAYPAL -> ImageVector.vectorResource(R.drawable.paypal)
-            VISA -> ImageVector.vectorResource(R.drawable.visa)
+fun paymentMethodIcon(paymentMethod: PaymentMethodInfo?) : ImageVector {
+    if (paymentMethod != null) {
+        when (paymentMethod) {
+            is PaymentMethodInfo.CreditCard -> {
+                return when (PaymentMethods.getFromString(paymentMethod.brand)) {
+                    AMEX -> ImageVector.vectorResource(R.drawable.amex)
+                    MAESTRO -> ImageVector.vectorResource(R.drawable.maestro)
+                    MASTERCARD -> ImageVector.vectorResource(R.drawable.mastercard)
+                    VISA -> ImageVector.vectorResource(R.drawable.visa)
+                    else -> Icons.Outlined.Close
+                }
+            }
+            is PaymentMethodInfo.PayPal -> ImageVector.vectorResource(R.drawable.paypal)
         }
-    } else {
-        Icons.Outlined.Close
+    }
+    return Icons.Outlined.Close
+}
+
+@Composable
+fun paymentMethodIcon(payMethod: PaymentMethods): ImageVector {
+    return when(payMethod){
+        AMEX -> ImageVector.vectorResource(R.drawable.amex)
+        MAESTRO -> ImageVector.vectorResource(R.drawable.maestro)
+        MASTERCARD -> ImageVector.vectorResource(R.drawable.mastercard)
+        PAYPAL -> ImageVector.vectorResource(R.drawable.paypal)
+        VISA -> ImageVector.vectorResource(R.drawable.visa)
+        UNKNOWN -> Icons.Outlined.Close
     }
 }
 
@@ -187,14 +204,14 @@ fun PaymentMethodRow(
     cardExpires: String,
     emailAddress: String,
     deleteAction: () -> Unit
-){
+) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
-    ){
+    ) {
         Image(
-            paymentMethodIcon(paymentMethod),
+            paymentMethodIcon(PaymentMethods.getFromString(paymentMethod) ?: UNKNOWN),
             contentDescription = "$paymentMethod icon",
             modifier = Modifier.padding(horizontal = 6.dp)
         )
@@ -202,8 +219,8 @@ fun PaymentMethodRow(
             modifier = Modifier.fillMaxWidth(fraction = 0.9f).padding(horizontal = 8.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            if(PaymentMethods.getFromString(paymentMethod) == PAYPAL){
-                Text(paymentMethod)
+            if (paymentMethod == PAYPAL.visibleName){
+                Text(PAYPAL.visibleName)
                 Text(emailAddress)
             } else {
                 Text("$paymentMethod **** $endingCardNumber")
@@ -230,13 +247,13 @@ fun AddressSelectorDialog(
     onDismissRequest: () -> Unit,
     onConfirm: (Address) -> Unit,
     onCancel: () -> Unit
-){
+) {
     var expanded by remember { mutableStateOf(false) }
     val textFieldState = rememberTextFieldState("")
     var selectedIndex by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(selectedIndex) {
-        textFieldState.setTextAndPlaceCursorAtEnd( getAddressText(items[selectedIndex]) )
+        textFieldState.setTextAndPlaceCursorAtEnd(getAddressText(items[selectedIndex]))
     }
 
     Dialog(onDismissRequest = onDismissRequest) {
@@ -267,17 +284,124 @@ fun AddressSelectorDialog(
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         colors = ExposedDropdownMenuDefaults.textFieldColors(),
                     )
-                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }) {
                         items.forEachIndexed { index, option ->
                             DropdownMenuItem(
-                                text = { Text( getAddressText(option), style = MaterialTheme.typography.bodyLarge) },
+                                text = {
+                                    Text(
+                                        getAddressText(option),
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                },
                                 onClick = {
                                     selectedIndex = index
                                     expanded = false
                                 },
                                 contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                             )
-                            HorizontalDivider(thickness = 3.dp, modifier = Modifier.padding(vertical = 6.dp))
+                            HorizontalDivider(
+                                thickness = 3.dp,
+                                modifier = Modifier.padding(vertical = 6.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextButton(onClick = { onCancel() }) {
+                    Text(stringResource(R.string.cancel))
+                }
+
+                TextButton(onClick = { onConfirm(items[selectedIndex]) }) {
+                    Text(stringResource(R.string.confirm))
+                }
+            }
+        }
+    }
+}
+
+fun getPaymentText(paymentMethodInfo: PaymentMethodInfo): String {
+    if (paymentMethodInfo is PaymentMethodInfo.CreditCard) {
+        return "${paymentMethodInfo.brand} **** ${paymentMethodInfo.last4}"
+
+    } else if (paymentMethodInfo is PaymentMethodInfo.PayPal) { // Paypal
+        return "${PAYPAL.visibleName} - ${paymentMethodInfo.email}"
+    }
+    return "-"
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PaymentMethodSelectorDialog(
+    items: List<PaymentMethodInfo>,
+    onDismissRequest: () -> Unit,
+    onConfirm: (PaymentMethodInfo) -> Unit,
+    onCancel: () -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val textFieldState = rememberTextFieldState("")
+    var selectedIndex by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(selectedIndex) {
+        textFieldState.setTextAndPlaceCursorAtEnd(getPaymentText(items[selectedIndex]))
+    }
+
+    Dialog(onDismissRequest = onDismissRequest) {
+        Card(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.choosePaymentMethod),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                ExposedDropdownMenuBox(
+                    modifier = Modifier.fillMaxWidth(),
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it }
+                ) {
+                    TextField(
+                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                        state = textFieldState,
+                        readOnly = true,
+                        lineLimits = TextFieldLineLimits.MultiLine(1, 3),
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }) {
+                        items.forEachIndexed { index, option ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        getPaymentText(option),
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                },
+                                onClick = {
+                                    selectedIndex = index
+                                    expanded = false
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                            )
+                            HorizontalDivider(
+                                thickness = 3.dp,
+                                modifier = Modifier.padding(top = 6.dp)
+                            )
                         }
                     }
                 }

@@ -7,7 +7,8 @@ enum class PaymentMethods (val visibleName: String){
     MAESTRO("Maestro"),
     MASTERCARD("MasterCard"),
     PAYPAL("PayPal"),
-    VISA("Visa");
+    VISA("Visa"),
+    UNKNOWN("-");
 
     companion object {
         fun getFromString(str:String): PaymentMethods? {

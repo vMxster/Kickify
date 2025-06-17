@@ -151,6 +151,8 @@
     <string name="noAddressAddOne">No shipping address found.\nAdd the first tapping on + button.</string>
     <string name="noPaymentMethodsAddOne">No payment methods found.\nAdd the first tapping on + button.</string>
     <string name="paymentMethods">Payment Methods</string>
+    <string name="choosePaymentMethod">Choose Payment Method</string>
+    <string name="noPaymentMethodSelected">No Payment method selected</string>
     <string name="addPaymentMethod">Add Payment Method</string>
     <string name="checkAllFieldsAreCorrect">Check all fields are correct.</string>
     <string name="cardExpires">Expires</string>

@@ -33,7 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.data.database.Address
-import it.unibo.kickify.data.models.PaymentMethods
+import it.unibo.kickify.data.models.PaymentMethodInfo
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.AddressOnMapBox
 import it.unibo.kickify.ui.composables.AddressSelectorDialog
@@ -41,8 +41,10 @@ import it.unibo.kickify.ui.composables.CartAndCheckoutResume
 import it.unibo.kickify.ui.composables.CheckOutInformationRow
 import it.unibo.kickify.ui.composables.DialogWithImage
 import it.unibo.kickify.ui.composables.InformationSectionTitle
+import it.unibo.kickify.ui.composables.PaymentMethodSelectorDialog
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.composables.getAddressText
+import it.unibo.kickify.ui.composables.getPaymentText
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.cart.CartViewModel
 import it.unibo.kickify.ui.screens.profile.ProfileViewModel
@@ -62,6 +64,7 @@ fun CheckOutScreen(
     val userEmail by settingsViewModel.userId.collectAsStateWithLifecycle()
     val user by profileViewModel.user.collectAsStateWithLifecycle()
     val addrList by profileViewModel.addressList.collectAsStateWithLifecycle()
+    val payMethodList by profileViewModel.paymentMethods.collectAsStateWithLifecycle()
     val isLoadingProfile by profileViewModel.isLoading.collectAsStateWithLifecycle()
     val isLoadingCart by cartViewModel.isLoading.collectAsStateWithLifecycle()
     val subtotal by cartViewModel.subTotal.collectAsStateWithLifecycle()
@@ -89,7 +92,7 @@ fun CheckOutScreen(
         var showPaymentMethodSelectorDialog by rememberSaveable { mutableStateOf(false) }
 
         var selectedAddress by remember { mutableStateOf<Address?>(null) }
-        var selectedPaymentMethod by remember { mutableStateOf<PaymentMethods?>(null) }
+        var selectedPaymentMethod by remember { mutableStateOf<PaymentMethodInfo?>(null) }
 
         var enabledCheckoutButton by remember { mutableStateOf(false) }
 
@@ -158,12 +161,14 @@ fun CheckOutScreen(
 
                         InformationSectionTitle(stringResource(R.string.paymentMethods))
                         Spacer(Modifier.height(6.dp))
+
                         CheckOutInformationRow(
-                            leadingIcon = null, //paymentMethodIcon(payMethod),
-                            primaryText = "pay method", //payMethod,
-                            secondaryText = "payment details", // paymentDetails,
+                            leadingIcon = null,
+                            primaryText = selectedPaymentMethod?.let { getPaymentText(it) }
+                                ?: stringResource(R.string.noPaymentMethodSelected),
+                            secondaryText = "",
                             showEditButton = true,
-                            onEditInformation = { }
+                            onEditInformation = { showPaymentMethodSelectorDialog = true }
                         )
                     }
                 }
@@ -191,6 +196,17 @@ fun CheckOutScreen(
                 )
             }
 
+            if(showPaymentMethodSelectorDialog){
+                PaymentMethodSelectorDialog(
+                    items = payMethodList,
+                    onDismissRequest = { showPaymentMethodSelectorDialog = false },
+                    onConfirm = { selectedPay ->
+                        showPaymentMethodSelectorDialog = false
+                        selectedPaymentMethod = selectedPay
+                    },
+                    onCancel = { showPaymentMethodSelectorDialog = false }
+                )
+            }
             if(showDialog){
                 DialogWithImage(
                     imageVector = Icons.Outlined.Check,
