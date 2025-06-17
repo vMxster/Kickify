@@ -71,11 +71,18 @@ fun ProfileScreen(
     val errorMessage by profileViewModel.errorMessage.collectAsStateWithLifecycle()
     val isLoading by profileViewModel.isLoading.collectAsStateWithLifecycle()
 
+    LaunchedEffect(addrList) {
+        profileViewModel.getUserAddress(userEmail)
+    }
+
+    LaunchedEffect(paymentMethodList) {
+        profileViewModel.getPaymentMethods(userEmail)
+    }
+
     LaunchedEffect(userEmail) {
         profileViewModel.getUserAddress(userEmail)
         profileViewModel.getProfile(userEmail)
         profileViewModel.getPaymentMethods(userEmail)
-        println("payment list profile screen: $paymentMethodList")
     }
 
     LaunchedEffect(errorMessage) {
@@ -166,7 +173,7 @@ fun ProfileScreen(
             }
 
             ProfileCardContainer(
-                cardTitle = stringResource(R.string.paymentMethod),
+                cardTitle = stringResource(R.string.paymentMethods),
                 actionIcon = Icons.Outlined.Add,
                 action = {
                     navController.navigate(KickifyRoute.EditProfile(EditProfileSections.PAYMENT_METHOD))
@@ -182,7 +189,9 @@ fun ProfileScreen(
                             endingCardNumber = method.last4,
                             cardExpires = "${expMonth}/${expYear}",
                             emailAddress = "",
-                            deleteAction = { profileViewModel.deletePaymentMethod(userEmail, method.id) }
+                            deleteAction = {
+                                profileViewModel.deletePaymentMethod(userEmail, method.id)
+                            }
                         )
                     } else if(method is PaymentMethodInfo.PayPal){
                         PaymentMethodRow(
@@ -190,7 +199,9 @@ fun ProfileScreen(
                             endingCardNumber = "",
                             cardExpires = "",
                             emailAddress = method.email,
-                            deleteAction = { profileViewModel.deletePaymentMethod(userEmail, method.id) }
+                            deleteAction = {
+                                profileViewModel.deletePaymentMethod(userEmail, method.id)
+                            }
                         )
                     }
                 }

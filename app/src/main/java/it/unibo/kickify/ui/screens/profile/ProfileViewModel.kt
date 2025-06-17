@@ -36,6 +36,9 @@ class ProfileViewModel(
     private val _paymentMethods = MutableStateFlow<List<PaymentMethodInfo>>(emptyList())
     val paymentMethods: StateFlow<List<PaymentMethodInfo>> = _paymentMethods.asStateFlow()
 
+    private val _paymentMethodsListModified = MutableStateFlow(false)
+    val paymentMethodsListModified: StateFlow<Boolean> = _paymentMethodsListModified.asStateFlow()
+
     fun getProfile(email: String) {
         _errorMessage.value = null
         _isLoading.value = true
@@ -215,6 +218,7 @@ class ProfileViewModel(
                     )
                     result.onSuccess {
                         _errorMessage.value = null
+                        _paymentMethodsListModified.value = true
                         getPaymentMethods(userEmail)
                     }.onFailure { exception ->
                         _errorMessage.value = exception.message ?: "Unknown error"
@@ -238,6 +242,7 @@ class ProfileViewModel(
                 val result = appRepository.deleteUserPaymentMethod(id)
                 result.onSuccess {
                     _errorMessage.value = null
+                    _paymentMethodsListModified.value = true
                     getPaymentMethods(userEmail)
                 }.onFailure { exception ->
                     _errorMessage.value = exception.message ?: "Unknown error"
@@ -254,6 +259,10 @@ class ProfileViewModel(
 
     fun resetModifiedAddress(){
         _addressListModified.value = false
+    }
+
+    fun resetModifiedPayment(){
+        _paymentMethodsListModified.value = false
     }
 
     fun dismissError() {

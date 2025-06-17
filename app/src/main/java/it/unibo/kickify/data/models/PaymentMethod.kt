@@ -41,8 +41,8 @@ sealed class PaymentMethodInfo {
             return last4.length == 4 && last4.all { it.isDigit() }
         }
 
-        private fun isValidMonth(month: Int): Boolean {
-            return month in 1..12
+        private fun isValidMonth(month: String): Boolean {
+            return month.length == 2 && month.all{it.isDigit()} && month in "01" .. "12"
         }
 
         private fun isValidYear(year: Int): Boolean {
@@ -52,11 +52,11 @@ sealed class PaymentMethodInfo {
 
         fun validateCreditCard(
             brand: String, last4: String,
-            expirationMonth: Int, expirationYear: Int
+            expirationMonth: String, expirationYear: Int
         ): Boolean {
             return brand.isNotBlank() && isValidCardBrand(brand) && isValidLast4(last4)
                     && expirationYear > 0 && isValidYear(expirationYear)
-                    && expirationMonth > 0 && isValidMonth(expirationMonth)
+                    && isValidMonth(expirationMonth)
         }
 
         fun validatePayPal(email: String): Boolean {

@@ -156,7 +156,7 @@ fun CheckOutScreen(
                         )
                         Spacer(Modifier.height(10.dp))
 
-                        InformationSectionTitle(stringResource(R.string.paymentMethod))
+                        InformationSectionTitle(stringResource(R.string.paymentMethods))
                         Spacer(Modifier.height(6.dp))
                         CheckOutInformationRow(
                             leadingIcon = null, //paymentMethodIcon(payMethod),

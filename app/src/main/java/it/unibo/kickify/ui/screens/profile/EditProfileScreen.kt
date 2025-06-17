@@ -115,6 +115,7 @@ fun EditProfileScreen(
     val errorMessageProfile by profileViewModel.errorMessage.collectAsStateWithLifecycle()
     val addressModified by profileViewModel.addressListModified.collectAsStateWithLifecycle()
     val modifiedPassword by profileViewModel.passwordModified.collectAsStateWithLifecycle()
+    val modifiedPaymentMethods by profileViewModel.paymentMethodsListModified.collectAsStateWithLifecycle()
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -142,6 +143,14 @@ fun EditProfileScreen(
         }
     }
 
+    LaunchedEffect(modifiedPaymentMethods) {
+        if(modifiedPaymentMethods){
+            profileViewModel.getPaymentMethods(userEmail)
+            profileViewModel.resetModifiedPayment()
+            navController.popBackStack()
+        }
+    }
+
     LaunchedEffect(errorMessageProfile) {
         errorMessageProfile?.let {
             snackBarHostState.showSnackbar(
@@ -164,7 +173,7 @@ fun EditProfileScreen(
         screenTitle = when(section) {
             EditProfileSections.USER_INFO -> stringResource(R.string.editProfile_title)
             EditProfileSections.ADDRESS -> stringResource(R.string.addNewAddress)
-            EditProfileSections.PAYMENT_METHOD -> stringResource(R.string.paymentMethod)
+            EditProfileSections.PAYMENT_METHOD -> stringResource(R.string.addPaymentMethod)
         },
         navController = navController,
         showTopAppBar = true,
@@ -206,8 +215,7 @@ fun EditAddressSection(
     coroutineScope: CoroutineScope
 ){
     Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-            .padding(horizontal = 10.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp, horizontal = 10.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -360,6 +368,7 @@ fun EditAddressSection(
         }
         Spacer(modifier = Modifier.height(12.dp))
 
+        val addAddressErrorMsg = stringResource(R.string.addressMissingFields)
         Button(
             onClick = {
                 val areFieldsOk = listOf(streetName, number, cap, city, province, nation)
@@ -372,7 +381,7 @@ fun EditAddressSection(
                 } else {
                     coroutineScope.launch {
                         snackBarHostState.showSnackbar(
-                            message = "Fill in all fields",
+                            message = addAddressErrorMsg,
                             duration = SnackbarDuration.Long
                         )
                     }
@@ -724,9 +733,10 @@ fun AddressContainer(
 @Composable
 fun AddPaymentMethodSection(profileViewModel: ProfileViewModel, userEmail: String){
     var selectedMethodType by remember { mutableStateOf("CreditCard") }
+    val cardBrands = remember { PaymentMethods.entries.filter { it != PaymentMethods.PAYPAL }.map { it.visibleName } }
 
     // values for credit card
-    var creditCardBrand by remember { mutableStateOf(PaymentMethods.entries.first().visibleName) }
+    var creditCardBrand by remember { mutableStateOf(cardBrands[0]) }
     var creditCardLast4 by remember { mutableStateOf("") }
     var creditCardMonth by remember { mutableStateOf("") }
     var creditCardYear by remember { mutableStateOf("") }
@@ -734,8 +744,6 @@ fun AddPaymentMethodSection(profileViewModel: ProfileViewModel, userEmail: Strin
     var paypalEmail by remember { mutableStateOf("") }
 
     val coroutineScope = rememberCoroutineScope()
-
-    val cardBrands = remember { PaymentMethods.entries.filter { it != PaymentMethods.PAYPAL }.map { it.visibleName } }
     var expanded by remember { mutableStateOf(false) }
 
     val handleAddPaymentMethod: () -> Unit = {
@@ -745,7 +753,7 @@ fun AddPaymentMethodSection(profileViewModel: ProfileViewModel, userEmail: Strin
 
             if (selectedMethodType == "CreditCard") {
                 isValid = PaymentMethodInfo.validateCreditCard(creditCardBrand,
-                    creditCardLast4, creditCardMonth.toInt(), creditCardYear.toInt()
+                    creditCardLast4, creditCardMonth, creditCardYear.toInt()
                 )
                 if (isValid) {
                     newPaymentMethod = PaymentMethodInfo.CreditCard(
@@ -755,6 +763,8 @@ fun AddPaymentMethodSection(profileViewModel: ProfileViewModel, userEmail: Strin
                         expirationMonth = creditCardMonth.toInt(),
                         expirationYear = creditCardYear.toInt()
                     )
+                } else {
+
                 }
             } else { // PayPal
                 isValid = PaymentMethodInfo.validatePayPal(paypalEmail)
@@ -792,7 +802,7 @@ fun AddPaymentMethodSection(profileViewModel: ProfileViewModel, userEmail: Strin
                 ),
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Carta di Credito", color = MaterialTheme.colorScheme.onBackground)
+                Text(stringResource(R.string.creditCard), color = MaterialTheme.colorScheme.onBackground)
             }
             Spacer(Modifier.width(8.dp))
 
@@ -804,9 +814,11 @@ fun AddPaymentMethodSection(profileViewModel: ProfileViewModel, userEmail: Strin
                 ),
                 modifier = Modifier.weight(1f)
             ) {
-                Text("PayPal", color = MaterialTheme.colorScheme.onBackground)
+                Text(PaymentMethods.PAYPAL.visibleName, color = MaterialTheme.colorScheme.onBackground)
             }
         }
+
+        val addPayMethodModifier = Modifier.fillMaxWidth()
 
         if (selectedMethodType == "CreditCard") {
             val textFieldState = rememberTextFieldState(creditCardBrand)
@@ -815,18 +827,27 @@ fun AddPaymentMethodSection(profileViewModel: ProfileViewModel, userEmail: Strin
                 textFieldState.setTextAndPlaceCursorAtEnd(creditCardBrand)
             }
 
-            Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.creditCard_brand),
+                    modifier = addPayMethodModifier
+                )
                 ExposedDropdownMenuBox(
                     expanded = expanded,
                     onExpandedChange = { expanded = it }
                 ) {
                     OutlinedTextField(
-                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                        modifier = addPayMethodModifier
+                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                         state = textFieldState,
                         readOnly = true,
                         lineLimits = TextFieldLineLimits.SingleLine,
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        colors = ExposedDropdownMenuDefaults.textFieldColors()
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                        shape = RoundedCornerShape(16.dp)
                     )
                     ExposedDropdownMenu(
                         expanded = expanded,
@@ -845,7 +866,12 @@ fun AddPaymentMethodSection(profileViewModel: ProfileViewModel, userEmail: Strin
                         }
                     }
                 }
+                Spacer(modifier = Modifier.height(4.dp))
 
+                Text(
+                    text = stringResource(R.string.creditCard_last4),
+                    modifier = addPayMethodModifier
+                )
                 OutlinedTextField(
                     value = creditCardLast4,
                     onValueChange = { newValue ->
@@ -854,73 +880,102 @@ fun AddPaymentMethodSection(profileViewModel: ProfileViewModel, userEmail: Strin
                         }
                     },
                     shape = RoundedCornerShape(16.dp),
-                    placeholder = { Text("Ultime 4 cifre") },
+                    placeholder = { Text(stringResource(R.string.creditCard_last4)) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Next
                     ),
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = addPayMethodModifier,
                     singleLine = true
                 )
+                Spacer(modifier = Modifier.height(4.dp))
 
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(
-                        value = creditCardMonth,
-                        onValueChange = { newValue ->
-                            if (newValue.all { it.isDigit() } && newValue.length <= 2) {
-                                creditCardMonth = newValue
-                            }
-                        },
-                        shape = RoundedCornerShape(16.dp),
-                        placeholder = { Text("Mese (MM)") },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Next
-                        ),
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Column(
                         modifier = Modifier.weight(1f),
-                        singleLine = true
-                    )
-                    OutlinedTextField(
-                        value = creditCardYear,
-                        onValueChange = { newValue ->
-                            if (newValue.all { it.isDigit() } && newValue.length <= 4) {
-                                creditCardYear = newValue
-                            }
-                        },
-                        shape = RoundedCornerShape(16.dp),
-                        placeholder = { Text("Anno (AAAA)") },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password,
-                            imeAction = ImeAction.Next
-                        ),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.creditCard_month),
+                            modifier = addPayMethodModifier
+                        )
+                        OutlinedTextField(
+                            value = creditCardMonth,
+                            onValueChange = { newValue ->
+                                if (newValue.all { it.isDigit() } && newValue.length <= 2) {
+                                    creditCardMonth = newValue
+                                }
+                            },
+                            shape = RoundedCornerShape(16.dp),
+                            placeholder = { Text(stringResource(R.string.creditCard_month)) },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Next
+                            ),
+                            singleLine = true
+                        )
+                    }
+                    Column(
                         modifier = Modifier.weight(1f),
-                        singleLine = true
-                    )
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.creditCard_year),
+                            modifier = addPayMethodModifier
+                        )
+                        OutlinedTextField(
+                            value = creditCardYear,
+                            onValueChange = { newValue ->
+                                if (newValue.all { it.isDigit() } && newValue.length <= 4) {
+                                    creditCardYear = newValue
+                                }
+                            },
+                            shape = RoundedCornerShape(16.dp),
+                            placeholder = { Text(stringResource(R.string.creditCard_year)) },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done
+                            ),
+                            singleLine = true
+                        )
+                    }
                 }
             }
         }
 
         if (selectedMethodType == "PayPal") {
-            Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.paypalEmail),
+                    modifier = addPayMethodModifier
+                )
                 OutlinedTextField(
                     value = paypalEmail,
                     onValueChange = { paypalEmail = it },
                     shape = RoundedCornerShape(16.dp),
-                    placeholder = { Text("Email PayPal") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text(stringResource(R.string.paypalEmail)) },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Done
+                    ),
+                    modifier = addPayMethodModifier,
                     singleLine = true
                 )
             }
         }
-
         Spacer(Modifier.height(24.dp))
 
         Button(
             onClick = handleAddPaymentMethod,
             modifier = Modifier.fillMaxWidth().height(50.dp)
         ) {
-            Text("Aggiungi Metodo di Pagamento")
+            Text(stringResource(R.string.addPaymentMethod))
         }
     }
 }
