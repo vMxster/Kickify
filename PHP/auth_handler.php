@@ -122,6 +122,50 @@ try {
                 }
 
                 break;
+            
+            case "getUserPayMethods":
+                $email = $_POST["email"];
+                $paymethods = $dbh->getUserPayMethods($email);
+                if($paymethods) {
+                    $response = [
+                        "success" => true,
+                        "paymethods" => $paymethods
+                    ];
+                } else {
+                    throw new Exception("Metodi di pagamento non trovati");
+                }
+                break;
+
+            case "addUserPayMethod":
+                $userEmail = $_POST["userEmail"];
+                $paypalEmail = empty($_POST["paypalEmail"]) ? NULL : $_POST["paypalEmail"];
+                $creditCardBrand = empty($_POST["creditCardBrand"]) ? NULL : $_POST["creditCardBrand"];
+                $creditCardLast4 = empty($_POST["creditCardBrand"]) ? NULL : $_POST["creditCardBrand"];
+                $creditCardExpMonth = empty($_POST["creditCardExpMonth"]) ? NULL : $_POST["creditCardExpMonth"];
+                $creditCardExpYear = empty($_POST["creditCardExpYear"]) ? NULL : $_POST["creditCardExpYear"];
+                if ($dbh->addUserPayMethod($userEmail, $paypalEmail, $creditCardBrand, $creditCardLast4, $creditCardExpMonth, $creditCardExpYear)) {
+                    $response = [
+                        "success" => true,
+                        "message" => "Metodo di pagamento aggiunto"
+                    ];
+                } else {
+                    throw new Exception("Metodo di pagamento non aggiunto");
+                }
+
+                break;
+
+            case "removeUserPayMethod":
+                $id = $_POST["id"];
+                if ($dbh->removeUserPayMethod($id)) {
+                    $response = [
+                        "success" => true,
+                        "message" => "Metodo di pagamento rimosso"
+                    ];
+                } else {
+                    throw new Exception("Metodo di pagamento non rimosso");
+                }
+
+                break;
 
             case "isUserRegistered":
                 $email = $_POST["email"];

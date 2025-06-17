@@ -1163,6 +1163,32 @@ class DatabaseHelper {
         return $stmt->execute();
     }
 
+     // Get user payment methods
+    public function getUserPayMethods($email){
+        $query = "SELECT * FROM METODO_PAGAMENTO WHERE Email = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+    
+    // Add new user payment method
+    public function addUserPayMethod($userEmail, $paypalEmail, $creditCardBrand, $creditCardLast4, $creditCardExpMonth, $creditCardExpYear){
+        $query = "INSERT INTO METODO_PAGAMENTO(Email, CreditCard_brand, CreditCard_Last4, CreditCard_ExpMonth, CreditCard_ExpYear, PayPal_Email) VALUES (?,?,?,?,?,?)";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("sssiis", $userEmail, $creditCardBrand, $creditCardLast4, $creditCardExpMonth, $creditCardExpYear, $paypalEmail);
+        return $stmt->execute();
+    }
+    
+    // Remove user payment method
+    public function removeUserPayMethod($id){
+        $query = "DELETE FROM METODO_PAGAMENTO WHERE Id = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("i", $id);
+        return $stmt->execute();
+    }
+
     /*******************
      * WISHLIST QUERIES *
      *******************/
