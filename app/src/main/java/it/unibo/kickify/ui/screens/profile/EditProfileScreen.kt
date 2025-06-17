@@ -200,7 +200,7 @@ fun EditProfileScreen(
                 }
 
                 EditProfileSections.PAYMENT_METHOD -> {
-                    AddPaymentMethodSection(profileViewModel, userEmail)
+                    AddPaymentMethodSection(snackBarHostState, profileViewModel, userEmail)
                 }
             }
         }
@@ -368,7 +368,7 @@ fun EditAddressSection(
         }
         Spacer(modifier = Modifier.height(12.dp))
 
-        val addAddressErrorMsg = stringResource(R.string.addressMissingFields)
+        val addAddressErrorMsg = stringResource(R.string.missingFields)
         Button(
             onClick = {
                 val areFieldsOk = listOf(streetName, number, cap, city, province, nation)
@@ -731,7 +731,11 @@ fun AddressContainer(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddPaymentMethodSection(profileViewModel: ProfileViewModel, userEmail: String){
+fun AddPaymentMethodSection(
+    snackBarHostState: SnackbarHostState,
+    profileViewModel: ProfileViewModel,
+    userEmail: String
+){
     var selectedMethodType by remember { mutableStateOf("CreditCard") }
     val cardBrands = remember { PaymentMethods.entries.filter { it != PaymentMethods.PAYPAL }.map { it.visibleName } }
 
@@ -763,8 +767,6 @@ fun AddPaymentMethodSection(profileViewModel: ProfileViewModel, userEmail: Strin
                         expirationMonth = creditCardMonth.toInt(),
                         expirationYear = creditCardYear.toInt()
                     )
-                } else {
-
                 }
             } else { // PayPal
                 isValid = PaymentMethodInfo.validatePayPal(paypalEmail)
@@ -971,8 +973,38 @@ fun AddPaymentMethodSection(profileViewModel: ProfileViewModel, userEmail: Strin
         }
         Spacer(Modifier.height(24.dp))
 
+        val msgCheckFields = stringResource(R.string.checkAllFieldsAreCorrect)
+        val msgCheckPaypalEmail = stringResource(R.string.invalidEmailMessage)
         Button(
-            onClick = handleAddPaymentMethod,
+            onClick = {
+                val areFieldsOkCredit = listOf(creditCardBrand, creditCardLast4,
+                    creditCardMonth, creditCardYear).all { it.isNotBlank() }
+
+                if(selectedMethodType == "CreditCard") {
+                    if(areFieldsOkCredit) {
+                        handleAddPaymentMethod()
+                    } else {
+                        coroutineScope.launch {
+                            snackBarHostState.showSnackbar(
+                                message = msgCheckFields,
+                                duration = SnackbarDuration.Long
+                            )
+                        }
+                    }
+
+                } else if(selectedMethodType == "PayPal"){
+                    if(paypalEmail.isNotBlank()){
+                        handleAddPaymentMethod()
+                    } else {
+                        coroutineScope.launch {
+                            snackBarHostState.showSnackbar(
+                                message = msgCheckPaypalEmail,
+                                duration = SnackbarDuration.Long
+                            )
+                        }
+                    }
+                }
+            },
             modifier = Modifier.fillMaxWidth().height(50.dp)
         ) {
             Text(stringResource(R.string.addPaymentMethod))

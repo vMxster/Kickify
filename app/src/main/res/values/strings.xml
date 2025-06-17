@@ -145,14 +145,14 @@
     <string name="setDefaultAddress">Set as default address</string>
     <string name="addNewAddress">Add new address</string>
     <string name="saveAddress">Save address</string>
-    <string name="addressMissingFields">Fill in all fields.</string>
+    <string name="missingFields">Fill in all fields.</string>
     <string name="chooseShippingAddress">Choose shipping address</string>
     <string name="noShippingAddressSelected">No shipping address selected</string>
     <string name="noAddressAddOne">No shipping address found.\nAdd the first tapping on + button.</string>
     <string name="noPaymentMethodsAddOne">No payment methods found.\nAdd the first tapping on + button.</string>
-    <string name="paymentMethod">Payment Method</string>
     <string name="paymentMethods">Payment Methods</string>
     <string name="addPaymentMethod">Add Payment Method</string>
+    <string name="checkAllFieldsAreCorrect">Check all fields are correct.</string>
     <string name="cardExpires">Expires</string>
     <string name="creditCard">Credit Card</string>
     <string name="creditCard_brand">Credit Card Issuer</string>
