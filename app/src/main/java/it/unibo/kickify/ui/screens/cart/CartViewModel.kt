@@ -41,10 +41,10 @@ class CartViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             settingsRepository.userID.collectLatest { userid ->
-                _email.value = userid
+                _email.value = userid.lowercase()
 
                 if(userid.isNotEmpty()){
-                    loadCartInternal(userid)
+                    loadCartInternal(userid.lowercase())
                 } else {
                     _cartItems.value = emptyList()
                     _subTotal.value = 0.0

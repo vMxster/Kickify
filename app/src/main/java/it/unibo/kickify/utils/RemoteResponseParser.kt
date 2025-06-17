@@ -244,14 +244,14 @@ class RemoteResponseParser {
                         totalCost = orderJson.getDouble("Costo_Totale"),
                         paymentMethod = orderJson.getString("Metodo_Pagamento"),
                         isPresent = orderJson.getInt("Regalo") == 1,
-                        discountId = orderJson.optInt("ID_Sconto", 0),
-                        nomeDestinatario = orderJson.optString("Nome_Destinatario", ""),
-                        cognomeDestinatario = orderJson.optString("Cognome_Destinatario", ""),
-                        shippingEmail = orderJson.optString("Spe_Email", ""),
-                        shippingStreet = orderJson.optString("Spe_Via", ""),
-                        shippingCivic = orderJson.optInt("Spe_NumeroCivico", 0),
-                        shippingCap = orderJson.optInt("Spe_CAP", 0),
-                        shippingCity = orderJson.optString("Spe_Citta", "")
+                        discountId = if (orderJson.isNull("ID_Sconto")) null else orderJson.optInt("ID_Sconto"),
+                        nomeDestinatario = orderJson.optString("Nome_Destinatario"),
+                        cognomeDestinatario = orderJson.optString("Cognome_Destinatario"),
+                        shippingEmail = orderJson.optString("Spe_Email"),
+                        shippingStreet = orderJson.optString("Spe_Via"),
+                        shippingCivic = orderJson.optInt("Spe_NumeroCivico"),
+                        shippingCap = orderJson.optInt("Spe_CAP"),
+                        shippingCity = orderJson.optString("Spe_Citta")
                     )
                 )
             }

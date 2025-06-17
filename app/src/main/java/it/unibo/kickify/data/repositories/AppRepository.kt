@@ -266,9 +266,11 @@ class AppRepository(
                     val remoteCartItems = remoteResult.getOrNull() ?: emptyList()
                     if (remoteCartItems.isNotEmpty()) {
                         remoteCartItems.forEach { item ->
-                            productCartRepository.addToCart(
-                                cartId, item.productId, item.color, item.size, item.quantity
-                            )
+                            if (cartId != null) {
+                                productCartRepository.addToCart(
+                                    cartId, item.productId, item.color, item.size, item.quantity
+                                )
+                            }
                         }
                     }
                 }

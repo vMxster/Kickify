@@ -266,30 +266,7 @@ interface ProductCartDao {
     suspend fun getCartItems(cartId: Int): List<CartWithProductInfo>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertItem(item: CartProduct)
-
-    @Transaction
-    suspend fun addToCart(cartId: Int?, productId: Int, color: String, size: Double, quantity: Int = 1) {
-
-        val existingItem = getCartItemIfExists(cartId, productId, color, size)
-
-        if (existingItem != null) {
-            val newQuantity = existingItem.quantity + quantity
-            updateCartItemQuantity(cartId, productId, color, size, newQuantity)
-        } else {
-            val cartProduct = cartId?.let { CartProduct(it, productId, color, size, quantity) }
-            if (cartProduct != null) {
-                insertItem(cartProduct)
-            }
-        }
-    }
-
-    @Query("""
-        SELECT * FROM comprendere 
-        WHERE ID_Carrello = :cartId AND ID_Prodotto = :productId 
-        AND Colore = :color AND Taglia = :size LIMIT 1
-    """)
-    suspend fun getCartItemIfExists(cartId: Int?, productId: Int, color: String, size: Double): CartProduct?
+    suspend fun addToCart(item: CartProduct)
 
     @Query("""
         UPDATE comprendere SET Quantita = :quantity 
@@ -315,13 +292,13 @@ interface ProductCartDao {
 @Dao
 interface OrderDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrder(order: Order): Long
+    suspend fun insertOrder(order: Order)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrderProduct(orderProduct: OrderProduct): Long
+    suspend fun insertOrderProduct(orderProduct: OrderProduct)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTrackingInfo(trackingShipping: TrackingShipping): Long
+    suspend fun insertTrackingInfo(trackingShipping: TrackingShipping)
 
     @Query("""
         SELECT * FROM ORDINE o 

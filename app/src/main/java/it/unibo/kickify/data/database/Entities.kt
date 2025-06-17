@@ -232,7 +232,11 @@ data class CartProduct(
             onUpdate = ForeignKey.NO_ACTION
         )
     ],
-    indices = [Index("Email", unique = false), Index("ID_Sconto", unique = false)]
+    indices = [
+        Index("Email", unique = false),
+        Index("ID_Sconto", unique = false),
+        Index("Spe_Email", unique = false)
+    ]
 )
 data class Order(
     @PrimaryKey(autoGenerate = true)
@@ -255,10 +259,10 @@ data class Order(
     val isPresent: Boolean,
 
     @ColumnInfo(name = "NomeDestinatario")
-    val nomeDestinatario: String,
+    val nomeDestinatario: String?,
 
     @ColumnInfo(name = "CognomeDestinatario")
-    val cognomeDestinatario: String,
+    val cognomeDestinatario: String?,
 
     @ColumnInfo(name = "Email")
     val email: String,

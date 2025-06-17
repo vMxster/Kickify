@@ -72,8 +72,8 @@ fun MyOrdersScreen(
         }
 
         LaunchedEffect(userEmail) {
-            ordersViewModel.getOrders(userEmail)
-            ordersViewModel.getOrdersWithProducts(userEmail)
+            ordersViewModel.getOrders(userEmail.lowercase())
+            ordersViewModel.getOrdersWithProducts(userEmail.lowercase())
         }
 
         Column(
