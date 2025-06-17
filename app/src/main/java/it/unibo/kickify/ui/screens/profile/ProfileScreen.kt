@@ -71,14 +71,6 @@ fun ProfileScreen(
     val errorMessage by profileViewModel.errorMessage.collectAsStateWithLifecycle()
     val isLoading by profileViewModel.isLoading.collectAsStateWithLifecycle()
 
-    LaunchedEffect(addrList) {
-        profileViewModel.getUserAddress(userEmail)
-    }
-
-    LaunchedEffect(paymentMethodList) {
-        profileViewModel.getPaymentMethods(userEmail)
-    }
-
     LaunchedEffect(userEmail) {
         profileViewModel.getUserAddress(userEmail)
         profileViewModel.getProfile(userEmail)
@@ -127,8 +119,8 @@ fun ProfileScreen(
 
                 Text(
                     text = if(user == null) username else "${user?.name} ${user?.surname}",
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
-                        .padding(vertical = 4.dp).padding(start = 10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 4.dp).padding(start = 10.dp),
                     style = MaterialTheme.typography.titleMedium
                 )
                 TextInformationRow(if(user == null) userEmail else "${user?.email}")
@@ -153,22 +145,29 @@ fun ProfileScreen(
                 actionIcon = Icons.Outlined.Add,
                 action = { navController.navigate(KickifyRoute.EditProfile(EditProfileSections.ADDRESS)) }
             ) {
-                addrList.forEachIndexed { index, addr ->
-                    AddressContainer(
-                        index = index,
-                        address = addr.street,
-                        number = addr.civic,
-                        city = addr.city,
-                        province = addr.province,
-                        postCode = addr.cap,
-                        country = addr.nation,
-                        defaultAddress = addr.default,
-                        deleteAction = {
-                            profileViewModel.deleteUserAddress(
-                                userEmail, addr.street, addr.civic, addr.cap, addr.city
-                            )
-                        }
+                if(addrList.isEmpty()) {
+                    Text(
+                        stringResource(R.string.noAddressAddOne),
+                        Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 4.dp)
                     )
+                }else {
+                    addrList.forEachIndexed { index, addr ->
+                        AddressContainer(
+                            index = index,
+                            address = addr.street,
+                            number = addr.civic,
+                            city = addr.city,
+                            province = addr.province,
+                            postCode = addr.cap,
+                            country = addr.nation,
+                            defaultAddress = addr.default,
+                            deleteAction = {
+                                profileViewModel.deleteUserAddress(
+                                    userEmail, addr.street, addr.civic, addr.cap, addr.city
+                                )
+                            }
+                        )
+                    }
                 }
             }
 
@@ -179,30 +178,37 @@ fun ProfileScreen(
                     navController.navigate(KickifyRoute.EditProfile(EditProfileSections.PAYMENT_METHOD))
                 }
             ) {
-                for(method in paymentMethodList){
-                    if(method is PaymentMethodInfo.CreditCard){
-                        val expMonth = method.expirationMonth.toString().padStart(2, '0')
-                        val expYear = method.expirationYear.toString().takeLast(2)
+                if(paymentMethodList.isEmpty()){
+                    Text(
+                        stringResource(R.string.noPaymentMethodsAddOne),
+                        Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 4.dp)
+                    )
+                } else {
+                    paymentMethodList.forEach { method ->
+                        if (method is PaymentMethodInfo.CreditCard) {
+                            val expMonth = method.expirationMonth.toString().padStart(2, '0')
+                            val expYear = method.expirationYear.toString().takeLast(2)
 
-                        PaymentMethodRow(
-                            paymentMethod = method.brand,
-                            endingCardNumber = method.last4,
-                            cardExpires = "${expMonth}/${expYear}",
-                            emailAddress = "",
-                            deleteAction = {
-                                profileViewModel.deletePaymentMethod(userEmail, method.id)
-                            }
-                        )
-                    } else if(method is PaymentMethodInfo.PayPal){
-                        PaymentMethodRow(
-                            paymentMethod = PaymentMethods.PAYPAL.visibleName,
-                            endingCardNumber = "",
-                            cardExpires = "",
-                            emailAddress = method.email,
-                            deleteAction = {
-                                profileViewModel.deletePaymentMethod(userEmail, method.id)
-                            }
-                        )
+                            PaymentMethodRow(
+                                paymentMethod = method.brand,
+                                endingCardNumber = method.last4,
+                                cardExpires = "${expMonth}/${expYear}",
+                                emailAddress = "",
+                                deleteAction = {
+                                    profileViewModel.deletePaymentMethod(userEmail, method.id)
+                                }
+                            )
+                        } else if (method is PaymentMethodInfo.PayPal) {
+                            PaymentMethodRow(
+                                paymentMethod = PaymentMethods.PAYPAL.visibleName,
+                                endingCardNumber = "",
+                                cardExpires = "",
+                                emailAddress = method.email,
+                                deleteAction = {
+                                    profileViewModel.deletePaymentMethod(userEmail, method.id)
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -243,8 +249,7 @@ fun ProfileActionRow(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = 8.dp)
-                .padding(vertical = 6.dp),
+                .padding(horizontal = 8.dp, vertical = 6.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -269,8 +274,7 @@ fun TextInformationRow(
     rightValue: String? = null
 ){
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
-            .padding(vertical = 4.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ){

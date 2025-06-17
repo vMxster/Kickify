@@ -239,7 +239,7 @@ fun EditAddressSection(
         var province by rememberSaveable { mutableStateOf("") }
         val provinceFocusRequester = remember { FocusRequester() }
 
-        var nation by rememberSaveable { mutableStateOf("") }
+        var nation by rememberSaveable { mutableStateOf("Italia") }
         val nationFocusRequester = remember { FocusRequester() }
 
         var defaultAddress by rememberSaveable { mutableStateOf(false) }

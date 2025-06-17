@@ -72,11 +72,14 @@ class ProfileViewModel(
         viewModelScope.launch {
             try {
                 val result = appRepository.getUserAddress(email)
+                println("get user address list da app repo: issuccess: ${result.isSuccess}"
+                + result)
                 result.onSuccess { list ->
-                    _addressList.value = list
+                    _addressList.value = list.toList()
                     _errorMessage.value = null
 
                 }.onFailure { exception ->
+                    _addressList.value = emptyList()
                     _errorMessage.value = exception.message ?: "Unknown error"
                 }
             } catch (e: Exception) {
@@ -171,10 +174,11 @@ class ProfileViewModel(
             try {
                 val result = appRepository.getUserPaymentMethod(email)
                 result.onSuccess { list ->
-                    _paymentMethods.value = list
+                    _paymentMethods.value = list.toMutableList()
                     _errorMessage.value = null
 
                 }.onFailure { exception ->
+                    _paymentMethods.value = emptyList()
                     _errorMessage.value = exception.message ?: "Unknown error"
                 }
             } catch (e: Exception) {

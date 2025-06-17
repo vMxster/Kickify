@@ -788,8 +788,6 @@ class RemoteRepository(
             }
             val jsonArray = jsonObject.getJSONArray("paymethods")
             val payMethods = RemoteResponseParser.parsePaymentMethodList(jsonArray)
-            println("json obj: $jsonObject")
-            println("pay methods: $payMethods")
             Result.success(payMethods)
         } catch (e: Exception) {
             Log.e(tag, "Errore durante il recupero metodi pagamento di utente", e)
