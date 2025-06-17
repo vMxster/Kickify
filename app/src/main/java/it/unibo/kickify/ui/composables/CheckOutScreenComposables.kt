@@ -196,10 +196,10 @@ fun PaymentMethodRow(
         Image(
             paymentMethodIcon(paymentMethod),
             contentDescription = "$paymentMethod icon",
-            modifier = Modifier.padding(start = 9.dp)
+            modifier = Modifier.padding(horizontal = 6.dp)
         )
         Column(
-            modifier = Modifier.fillMaxWidth(fraction = 0.9f).padding(end = 8.dp),
+            modifier = Modifier.fillMaxWidth(fraction = 0.9f).padding(horizontal = 8.dp),
             horizontalAlignment = Alignment.Start
         ) {
             if(PaymentMethods.getFromString(paymentMethod) == PAYPAL){

@@ -32,6 +32,7 @@ import it.unibo.kickify.data.database.TrackingShipping
 import it.unibo.kickify.data.database.User
 import it.unibo.kickify.data.database.Version
 import it.unibo.kickify.data.database.WishlistProduct
+import it.unibo.kickify.data.models.PaymentMethodInfo
 import it.unibo.kickify.utils.RemoteResponseParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -770,6 +771,74 @@ class RemoteRepository(
             Result.success(success)
         } catch (e: Exception) {
             Log.e(tag, "Errore durante rimozione di indirizzo", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getUserPaymentMethod(email: String): Result<List<PaymentMethodInfo>> = withContext(Dispatchers.IO) {
+        try {
+            val params = mapOf(
+                "action" to "getUserPayMethods",
+                "email" to email
+            )
+            val response = makeRequest("auth_handler.php", params)
+            val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
+            val jsonArray = jsonObject.getJSONArray("paymethods")
+            val payMethods = RemoteResponseParser.parsePaymentMethodList(jsonArray)
+            println("json obj: $jsonObject")
+            println("pay methods: $payMethods")
+            Result.success(payMethods)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante il recupero metodi pagamento di utente", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun addUserPaymentMethod(
+        userEmail: String, paypalEmail: String, creditCardBrand: String,
+        creditCardLast4: String, creditCardExpMonth: Int, creditCardExpYear: Int
+    ): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val params = mapOf(
+                "action" to "addUserPayMethod",
+                "userEmail" to userEmail,
+                "paypalEmail" to paypalEmail,
+                "creditCardBrand" to creditCardBrand,
+                "creditCardLast4" to creditCardLast4,
+                "creditCardExpMonth" to creditCardExpMonth.toString(),
+                "creditCardExpYear" to creditCardExpYear.toString()
+            )
+            val response = makeRequest("auth_handler.php", params)
+            val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
+            val success = RemoteResponseParser.parseSuccess(jsonObject)
+            Result.success(success)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante aggiunta di metodo pagamento", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun deleteUserPaymentMethod(id: Int): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val params = mapOf(
+                "action" to "removeUserPayMethod",
+                "id" to id.toString()
+            )
+            val response = makeRequest("auth_handler.php", params)
+            val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
+            }
+            val success = RemoteResponseParser.parseSuccess(jsonObject)
+            Result.success(success)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante rimozione di metodo pagamento", e)
             Result.failure(e)
         }
     }

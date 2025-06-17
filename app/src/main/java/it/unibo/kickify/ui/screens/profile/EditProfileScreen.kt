@@ -20,6 +20,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CameraAlt
@@ -30,6 +33,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
@@ -187,7 +191,7 @@ fun EditProfileScreen(
                 }
 
                 EditProfileSections.PAYMENT_METHOD -> {
-                    AddPaymentMethodSection(profileViewModel)
+                    AddPaymentMethodSection(profileViewModel, userEmail)
                 }
             }
         }
@@ -718,11 +722,11 @@ fun AddressContainer(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddPaymentMethodSection(profileViewModel: ProfileViewModel){
+fun AddPaymentMethodSection(profileViewModel: ProfileViewModel, userEmail: String){
     var selectedMethodType by remember { mutableStateOf("CreditCard") }
 
     // values for credit card
-    var creditCardBrand by remember { mutableStateOf("") }
+    var creditCardBrand by remember { mutableStateOf(PaymentMethods.entries.first().visibleName) }
     var creditCardLast4 by remember { mutableStateOf("") }
     var creditCardMonth by remember { mutableStateOf("") }
     var creditCardYear by remember { mutableStateOf("") }
@@ -736,7 +740,7 @@ fun AddPaymentMethodSection(profileViewModel: ProfileViewModel){
 
     val handleAddPaymentMethod: () -> Unit = {
         coroutineScope.launch {
-            var isValid = false
+            var isValid: Boolean
             var newPaymentMethod: PaymentMethodInfo? = null
 
             if (selectedMethodType == "CreditCard") {
@@ -745,6 +749,7 @@ fun AddPaymentMethodSection(profileViewModel: ProfileViewModel){
                 )
                 if (isValid) {
                     newPaymentMethod = PaymentMethodInfo.CreditCard(
+                        id = -1, // id will be given by remote server
                         brand = creditCardBrand,
                         last4 = creditCardLast4,
                         expirationMonth = creditCardMonth.toInt(),
@@ -754,13 +759,13 @@ fun AddPaymentMethodSection(profileViewModel: ProfileViewModel){
             } else { // PayPal
                 isValid = PaymentMethodInfo.validatePayPal(paypalEmail)
                 if (isValid) {
-                    newPaymentMethod = PaymentMethodInfo.PayPal(email = paypalEmail)
+                    newPaymentMethod = PaymentMethodInfo.PayPal(id = -1, email = paypalEmail)
                 }
             }
 
             if (isValid && newPaymentMethod != null) {
                 try {
-                    profileViewModel.addPaymentMethod(newPaymentMethod)
+                    profileViewModel.addPaymentMethod(userEmail, newPaymentMethod)
 
                 } catch (e: Exception) {
                     println("Errore durante il salvataggio: ${e.message}")
@@ -783,11 +788,11 @@ fun AddPaymentMethodSection(profileViewModel: ProfileViewModel){
                 onClick = { selectedMethodType = "CreditCard" },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (selectedMethodType == "CreditCard")
-                        MaterialTheme.colorScheme.primary else Color.LightGray
+                        BluePrimary else Color.Transparent
                 ),
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Carta di Credito")
+                Text("Carta di Credito", color = MaterialTheme.colorScheme.onBackground)
             }
             Spacer(Modifier.width(8.dp))
 
@@ -795,27 +800,33 @@ fun AddPaymentMethodSection(profileViewModel: ProfileViewModel){
                 onClick = { selectedMethodType = "PayPal" },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (selectedMethodType == "PayPal")
-                        MaterialTheme.colorScheme.primary else Color.LightGray
+                        BluePrimary else Color.Transparent
                 ),
                 modifier = Modifier.weight(1f)
             ) {
-                Text("PayPal")
+                Text("PayPal", color = MaterialTheme.colorScheme.onBackground)
             }
         }
 
         if (selectedMethodType == "CreditCard") {
+            val textFieldState = rememberTextFieldState(creditCardBrand)
+
+            LaunchedEffect(creditCardBrand) {
+                textFieldState.setTextAndPlaceCursorAtEnd(creditCardBrand)
+            }
+
             Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 ExposedDropdownMenuBox(
                     expanded = expanded,
-                    onExpandedChange = { expanded = !expanded }
+                    onExpandedChange = { expanded = it }
                 ) {
                     OutlinedTextField(
-                        value = creditCardBrand,
-                        onValueChange = { },
+                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                        state = textFieldState,
                         readOnly = true,
-                        shape = RoundedCornerShape(16.dp),
+                        lineLimits = TextFieldLineLimits.SingleLine,
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier.fillMaxWidth()
+                        colors = ExposedDropdownMenuDefaults.textFieldColors()
                     )
                     ExposedDropdownMenu(
                         expanded = expanded,
@@ -823,11 +834,13 @@ fun AddPaymentMethodSection(profileViewModel: ProfileViewModel){
                     ) {
                         cardBrands.forEach { selectionOption ->
                             DropdownMenuItem(
+                                text = { Text(text = selectionOption, style = MaterialTheme.typography.bodyLarge) },
                                 onClick = {
+                                    textFieldState.setTextAndPlaceCursorAtEnd(selectionOption)
                                     creditCardBrand = selectionOption
                                     expanded = false
                                 },
-                                text = { Text(text = selectionOption) }
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                             )
                         }
                     }

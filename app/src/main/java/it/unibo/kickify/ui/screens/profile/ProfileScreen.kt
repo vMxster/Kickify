@@ -74,6 +74,8 @@ fun ProfileScreen(
     LaunchedEffect(userEmail) {
         profileViewModel.getUserAddress(userEmail)
         profileViewModel.getProfile(userEmail)
+        profileViewModel.getPaymentMethods(userEmail)
+        println("payment list profile screen: $paymentMethodList")
     }
 
     LaunchedEffect(errorMessage) {
@@ -172,20 +174,23 @@ fun ProfileScreen(
             ) {
                 for(method in paymentMethodList){
                     if(method is PaymentMethodInfo.CreditCard){
+                        val expMonth = method.expirationMonth.toString().padStart(2, '0')
+                        val expYear = method.expirationYear.toString().takeLast(2)
+
                         PaymentMethodRow(
                             paymentMethod = method.brand,
                             endingCardNumber = method.last4,
-                            cardExpires = "${method.expirationMonth}/${method.expirationYear}",
+                            cardExpires = "${expMonth}/${expYear}",
                             emailAddress = "",
-                            deleteAction = { profileViewModel.deletePaymentMethod(method) }
+                            deleteAction = { profileViewModel.deletePaymentMethod(userEmail, method.id) }
                         )
                     } else if(method is PaymentMethodInfo.PayPal){
                         PaymentMethodRow(
-                            paymentMethod = PaymentMethods.PAYPAL.toString(),
+                            paymentMethod = PaymentMethods.PAYPAL.visibleName,
                             endingCardNumber = "",
                             cardExpires = "",
                             emailAddress = method.email,
-                            deleteAction = { profileViewModel.deletePaymentMethod(method) }
+                            deleteAction = { profileViewModel.deletePaymentMethod(userEmail, method.id) }
                         )
                     }
                 }

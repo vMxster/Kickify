@@ -17,6 +17,7 @@ import it.unibo.kickify.data.database.TrackingShipping
 import it.unibo.kickify.data.database.User
 import it.unibo.kickify.data.database.Version
 import it.unibo.kickify.data.database.WishlistProduct
+import it.unibo.kickify.data.models.PaymentMethodInfo
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -155,6 +156,34 @@ class RemoteResponseParser {
                         default = itemJson.getInt("Predefinito") == 1
                     )
                 )
+            }
+            return items
+        }
+
+        // Parser per lista metodi pagamento
+        fun parsePaymentMethodList(json: JSONArray): List<PaymentMethodInfo> {
+            val items = mutableListOf<PaymentMethodInfo>()
+            for (i in 0 until json.length()) {
+                val itemJson = json.getJSONObject(i)
+
+                // add paypal account
+                if(itemJson.optString("PayPal_Email") != "null"){
+                    items.add(
+                        PaymentMethodInfo.PayPal(
+                            id = itemJson.getInt("Id"),
+                            email = itemJson.optString("PayPal_Email"))
+                    )
+                } else {
+                    items.add(
+                        PaymentMethodInfo.CreditCard(
+                            id = itemJson.getInt("Id"),
+                            brand = itemJson.optString("CreditCard_brand"),
+                            last4 = itemJson.optString("CreditCard_Last4"),
+                            expirationMonth = itemJson.optInt("CreditCard_ExpMonth"),
+                            expirationYear = itemJson.optInt("CreditCard_ExpYear")
+                        )
+                    )
+                }
             }
             return items
         }

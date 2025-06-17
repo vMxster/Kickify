@@ -5,12 +5,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import it.unibo.kickify.data.models.PaymentMethodInfo
 import it.unibo.kickify.data.models.Theme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.json.Json
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -30,7 +27,6 @@ class SettingsRepository(
         private val APP_LANG = stringPreferencesKey("app_lang")
         private val ONBOARDING_COMPLETED = booleanPreferencesKey("completed_onboarding")
         private val LAST_ACCESS = stringPreferencesKey("last_access")
-        private val PAYMENT_METHODS = stringPreferencesKey("payment_methods_info")
     }
 
     // get userid
@@ -132,36 +128,6 @@ class SettingsRepository(
     // set completed onboarding
     suspend fun setOnboardingCompleted(completed: Boolean) = dataStore.edit {
         it[ONBOARDING_COMPLETED] = completed
-    }
-
-    private val jsonSerializer = Json {
-        prettyPrint = false
-        ignoreUnknownKeys = true
-    }
-
-    suspend fun savePaymentMethods(paymentMethodsList: List<PaymentMethodInfo>?) = dataStore.edit {
-        if (paymentMethodsList.isNullOrEmpty()) {
-            it.remove(PAYMENT_METHODS)
-        } else {
-            val jsonString = jsonSerializer.encodeToString(
-                ListSerializer(PaymentMethodInfo.serializer()), paymentMethodsList)
-            it[PAYMENT_METHODS] = jsonString
-        }
-    }
-
-    fun getPaymentMethods(): Flow<List<PaymentMethodInfo>> = dataStore.data.map {
-        val jsonString = it[PAYMENT_METHODS]
-        if (jsonString == null) {
-            emptyList() // no payment methods saved
-        } else {
-            try {
-                jsonSerializer.decodeFromString(
-                    ListSerializer(PaymentMethodInfo.serializer()), jsonString)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                emptyList()
-            }
-        }
     }
 
     suspend fun removeUserAccount() {

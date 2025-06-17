@@ -6,7 +6,7 @@ enum class PaymentMethods (val visibleName: String){
     AMEX("American Express"),
     MAESTRO("Maestro"),
     MASTERCARD("MasterCard"),
-    PAYPAL("Paypal"),
+    PAYPAL("PayPal"),
     VISA("Visa");
 
     companion object {
@@ -20,12 +20,13 @@ enum class PaymentMethods (val visibleName: String){
 sealed class PaymentMethodInfo {
     @Serializable
     data class CreditCard(
+        val id: Int,
         val brand: String, val last4: String,
         val expirationMonth: Int, val expirationYear: Int
     ) : PaymentMethodInfo()
 
     @Serializable
-    data class PayPal(val email: String) : PaymentMethodInfo()
+    data class PayPal(val id: Int, val email: String) : PaymentMethodInfo()
 
     companion object{
         private fun isValidEmail(email: String): Boolean {

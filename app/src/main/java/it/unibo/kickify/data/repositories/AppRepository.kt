@@ -19,8 +19,9 @@ import it.unibo.kickify.data.database.ProductWithImage
 import it.unibo.kickify.data.database.ReviewWithUserInfo
 import it.unibo.kickify.data.database.User
 import it.unibo.kickify.data.database.UserOAuth
-import it.unibo.kickify.data.database.WishlistProduct
 import it.unibo.kickify.data.database.Version
+import it.unibo.kickify.data.database.WishlistProduct
+import it.unibo.kickify.data.models.PaymentMethodInfo
 import it.unibo.kickify.data.repositories.local.CartRepository
 import it.unibo.kickify.data.repositories.local.ImageRepository
 import it.unibo.kickify.data.repositories.local.OAuthUserRepository
@@ -645,6 +646,23 @@ class AppRepository(
         cap: String, city: String
     ): Result<Boolean>{
         return remoteRepository.deleteUserAddress(email, street, number, cap, city)
+    }
+
+    suspend fun getUserPaymentMethod(email: String): Result<List<PaymentMethodInfo>> {
+        return remoteRepository.getUserPaymentMethod(email)
+    }
+
+    suspend fun addUserPaymentMethod(
+        userEmail: String, paypalEmail: String, creditCardBrand: String,
+        creditCardLast4: String, creditCardExpMonth: Int, creditCardExpYear: Int
+    ): Result<Boolean>{
+        return remoteRepository.addUserPaymentMethod(
+            userEmail, paypalEmail, creditCardBrand, creditCardLast4, creditCardExpMonth, creditCardExpYear
+        )
+    }
+
+    suspend fun deleteUserPaymentMethod(id: Int): Result<Boolean>{
+        return remoteRepository.deleteUserPaymentMethod(id)
     }
 
     suspend fun updateUserImage(email: String, imgFile: ByteArray, mimeType: String): Result<String> {

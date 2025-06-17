@@ -6,7 +6,6 @@ import it.unibo.kickify.data.database.Address
 import it.unibo.kickify.data.database.User
 import it.unibo.kickify.data.models.PaymentMethodInfo
 import it.unibo.kickify.data.repositories.AppRepository
-import it.unibo.kickify.data.repositories.SettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +13,6 @@ import kotlinx.coroutines.launch
 
 class ProfileViewModel(
     private val appRepository: AppRepository,
-    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
@@ -162,22 +160,20 @@ class ProfileViewModel(
         }
     }
 
-    fun addPaymentMethod(paymentMethodInfo: PaymentMethodInfo){
+    fun getPaymentMethods(email: String){
         _errorMessage.value = null
         _isLoading.value = true
 
         viewModelScope.launch {
             try {
-                if(!_paymentMethods.value.contains(paymentMethodInfo)){
-                    val newList = _paymentMethods.value.toMutableList()
-                    if(newList.add(paymentMethodInfo)) { //if added successfully
-                        _paymentMethods.value = newList
-                        settingsRepository.savePaymentMethods(newList)
-                    } else {
-                        _errorMessage.value = "An error occurred. Payment method not added."
-                    }
-                }
+                val result = appRepository.getUserPaymentMethod(email)
+                result.onSuccess { list ->
+                    _paymentMethods.value = list
+                    _errorMessage.value = null
 
+                }.onFailure { exception ->
+                    _errorMessage.value = exception.message ?: "Unknown error"
+                }
             } catch (e: Exception) {
                 _errorMessage.value = e.message ?: "Unexpected error."
 
@@ -187,20 +183,64 @@ class ProfileViewModel(
         }
     }
 
-    fun deletePaymentMethod(paymentMethodInfo: PaymentMethodInfo){
+    fun addPaymentMethod(userEmail: String, paymentMethodInfo: PaymentMethodInfo){
         _errorMessage.value = null
         _isLoading.value = true
 
         viewModelScope.launch {
             try {
-                if(_paymentMethods.value.contains(paymentMethodInfo)){
-                    val newList = _paymentMethods.value.toMutableList()
-                    if(newList.remove(paymentMethodInfo)) { //if removed successfully
-                        _paymentMethods.value = newList
-                        settingsRepository.savePaymentMethods(newList)
-                    } else {
-                        _errorMessage.value = "An error occurred. Payment method not deleted."
+                if(paymentMethodInfo is PaymentMethodInfo.PayPal) {
+                    val result = appRepository.addUserPaymentMethod(
+                        userEmail = userEmail,
+                        paypalEmail = paymentMethodInfo.email,
+                        creditCardBrand = "",
+                        creditCardLast4 = "",
+                        creditCardExpMonth = 0,
+                        creditCardExpYear = 0
+                    )
+                    result.onSuccess {
+                        _errorMessage.value = null
+                        getPaymentMethods(userEmail)
+                    }.onFailure { exception ->
+                        _errorMessage.value = exception.message ?: "Unknown error"
                     }
+                } else if(paymentMethodInfo is PaymentMethodInfo.CreditCard){
+                    val result = appRepository.addUserPaymentMethod(
+                        userEmail = userEmail,
+                        paypalEmail = "",
+                        creditCardBrand = paymentMethodInfo.brand,
+                        creditCardLast4 = paymentMethodInfo.last4,
+                        creditCardExpMonth = paymentMethodInfo.expirationMonth,
+                        creditCardExpYear = paymentMethodInfo.expirationYear
+                    )
+                    result.onSuccess {
+                        _errorMessage.value = null
+                        getPaymentMethods(userEmail)
+                    }.onFailure { exception ->
+                        _errorMessage.value = exception.message ?: "Unknown error"
+                    }
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = e.message ?: "Unexpected error."
+
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun deletePaymentMethod(userEmail: String, id: Int){
+        _errorMessage.value = null
+        _isLoading.value = true
+
+        viewModelScope.launch {
+            try {
+                val result = appRepository.deleteUserPaymentMethod(id)
+                result.onSuccess {
+                    _errorMessage.value = null
+                    getPaymentMethods(userEmail)
+                }.onFailure { exception ->
+                    _errorMessage.value = exception.message ?: "Unknown error"
                 }
 
             } catch (e: Exception) {
