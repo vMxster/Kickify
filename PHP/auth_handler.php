@@ -140,7 +140,7 @@ try {
                 $userEmail = $_POST["userEmail"];
                 $paypalEmail = empty($_POST["paypalEmail"]) ? NULL : $_POST["paypalEmail"];
                 $creditCardBrand = empty($_POST["creditCardBrand"]) ? NULL : $_POST["creditCardBrand"];
-                $creditCardLast4 = empty($_POST["creditCardBrand"]) ? NULL : $_POST["creditCardBrand"];
+                $creditCardLast4 = empty($_POST["creditCardLast4"]) ? NULL : $_POST["creditCardLast4"];
                 $creditCardExpMonth = empty($_POST["creditCardExpMonth"]) ? NULL : $_POST["creditCardExpMonth"];
                 $creditCardExpYear = empty($_POST["creditCardExpYear"]) ? NULL : $_POST["creditCardExpYear"];
                 if ($dbh->addUserPayMethod($userEmail, $paypalEmail, $creditCardBrand, $creditCardLast4, $creditCardExpMonth, $creditCardExpYear)) {
