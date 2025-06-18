@@ -5,7 +5,7 @@ import it.unibo.kickify.data.database.*
 
 class CartRepository(private val cartDao: CartDao) {
 
-    suspend fun getCartByEmail(email: String): Cart? =
+    suspend fun getCartByEmail(email: String): Cart =
         cartDao.getCartByEmail(email)
 
     suspend fun updateCartTotal(cartId: Int): Int {

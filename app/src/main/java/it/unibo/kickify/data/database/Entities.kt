@@ -185,8 +185,8 @@ data class Cart(
         )
     ],
     indices = [
-        Index("ID_Carrello", unique = true),
-        Index("ID_Prodotto", unique = true)
+        Index("ID_Carrello", unique = false),
+        Index("ID_Prodotto", unique = false)
               ],
     primaryKeys = ["ID_Carrello", "ID_Prodotto", "Colore", "Taglia"]
 )

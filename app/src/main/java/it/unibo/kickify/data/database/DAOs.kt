@@ -235,7 +235,7 @@ interface CartDao {
     @Query("""
         SELECT * FROM CARRELLO WHERE Email = :email
     """)
-    suspend fun getCartByEmail(email: String): Cart?
+    suspend fun getCartByEmail(email: String): Cart
 
     @Transaction
     @Query("""

@@ -260,25 +260,20 @@ class AppRepository(
     suspend fun getCartItems(email: String): Result<List<CartWithProductInfo>> =
         withContext(Dispatchers.IO) {
             try {
-                val cartId = cartRepository.getCartByEmail(email)?.cartId
+                val cartId = cartRepository.getCartByEmail(email).cartId
                 val remoteResult = remoteRepository.getCartItems(email)
                 if (remoteResult.isSuccess) {
                     val remoteCartItems = remoteResult.getOrNull() ?: emptyList()
                     if (remoteCartItems.isNotEmpty()) {
                         remoteCartItems.forEach { item ->
-                            if (cartId != null) {
-                                productCartRepository.addToCart(
-                                    cartId, item.productId, item.color, item.size, item.quantity
-                                )
-                            }
+                            productCartRepository.addToCart(
+                                cartId, item.productId, item.color, item.size, item.quantity
+                            )
                         }
                     }
                 }
-                val cart = cartRepository.getCartByEmail(email)
                 Result.success(
-                    cart?.let {
-                        productCartRepository.getCartItems(it.cartId)
-                    } ?: emptyList()
+                    productCartRepository.getCartItems(cartId)
                 )
             } catch (e: Exception) {
                 Log.e(tag, "Errore in getCartItems", e)
