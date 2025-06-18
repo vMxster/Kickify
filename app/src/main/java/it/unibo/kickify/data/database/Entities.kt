@@ -216,26 +216,10 @@ data class CartProduct(
             childColumns = ["Email"],
             onDelete = ForeignKey.NO_ACTION,
             onUpdate = ForeignKey.NO_ACTION
-        ),
-        ForeignKey(
-            entity = Discount::class,
-            parentColumns = ["ID_Sconto"],
-            childColumns = ["ID_Sconto"],
-            onDelete = ForeignKey.NO_ACTION,
-            onUpdate = ForeignKey.NO_ACTION
-        ),
-        ForeignKey(
-            entity = Address::class,
-            parentColumns = ["Email", "Via", "NumeroCivico", "CAP", "Citta"],
-            childColumns = ["Spe_Email", "Spe_Via", "Spe_NumeroCivico", "Spe_CAP", "Spe_Citta"],
-            onDelete = ForeignKey.NO_ACTION,
-            onUpdate = ForeignKey.NO_ACTION
         )
     ],
     indices = [
-        Index("Email", unique = false),
-        Index("ID_Sconto", unique = false),
-        Index("Spe_Email", unique = false)
+        Index("Email", unique = false)
     ]
 )
 data class Order(
@@ -280,10 +264,7 @@ data class Order(
     val shippingCap: Int,
 
     @ColumnInfo(name = "Spe_Citta")
-    val shippingCity: String,
-
-    @ColumnInfo(name = "ID_Sconto")
-    val discountId: Int?
+    val shippingCity: String
 )
 
 @Entity(
@@ -493,25 +474,6 @@ data class Notification(
     val email: String
 )
 
-@Entity(tableName = "SCONTO")
-data class Discount(
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "ID_Sconto")
-    val discountId: Int,
-
-    @ColumnInfo(name = "TipoSconto")
-    val discountType: String,
-
-    @ColumnInfo(name = "Valore")
-    val discountValue: Double,
-
-    @ColumnInfo(name = "Data_Inizio")
-    val startDate: String, // formato ISO date
-
-    @ColumnInfo(name = "Data_Fine")
-    val endDate: String // formato ISO date
-)
-
 @Entity(
     tableName = "PRODOTTO_STORICO",
     foreignKeys = [
@@ -598,37 +560,6 @@ data class Wishlist(
 
     @ColumnInfo(name = "Data_Modifica")
     val updateDate: String // formato ISO date
-)
-
-@Entity(
-    tableName = "utilizza",
-    foreignKeys = [
-        ForeignKey(
-            entity = User::class,
-            parentColumns = ["Email"],
-            childColumns = ["Email"],
-            onDelete = ForeignKey.NO_ACTION,
-            onUpdate = ForeignKey.NO_ACTION
-        ),
-        ForeignKey(
-            entity = Discount::class,
-            parentColumns = ["ID_Sconto"],
-            childColumns = ["ID_Sconto"],
-            onDelete = ForeignKey.NO_ACTION,
-            onUpdate = ForeignKey.NO_ACTION
-        )
-    ],
-    indices = [
-        Index(value = ["Email", "ID_Sconto"], unique = true),
-              ],
-    primaryKeys = ["ID_Sconto", "Email"]
-)
-data class DiscountUser(
-    @ColumnInfo(name = "ID_Sconto")
-    val discountId: Int,
-
-    @ColumnInfo(name = "Email")
-    val email: String
 )
 
 @Entity(
@@ -842,9 +773,6 @@ data class OrderProductDetails(
 
     @ColumnInfo(name = "Tipo")
     val type: String,
-
-    @ColumnInfo(name = "ID_Sconto")
-    val discountId: Int?,
 
     @ColumnInfo(name = "ID_Prodotto")
     val productId: Int,

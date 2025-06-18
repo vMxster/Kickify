@@ -304,25 +304,6 @@ class RemoteRepository(
         }
     }
 
-    suspend fun clearWishlist(email: String): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val params = mapOf(
-                "action" to "clearWishlist",
-                "user_email" to email
-            )
-            val response = makeRequest("wishlist_handler.php", params)
-            val jsonObject = JSONObject(response)
-            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
-                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
-            }
-            val success = RemoteResponseParser.parseSuccess(jsonObject)
-            Result.success(success)
-        } catch (e: Exception) {
-            Log.e(tag, "Errore durante la pulizia della wishlist", e)
-            Result.failure(e)
-        }
-    }
-
     suspend fun isInWishlist(email: String, productId: Int): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
             val params = mapOf(
@@ -344,12 +325,11 @@ class RemoteRepository(
     }
 
     // NOTIFICHE
-    suspend fun getNotifications(email: String, lastAccess: String): Result<List<Notification>> = withContext(Dispatchers.IO) {
+    suspend fun getNotifications(email: String): Result<List<Notification>> = withContext(Dispatchers.IO) {
         try {
             val params = mapOf(
                 "action" to "getUserNotifications",
-                "email" to email,
-                "lastAccess" to lastAccess
+                "email" to email
             )
             val response = makeRequest("notifications_handler.php", params)
             val jsonObject = JSONObject(response)
@@ -358,31 +338,6 @@ class RemoteRepository(
             Result.success(notifications)
         } catch (e: Exception) {
             Log.e(tag, "Errore durante il recupero delle notifiche", e)
-            Result.failure(e)
-        }
-    }
-
-    suspend fun createNotification(
-        email: String,
-        message: String,
-        type: String
-    ): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val params = mutableMapOf(
-                "action" to "createNotification",
-                "email" to email,
-                "message" to message,
-                "type" to type
-            )
-            val response = makeRequest("notifications_handler.php", params)
-            val jsonObject = JSONObject(response)
-            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
-                return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
-            }
-            val success = RemoteResponseParser.parseSuccess(jsonObject)
-            Result.success(success)
-        } catch (e: Exception) {
-            Log.e(tag, "Errore durante la creazione della notifica", e)
             Result.failure(e)
         }
     }
@@ -433,8 +388,8 @@ class RemoteRepository(
                 "orderId" to orderId.toString(),
             )
             val response = makeRequest("order_handler.php", params)
-            val jsonArray = JSONArray(response)
-            val orderDetails = RemoteResponseParser.parseOrderDetails(jsonArray)
+            val jsonObject = JSONObject(response)
+            val orderDetails = RemoteResponseParser.parseOrderDetails(jsonObject)
             Result.success(orderDetails)
         } catch (e: Exception) {
             Log.e(tag, "Errore durante il recupero dei dettagli degli ordini", e)

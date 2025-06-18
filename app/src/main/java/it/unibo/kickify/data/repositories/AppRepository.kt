@@ -52,12 +52,10 @@ class AppRepository(
     private val oAuthUserRepository: OAuthUserRepository
 ) {
     private val tag = "AppRepository"
-
-    val lastAccess = settingsRepository.lastAccess
-
-    suspend fun setLastAccessNow() = withContext(Dispatchers.IO) {
-        settingsRepository.setLastAccess()
-    }
+    private val lastAccess = settingsRepository.lastAccess
+    private var productsLoaded = false
+    private var historyLoaded = false
+    private var ordersLoaded = false
 
     // PRODOTTI
     suspend fun getProducts(): Result<Map<Product, Image>> = withContext(Dispatchers.IO) {
@@ -101,6 +99,8 @@ class AppRepository(
                 }
             }
             val productsWithImages = productRepository.getProductsWithImage()
+            productsLoaded = true
+            checkAndUpdateLastAccess()
             Result.success(productsWithImages)
         } catch (e: Exception) {
             Log.e(tag, "Errore in getProducts", e)
@@ -166,6 +166,8 @@ class AppRepository(
                         productRepository.insertProductsHistory(remoteHistory)
                     }
                 }
+                historyLoaded = true
+                checkAndUpdateLastAccess()
                 Result.success(
                     productRepository.getProductsHistory()
                 )
@@ -284,11 +286,9 @@ class AppRepository(
     suspend fun addToCart(email: String, productId: Int, color: String, size: Double, quantity: Int = 1): Result<Boolean> {
         val result = remoteRepository.addToCart(email, productId, color, size, quantity)
         if (result.isSuccess && result.getOrNull() == true) {
-            val cartId = cartRepository.getCartByEmail(email)?.cartId
-            if (cartId != null) {
-                productCartRepository.addToCart(cartId, productId, color, size, quantity)
-                cartRepository.updateCartTotal(cartId)
-            }
+            val cartId = cartRepository.getCartByEmail(email).cartId
+            productCartRepository.addToCart(cartId, productId, color, size, quantity)
+            cartRepository.updateCartTotal(cartId)
         }
         return result
     }
@@ -297,7 +297,7 @@ class AppRepository(
         return try {
             val cart = cartRepository.getCartByEmail(email)
             val result = remoteRepository.removeFromCart(email, productId, color, size)
-            if (result.isSuccess && result.getOrNull() == true && cart != null) {
+            if (result.isSuccess && result.getOrNull() == true) {
                 productCartRepository.removeFromCart(cart.cartId, productId, color, size)
                 cartRepository.updateCartTotal(cart.cartId)
             }
@@ -352,7 +352,7 @@ class AppRepository(
     // NOTIFICHE
     suspend fun getNotifications(email: String): Result<List<Notification>> = withContext(Dispatchers.IO) {
         try {
-            val remoteResult = remoteRepository.getNotifications(email, lastAccess.first())
+            val remoteResult = remoteRepository.getNotifications(email)
             if (remoteResult.isSuccess) {
                 val remoteNotifications = remoteResult.getOrNull() ?: emptyList()
                 return@withContext Result.success(remoteNotifications)
@@ -383,6 +383,8 @@ class AppRepository(
                     }
                 }
             }
+            ordersLoaded = true
+            //checkAndUpdateLastAccess()
             Result.success(
                 orderRepository.getOrders(email)
             )
@@ -464,10 +466,10 @@ class AppRepository(
                 shippingType, isGift, giftFirstName, giftLastName,
                 street, city, civic, cap)
             if (remoteResult.isSuccess) {
-                cartRepository.getCartByEmail(email)?.cartId?.let {
+                cartRepository.getCartByEmail(email).cartId.let {
                     productCartRepository.clearCart(it)
                 }
-                cartRepository.getCartByEmail(email)?.cartId?.let {
+                cartRepository.getCartByEmail(email).cartId.let {
                     cartRepository.clearCart(it)
                 }
             }
@@ -676,5 +678,22 @@ class AppRepository(
 
     suspend fun verifyOTP(email: String, otp: String): Result<Boolean> = withContext(Dispatchers.IO) {
         remoteRepository.verifyOTP(email.lowercase(), otp)
+    }
+
+    private fun resetLoadingTracking() {
+        productsLoaded = false
+        historyLoaded = false
+        ordersLoaded = false
+    }
+
+    private suspend fun checkAndUpdateLastAccess() {
+        if (productsLoaded && historyLoaded && ordersLoaded) {
+            setLastAccessNow()
+            resetLoadingTracking()
+        }
+    }
+
+    private suspend fun setLastAccessNow() = withContext(Dispatchers.IO) {
+        settingsRepository.setLastAccess()
     }
 }

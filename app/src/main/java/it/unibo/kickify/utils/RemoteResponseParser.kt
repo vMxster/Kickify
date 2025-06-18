@@ -189,19 +189,20 @@ class RemoteResponseParser {
         }
 
         // Parser per gli ordini
-        fun parseOrderDetails(json: JSONArray): List<OrderDetails> {
+        fun parseOrderDetails(json: JSONObject): List<OrderDetails> {
             val orderDetailsList = mutableListOf<OrderDetails>()
-            for (i in 0 until json.length()) {
-                val orderJson = json.getJSONObject(i)
+            val orderArray = json.getJSONArray("orderDetails")
+
+            for (i in 0 until orderArray.length()) {
+                val orderJson = orderArray.getJSONObject(i)
                 val order = Order(
                     orderId = orderJson.getInt("ID_Ordine"),
-                    email = orderJson.getString("Email"),
+                    email = orderJson.optString("Email", ""),
                     shippingType = orderJson.getString("Tipo"),
                     orderDate = orderJson.getString("Data_Ordine"),
                     totalCost = orderJson.getDouble("Costo_Totale"),
                     paymentMethod = orderJson.getString("Metodo_Pagamento"),
-                    isPresent = orderJson.getBoolean("Regalo"),
-                    discountId = orderJson.optInt("ID_Sconto", 0),
+                    isPresent = orderJson.optInt("Regalo", 0) == 1,
                     nomeDestinatario = orderJson.optString("Nome_Destinatario", ""),
                     cognomeDestinatario = orderJson.optString("Cognome_Destinatario", ""),
                     shippingEmail = orderJson.optString("Spe_Email", ""),
@@ -212,7 +213,7 @@ class RemoteResponseParser {
                 )
                 val isDelivered = orderJson.optBoolean("tracking_delivered", false)
 
-                val productsArray = orderJson.getJSONArray("prodotti")
+                val productsArray = orderJson.getJSONArray("products")
                 val products = mutableListOf<OrderProduct>()
                 for (j in 0 until productsArray.length()) {
                     val productJson = productsArray.getJSONObject(j)
@@ -222,11 +223,11 @@ class RemoteResponseParser {
                         color = productJson.getString("Colore"),
                         size = productJson.getDouble("Taglia"),
                         quantity = productJson.getInt("Quantita"),
-                        purchasePrice = productJson.getDouble("Prezzo_Acquisto")
+                        purchasePrice = productJson.getDouble("Prezzo"),
                     )
                     products.add(product)
                 }
-                orderDetailsList.add(OrderDetails(order, isDelivered, products.toList()))
+                orderDetailsList.add(OrderDetails(order, isDelivered, products))
             }
             return orderDetailsList
         }
@@ -244,7 +245,6 @@ class RemoteResponseParser {
                         totalCost = orderJson.getDouble("Costo_Totale"),
                         paymentMethod = orderJson.getString("Metodo_Pagamento"),
                         isPresent = orderJson.getInt("Regalo") == 1,
-                        discountId = if (orderJson.isNull("ID_Sconto")) null else orderJson.optInt("ID_Sconto"),
                         nomeDestinatario = orderJson.optString("Nome_Destinatario"),
                         cognomeDestinatario = orderJson.optString("Cognome_Destinatario"),
                         shippingEmail = orderJson.optString("Spe_Email"),

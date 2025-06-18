@@ -259,7 +259,7 @@ interface CartDao {
 @Dao
 interface ProductCartDao {
     @Query("""
-        SELECT c.*, p.Nome, p.Prezzo, p.Genere  
+        SELECT c.*, p.Nome, p.Prezzo, p.Genere 
         FROM comprendere c JOIN PRODOTTO p ON c.ID_Prodotto = p.ID_Prodotto 
         WHERE c.ID_Carrello = :cartId
     """)
@@ -323,7 +323,6 @@ interface OrderDao {
             o.Metodo_Pagamento,
             o.Regalo,
             o.Tipo_Spedizione AS Tipo,
-            o.ID_Sconto,
             
             p.ID_Prodotto,
             p.Nome,

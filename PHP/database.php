@@ -1635,7 +1635,6 @@ class DatabaseHelper {
                     o.Metodo_Pagamento,
                     o.Regalo,
                     o.Tipo_Spedizione AS Tipo,
-                    o.ID_Sconto,
                     
                     p.ID_Prodotto,
     
@@ -1653,13 +1652,12 @@ class DatabaseHelper {
                         AND ts.Arrivo_Effettivo IS NOT NULL
                     ) > 0 AS delivered_flag
     
-                FROM ORDINE o
+                FROM ORDINE o 
                 JOIN PRODOTTO_ORDINE po 
-                      ON o.ID_Ordine = po.ID_Ordine
+                      ON o.ID_Ordine = po.ID_Ordine 
                 JOIN PRODOTTO p 
-                      ON po.ID_Prodotto = p.ID_Prodotto
-                WHERE o.Email = ?
-                -- Esempio: ordina per Data_Ordine (decrescente) e poi per ID_Prodotto
+                      ON po.ID_Prodotto = p.ID_Prodotto 
+                WHERE o.ID_Ordine = ? 
                 ORDER BY o.Data_Ordine DESC, p.ID_Prodotto ASC";
     
         $stmt = $this->db->prepare($query);
@@ -1681,7 +1679,6 @@ class DatabaseHelper {
                     'Metodo_Pagamento'=> $row['Metodo_Pagamento'],
                     'Regalo'          => $row['Regalo'],
                     'Tipo'            => $row['Tipo'],
-                    'ID_Sconto'       => $row['ID_Sconto'],
                     // Salviamo il valore booleano una sola volta per ogni ordine:
                     'tracking_delivered' => (bool) $row['delivered_flag'],
                     'products'        => []

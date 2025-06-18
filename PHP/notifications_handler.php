@@ -13,13 +13,12 @@ try {
     if (isset($_POST["action"])) {
         switch ($_POST["action"]) {
             case "getUserNotifications":
-                if (!isset($_POST["lastAccess"]) || !isset($_POST["email"])) {
+                if (!isset($_POST["email"])) {
                     throw new Exception("lastAccess is required");
                 }
                 $email = $_POST["email"];
-                $lastAccess = $_POST["lastAccess"];
                 
-                $notifications = $dbh->getUserNotifications($email, $lastAccess);
+                $notifications = $dbh->getUserNotifications($email);
                 $response = [
                     "success" => true,
                     "notifications" => $notifications

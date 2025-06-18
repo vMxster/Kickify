@@ -5,13 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import it.unibo.kickify.data.repositories.AppRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @Database(
     entities = [
@@ -28,11 +24,9 @@ import java.util.Locale
         Address::class,
         Message::class,
         Notification::class,
-        Discount::class,
         HistoryProduct::class,
         Review::class,
         Wishlist::class,
-        DiscountUser::class,
         WishlistProduct::class,
         Image::class,
         UserOAuth::class
