@@ -145,7 +145,9 @@ fun ThemeChooserRow(
             style = MaterialTheme.typography.bodyLarge
         )
     }
-    SingleChoiceSegmentedButtonRow {
+    SingleChoiceSegmentedButtonRow(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp)
+    ) {
         Theme.entries.forEachIndexed { index, th ->
             SegmentedButton(
                 shape = SegmentedButtonDefaults.itemShape(

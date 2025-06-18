@@ -9,15 +9,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
-import androidx.compose.material.icons.outlined.AccountBalanceWallet
-import androidx.compose.material.icons.outlined.NotificationsActive
-import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,9 +23,9 @@ import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -102,44 +100,7 @@ fun SettingsScreen(
         ) {
             var showDialogLogout by rememberSaveable { mutableStateOf(false) }
 
-            SettingsTitleLine(stringResource(R.string.settings_accountTitle))
-            SettingsItemWithLeadingIcon(
-                icon = Icons.Outlined.NotificationsActive,
-                text = stringResource(R.string.settings_notifications),
-                onClick = {}
-            )
-            SettingsItemWithLeadingIcon(
-                icon = Icons.Outlined.ShoppingCart,
-                text = stringResource(R.string.settings_shippingAddress),
-                onClick = {}
-            )
-            SettingsItemWithLeadingIcon(
-                icon = Icons.Outlined.AccountBalanceWallet,
-                text = stringResource(R.string.payment),
-                onClick = {}
-            )
-            SettingsItemWithLeadingIcon(
-                icon = Icons.AutoMirrored.Outlined.Logout,
-                text = stringResource(R.string.logout),
-                onClick = { showDialogLogout = true }
-            )
-            MessageDialog(
-                showDialog = showDialogLogout,
-                title = stringResource(R.string.logout),
-                titleColor = null,
-                text = stringResource(R.string.logout_confirmMessage),
-                cancelText = stringResource(R.string.settings_cancel),
-                confirmText = stringResource(R.string.logout),
-                onConfirm = {
-                    showDialogLogout = false
-                    settingsViewModel.removeUserAccount()
-                },
-                onDismiss = { showDialogLogout = false}
-            )
-
-            Spacer(Modifier.height(15.dp))
             SettingsTitleLine(stringResource(R.string.settings_appSettingsTitle))
-
             SettingsItemWithTrailingSwitchButton(
                 enabled = settingsViewModel.isStrongAuthenticationAvailable(ctx),
                 textIfDisabled = stringResource(R.string.settings_biometricLoginUnavailable),
@@ -193,6 +154,27 @@ fun SettingsScreen(
                     }
                 )
             }
+            Spacer(Modifier.height(15.dp))
+
+            SettingsTitleLine(stringResource(R.string.settings_accountTitle))
+            SettingsItemWithLeadingIcon(
+                icon = Icons.AutoMirrored.Outlined.Logout,
+                text = stringResource(R.string.logout),
+                onClick = { showDialogLogout = true }
+            )
+            MessageDialog(
+                showDialog = showDialogLogout,
+                title = stringResource(R.string.logout),
+                titleColor = null,
+                text = stringResource(R.string.logout_confirmMessage),
+                cancelText = stringResource(R.string.settings_cancel),
+                confirmText = stringResource(R.string.logout),
+                onConfirm = {
+                    showDialogLogout = false
+                    settingsViewModel.removeUserAccount()
+                },
+                onDismiss = { showDialogLogout = false}
+            )
         }
     }
 }
@@ -217,10 +199,11 @@ fun LanguageSelector(
         expanded = expanded,
         onExpandedChange = { expanded = it }
     ) {
-        TextField(
+        OutlinedTextField(
             modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
             state = textFieldState,
             readOnly = true,
+            shape = RoundedCornerShape(16.dp),
             lineLimits = TextFieldLineLimits.SingleLine,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
