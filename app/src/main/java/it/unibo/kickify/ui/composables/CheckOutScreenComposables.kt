@@ -253,7 +253,9 @@ fun AddressSelectorDialog(
     var selectedIndex by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(selectedIndex) {
-        textFieldState.setTextAndPlaceCursorAtEnd(getAddressText(items[selectedIndex]))
+        if(items.isNotEmpty()) {
+            textFieldState.setTextAndPlaceCursorAtEnd(getAddressText(items[selectedIndex]))
+        }
     }
 
     Dialog(onDismissRequest = onDismissRequest) {
@@ -311,7 +313,7 @@ fun AddressSelectorDialog(
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -350,7 +352,9 @@ fun PaymentMethodSelectorDialog(
     var selectedIndex by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(selectedIndex) {
-        textFieldState.setTextAndPlaceCursorAtEnd(getPaymentText(items[selectedIndex]))
+        if(items.isNotEmpty()) {
+            textFieldState.setTextAndPlaceCursorAtEnd(getPaymentText(items[selectedIndex]))
+        }
     }
 
     Dialog(onDismissRequest = onDismissRequest) {
@@ -408,7 +412,7 @@ fun PaymentMethodSelectorDialog(
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {

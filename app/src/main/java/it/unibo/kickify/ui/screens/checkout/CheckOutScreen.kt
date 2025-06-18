@@ -115,7 +115,7 @@ fun CheckOutScreen(
             ) {
                 Card(
                     modifier = Modifier.fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 6.dp)
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
                     Column(
                         verticalArrangement = Arrangement.SpaceBetween,
