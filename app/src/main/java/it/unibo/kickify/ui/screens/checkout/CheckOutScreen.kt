@@ -74,6 +74,7 @@ fun CheckOutScreen(
     LaunchedEffect(userEmail) {
         profileViewModel.getUserAddress(userEmail)
         profileViewModel.getProfile(userEmail)
+        profileViewModel.getPaymentMethods(userEmail)
     }
 
     ScreenTemplate(
