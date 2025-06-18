@@ -58,18 +58,17 @@ fun HomeScreenBrandsSection(
         verticalAlignment = Alignment.CenterVertically
     ) {
         for ((name, id) in brands.entries) {
-            val brand = stringResource(R.string.brand)
             HomeScreenSmallBrandLogos(
                 name = name,
                 brandResLogoID = id,
-                onClick = { onClickAction("$brand: $name") }
+                onClick = { onClickAction(name) }
             )
         }
     }
 }
 
 @Composable
-fun HomeScreenCategorySection(onClick: (String) -> Unit){
+fun HomeScreenCategorySection(onClick: (ShopCategory) -> Unit){
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -86,9 +85,9 @@ fun HomeScreenCategorySection(onClick: (String) -> Unit){
 }
 
 @Composable
-fun HomeScreenCategoryButton(categoryName: ShopCategory, onClick: (String) -> Unit) {
+fun HomeScreenCategoryButton(categoryName: ShopCategory, onClick: (ShopCategory) -> Unit) {
     Button(
-        onClick = { onClick(categoryName.toString()) },
+        onClick = { onClick(categoryName) },
         modifier = Modifier.padding(horizontal = 4.dp),
         colors =  ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.surface,

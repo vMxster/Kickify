@@ -26,6 +26,7 @@ import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.composables.SearchRoundedTextField
 import it.unibo.kickify.ui.composables.SquareProductCardHomePage
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
+import it.unibo.kickify.ui.screens.products.FilterState
 import it.unibo.kickify.ui.screens.products.ProductsViewModel
 
 @Composable
@@ -67,7 +68,7 @@ fun HomeScreen(
                 SearchRoundedTextField(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
                     onSearch = { query ->
-                        productsViewModel.searchProducts(query)
+                        productsViewModel.updateFilters(FilterState(searchQuery = query))
                         navController.navigate(KickifyRoute.ProductList)
                     }
                 )
@@ -75,7 +76,8 @@ fun HomeScreen(
             item(span = { GridItemSpan(2) }) {
                 HomeScreenCategorySection(
                     onClick = { category ->
-                        navController.navigate(KickifyRoute.ProductListWithCategory(category))
+                        productsViewModel.updateFilters(FilterState(selectedGender = category))
+                        navController.navigate(KickifyRoute.ProductList)
                     }
                 )
             }
@@ -83,7 +85,8 @@ fun HomeScreen(
                 HomeScreenBrandsSection(
                     brands,
                     onClickAction = { brand ->
-                        navController.navigate(KickifyRoute.ProductListWithCategory(brand))
+                        productsViewModel.updateFilters(FilterState(selectedBrands = setOf(brand)))
+                        navController.navigate(KickifyRoute.ProductList)
                     }
                 )
             }
@@ -94,6 +97,7 @@ fun HomeScreen(
                 HomeScreenShoesSectionHeader(
                     sectionTitle = categ,
                     onClickButtonAction = {
+                        productsViewModel.updateFilters(FilterState())
                         navController.navigate(KickifyRoute.ProductListWithCategory(categ))
                     }
                 )
@@ -128,6 +132,7 @@ fun HomeScreen(
                 HomeScreenShoesSectionHeader(
                     sectionTitle = categ,
                     onClickButtonAction = {
+                        productsViewModel.updateFilters(FilterState())
                         navController.navigate(KickifyRoute.ProductListWithCategory(categ))
                     }
                 )
@@ -165,6 +170,7 @@ fun HomeScreen(
                 HomeScreenShoesSectionHeader(
                     sectionTitle = categ,
                     onClickButtonAction = {
+                        productsViewModel.updateFilters(FilterState())
                         navController.navigate(KickifyRoute.ProductListWithCategory(categ))
                     }
                 )

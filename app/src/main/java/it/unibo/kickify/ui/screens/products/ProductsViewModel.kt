@@ -120,7 +120,13 @@ class ProductsViewModel(
                     val genderMatch = filter.selectedGender == null ||
                             product.genre == filter.selectedGender.toString()
 
-                    priceInRange && brandMatch && genderMatch
+                    val nameMatch = filter.searchQuery == "" ||
+                            filter.searchQuery.split(" ").any{ w ->
+                                product.brand.contains(w, ignoreCase = true) ||
+                                        product.name.contains(w, ignoreCase = true)
+                            }
+
+                    priceInRange && brandMatch && genderMatch && nameMatch
                 }
 
                 // Ordinamento
@@ -355,7 +361,8 @@ data class FilterState(
     val selectedColors: Set<String> = emptySet(),
     val selectedSizes: Set<Int> = emptySet(),
     val selectedGender: ShopCategory? = null,
-    val orderBy: OrderBy = OrderBy.NONE
+    val orderBy: OrderBy = OrderBy.NONE,
+    val searchQuery: String = ""
 )
 
 enum class OrderBy {
