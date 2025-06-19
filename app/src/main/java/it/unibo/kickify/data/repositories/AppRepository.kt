@@ -193,7 +193,7 @@ class AppRepository(
 
     suspend fun getPopularProducts(): Result<List<Product>> = withContext(Dispatchers.IO) {
         try {
-            val products = productRepository.getPopularProducts()
+            val products = remoteRepository.getPopularProducts()
             if (products.isNotEmpty()) {
                 Result.success(products)
             } else {
@@ -221,7 +221,7 @@ class AppRepository(
 
     suspend fun getDiscountedProducts(): Result<List<Product>> = withContext(Dispatchers.IO) {
         try {
-            val products = productRepository.getDiscountedProducts()
+            val products = remoteRepository.getDiscountedProducts()
             if (products.isNotEmpty()) {
                 Result.success(products)
             } else {
@@ -384,7 +384,7 @@ class AppRepository(
                 }
             }
             ordersLoaded = true
-            //checkAndUpdateLastAccess()
+            checkAndUpdateLastAccess()
             Result.success(
                 orderRepository.getOrders(email)
             )

@@ -265,6 +265,24 @@ try {
             ];
             break;
 
+        case "getPopularProducts":
+            $products = $dbh->getPopularProducts();
+
+            $response = [
+                "success" => true,
+                "products" => $products
+            ];
+            break;
+
+        case "getDiscountedProducts":
+            $discountedProducts = $dbh->getDiscountedProducts();
+
+            $response = [
+                "success" => true,
+                "products" => $discountedProducts
+            ];
+            break;
+
         default:
             throw new Exception("Invalid action");
     }

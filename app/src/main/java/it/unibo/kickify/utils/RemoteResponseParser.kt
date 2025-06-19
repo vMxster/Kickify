@@ -262,17 +262,18 @@ class RemoteResponseParser {
         fun parseOrderTracking(json: JSONObject): List<TrackingShipping> {
             val trackingStates = mutableListOf<TrackingShipping>()
             val statesJson = json.getJSONArray("tracking_states")
+            val orderId = json.getJSONObject("order_info").optInt("order_id")
             for (i in 0 until statesJson.length()) {
                 val stateJson = statesJson.getJSONObject(i)
                 if (!stateJson.isNull("status")) {
                     trackingStates.add(
                         TrackingShipping(
-                            orderId = json.optInt("order_id"),
+                            orderId = orderId,
                             state = stateJson.optString("status"),
                             position = stateJson.optString("location"),
                             updateTimestamp = stateJson.optString("timestamp"),
                             estimatedArrival = stateJson.optString("estimated_arrival"),
-                            effectiveArrival = stateJson.optString("actual_arrival", "")
+                            effectiveArrival = stateJson.optString("actual_arrival")
                         )
                     )
                 }

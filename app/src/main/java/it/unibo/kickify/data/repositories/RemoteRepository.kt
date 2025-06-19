@@ -144,6 +144,38 @@ class RemoteRepository(
         }
     }
 
+    suspend fun getPopularProducts(): List<Product> = withContext(Dispatchers.IO) {
+        try {
+            val params = mapOf("action" to "getPopularProducts")
+            val response = makeRequest("product_handler.php", params)
+            val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                throw Exception(RemoteResponseParser.parseError(jsonObject))
+            }
+            val jsonArray = jsonObject.getJSONArray("products")
+            RemoteResponseParser.parseProducts(jsonArray)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante il recupero dei prodotti popolari", e)
+            emptyList()
+        }
+    }
+
+    suspend fun getDiscountedProducts(): List<Product> = withContext(Dispatchers.IO) {
+        try {
+            val params = mapOf("action" to "getDiscountedProducts")
+            val response = makeRequest("product_handler.php", params)
+            val jsonObject = JSONObject(response)
+            if (!RemoteResponseParser.parseSuccess(jsonObject)) {
+                throw Exception(RemoteResponseParser.parseError(jsonObject))
+            }
+            val jsonArray = jsonObject.getJSONArray("products")
+            RemoteResponseParser.parseProducts(jsonArray)
+        } catch (e: Exception) {
+            Log.e(tag, "Errore durante il recupero dei prodotti scontati", e)
+            emptyList()
+        }
+    }
+
     suspend fun getVersions(): Result<List<Version>> = withContext(Dispatchers.IO) {
         try {
             val params = mapOf("action" to "getVersions")

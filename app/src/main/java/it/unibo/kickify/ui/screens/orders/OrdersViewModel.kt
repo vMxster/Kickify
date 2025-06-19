@@ -27,8 +27,8 @@ class OrdersViewModel(
     private val _orders = MutableStateFlow<List<Order>>(listOf())
     val orders: StateFlow<List<Order>> = _orders.asStateFlow()
 
-    private val _orderTracking = MutableStateFlow<OrderDetailedTracking?>(null)
-    val orderTracking: StateFlow<OrderDetailedTracking?> = _orderTracking.asStateFlow()
+    private val _ordersTracking = MutableStateFlow<Map<Int, OrderDetailedTracking>>(mapOf())
+    val ordersTracking: StateFlow<Map<Int, OrderDetailedTracking>> = _ordersTracking.asStateFlow()
 
     fun getOrdersWithProducts(email: String) {
         _errorMessage.value = null
@@ -85,14 +85,18 @@ class OrdersViewModel(
                 val result = appRepository.getOrderTracking(orderId)
                 result.onSuccess { tracking ->
                     _errorMessage.value = null
-                    _orderTracking.value = tracking
+                    val currentMap = _ordersTracking.value.toMutableMap()
+                    val existingTracking = currentMap[orderId]
 
+                    if (existingTracking == null || existingTracking != tracking) {
+                        currentMap[orderId] = tracking
+                        _ordersTracking.value = currentMap
+                    }
                 }.onFailure { exception ->
                     _errorMessage.value = exception.message ?: "Unknown error"
                 }
             } catch (e: Exception) {
                 _errorMessage.value = e.message ?: "Unexpected error."
-
             } finally {
                 _isLoading.value = false
             }

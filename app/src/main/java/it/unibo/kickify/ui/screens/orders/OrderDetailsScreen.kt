@@ -53,9 +53,11 @@ fun OrderDetailsScreen(
 
     val productList by productsViewModel.products.collectAsStateWithLifecycle()
     val orderInfo = orderDetails.groupBy { it.orderId }
+    val ordersTrackingMap by ordersViewModel.ordersTracking.collectAsStateWithLifecycle()
+    val currentOrderTracking = ordersTrackingMap[orderID.toInt()]
 
     LaunchedEffect(userEmail) {
-        ordersViewModel.getOrders(userEmail.lowercase())
+        ordersViewModel.getOrderTracking(orderID.toInt())
         ordersViewModel.getOrdersWithProducts(userEmail.lowercase())
     }
 
@@ -115,7 +117,7 @@ fun OrderDetailsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(text = stringResource(R.string.expectedDeliveryDate))
-                Text(text = "#TODO")
+                Text(text = currentOrderTracking?.orderInfo?.estimatedArrival ?: stringResource(R.string.notAvailable))
             }
             Row (
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 4.dp),
@@ -123,24 +125,47 @@ fun OrderDetailsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(text = stringResource(R.string.trackingID))
-                Text(text = "#TODO")
+                Text(text = currentOrderTracking?.let { "TR-$orderID" } ?: stringResource(R.string.notAvailable))
             }
             HorizontalDivider(thickness = 3.dp, modifier = Modifier.padding(vertical = 6.dp))
 
             OrdersTitleLine(stringResource(R.string.orderStatus))
 
+            // Modifica per la barra di progressione
+            val orderPlacedInfo = currentOrderTracking?.trackingStates?.find { it.status == "Placed" }
+            val inProgressInfo = currentOrderTracking?.trackingStates?.find { it.status == "In progress" }
+            val shippedInfo = currentOrderTracking?.trackingStates?.find { it.status == "Shipped" }
+            val deliveredInfo = currentOrderTracking?.trackingStates?.find { it.status == "Delivered" }
+
+            // Determina lo stato attuale dell'ordine
+            val currentStepIndex = when {
+                deliveredInfo != null -> 4
+                shippedInfo != null -> 3
+                inProgressInfo != null -> 2
+                orderPlacedInfo != null -> 1
+                else -> 0
+            }
+
+            // Determina la data di arrivo da visualizzare
+            val arrivalDateToShow = if (!deliveredInfo?.actualArrival.isNullOrEmpty()) {
+                deliveredInfo?.actualArrival
+            } else {
+                deliveredInfo?.estimatedArrival ?: stringResource(R.string.notAvailable)
+            }
+
             StepProgressBar(
                 steps = listOf(
-                    stringResource(R.string.orderPlaced) + "\n" + "#TODO",
-                    stringResource(R.string.inProgress) + "\n" + "#TODO",
-                    stringResource(R.string.shipped) + "\n" + "#TODO",
-                    stringResource(R.string.delivered) + "\n" + "#TODO"
+                    stringResource(R.string.orderPlaced) + "\n" + (orderPlacedInfo?.timestamp ?: stringResource(R.string.notAvailable)),
+                    stringResource(R.string.inProgress) + "\n" + (inProgressInfo?.timestamp ?: stringResource(R.string.notAvailable)),
+                    stringResource(R.string.shipped) + "\n" + (shippedInfo?.timestamp ?: stringResource(R.string.notAvailable)),
+                    stringResource(R.string.delivered) + "\n" + arrivalDateToShow
                 ),
-                currentStep = 1
+                currentStep = currentStepIndex
             )
 
+            // Modifica per la posizione del pacco
             OrdersTitleLine(stringResource(R.string.parcelLocation))
-            AddressOnMapBox("Via Cavalcavia, 345, 47521 Cesena, Italia",
+            AddressOnMapBox(currentOrderTracking?.orderInfo?.currentLocation ?: "Via Cavalcavia, 345, 47521 Cesena, Italia",
                 zoomLevel = 18.0, showAddressLabelIfAvailable = true)
         }
     }

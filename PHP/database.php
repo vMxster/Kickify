@@ -599,6 +599,7 @@ class DatabaseHelper {
                 // Set order info only once
                 if (!$tracking['order_info']) {
                     $tracking['order_info'] = [
+                        'order_id' => $row['ID_Ordine'],
                         'shipping_type' => $row['shipping_type'],
                         'order_date' => $row['order_date'],
                         'current_status' => $row['status'],
@@ -1592,20 +1593,43 @@ class DatabaseHelper {
 
     // Check if user can review (has purchased the product)
     public function canUserReview($email, $productId) {
-    /*    $query = "SELECT 1 
+        $query = "SELECT 1 
                 FROM ORDINE o 
                 JOIN PRODOTTO_ORDINE po ON o.ID_Ordine = po.ID_Ordine
-                JOIN TRACKING_SPEDIZIONE ts ON po.ID_Ordine = ts.ID_Ordine
-                WHERE o.Email = ? AND po.ID_Prodotto = ? AND ts.Stato = 'delivered';"*/
-                $query = "SELECT 1 
-                FROM ORDINE o 
-                JOIN PRODOTTO_ORDINE po ON o.ID_Ordine = po.ID_Ordine
-               /* JOIN TRACKING_SPEDIZIONE ts ON po.ID_Ordine = ts.ID_Ordine*/
                 WHERE o.Email = ? AND po.ID_Prodotto = ?";
         $stmt = $this->db->prepare($query);
         $stmt->bind_param("ss", $email, $productId);
         $stmt->execute();
         return $stmt->get_result()->num_rows > 0;
+    }
+
+    public function getPopularProducts() {
+        $query = "SELECT p.* FROM PRODOTTO p 
+            JOIN PRODOTTO_ORDINE po ON p.ID_Prodotto = po.ID_Prodotto 
+            GROUP BY p.ID_Prodotto 
+            ORDER BY SUM(po.Quantita) DESC";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function getDiscountedProducts() {
+        $query = "SELECT DISTINCT p.* 
+                FROM PRODOTTO p 
+                JOIN (
+                    SELECT ID_Prodotto, Prezzo 
+                    FROM PRODOTTO_STORICO ps1
+                    WHERE Data_Modifica = (
+                        SELECT MAX(Data_Modifica) 
+                        FROM PRODOTTO_STORICO ps2 
+                        WHERE ps2.ID_Prodotto = ps1.ID_Prodotto
+                    )
+                ) latest_historic ON p.ID_Prodotto = latest_historic.ID_Prodotto
+                WHERE p.Prezzo < latest_historic.Prezzo 
+                ORDER BY p.Data_Aggiunta DESC";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
     /*********************
@@ -1767,7 +1791,7 @@ class DatabaseHelper {
             $shippedDate = $expectedDates['shipped']->format('Y-m-d H:i:s');
             $deliveredDate = $expectedDates['delivered']->format('Y-m-d H:i:s');
             $nullDate = null;
-
+           
             // Placed status
             $destination = $this->getUniversityLocation();
             $source = $this->getWarehouseLocation();

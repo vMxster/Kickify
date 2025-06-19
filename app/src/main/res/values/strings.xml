@@ -247,4 +247,5 @@
     <string name="biometricAuthLoginWithEmailAndPsw">Login with Email and Password</string>
     <string name="biometricAuthRetry">Retry Biometric Authentication</string>
     <string name="default_string">Default</string>
+    <string name="notAvailable">Not Available!</string>
 </resources>

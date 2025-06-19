@@ -138,31 +138,10 @@ interface ProductDao {
     suspend fun insertProductsHistory(remoteHistory: List<HistoryProduct>)
 
     @Query("""
-        SELECT p.* FROM PRODOTTO p 
-        JOIN PRODOTTO_ORDINE po ON p.ID_Prodotto = po.ID_Prodotto 
-        GROUP BY p.ID_Prodotto 
-        ORDER BY SUM(po.Quantita) DESC
-    """)
-    suspend fun getPopularProducts(): List<Product>
-
-    @Query("""
         SELECT * FROM PRODOTTO 
         ORDER BY Data_Aggiunta DESC
     """)
     suspend fun getNewProducts(): List<Product>
-
-    @Query("""
-        SELECT p.* FROM PRODOTTO p 
-        JOIN (
-            SELECT ps.ID_Prodotto, MAX(ps.Data_Modifica) as ultima_modifica 
-            FROM PRODOTTO_STORICO ps 
-            GROUP BY ps.ID_Prodotto 
-        ) ultime ON p.ID_Prodotto = ultime.ID_Prodotto 
-        JOIN PRODOTTO_STORICO ps ON ps.ID_Prodotto = ultime.ID_Prodotto 
-            AND ps.Data_Modifica = ultime.ultima_modifica 
-        WHERE p.Prezzo < ps.Prezzo
-    """)
-    suspend fun getDiscountedProducts(): List<Product>
 
     @Transaction
     @Query("SELECT p.*, i.URL FROM PRODOTTO p LEFT JOIN IMMAGINE i ON p.ID_Prodotto = i.ID_Prodotto " +
