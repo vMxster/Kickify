@@ -25,7 +25,7 @@ import androidx.navigation.NavController
 import it.unibo.kickify.R
 import it.unibo.kickify.ui.composables.AddressOnMapBox
 import it.unibo.kickify.ui.composables.BottomBar
-import it.unibo.kickify.ui.composables.OrderIDCenterTitle
+import it.unibo.kickify.ui.composables.OrderInfo
 import it.unibo.kickify.ui.composables.OrderItem
 import it.unibo.kickify.ui.composables.OrdersTitleLine
 import it.unibo.kickify.ui.composables.ScreenTemplate
@@ -77,7 +77,8 @@ fun OrderDetailsScreen(
         showTopAppBar = true,
         bottomAppBarContent = { BottomBar(navController) },
         showModalDrawer = true,
-        achievementsViewModel = achievementsViewModel
+        achievementsViewModel = achievementsViewModel,
+        showLoadingOverlay = isLoading
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -86,7 +87,7 @@ fun OrderDetailsScreen(
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            OrderIDCenterTitle(orderID)
+            OrderInfo(orderID, orderDate = currentOrderTracking?.orderInfo?.orderDate ?: "")
 
             val orderDet = orders.find { it.orderId == orderID.toInt() }
             if(orderDet != null) {

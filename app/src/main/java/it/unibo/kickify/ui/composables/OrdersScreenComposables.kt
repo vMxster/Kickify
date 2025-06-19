@@ -38,17 +38,9 @@ fun OrdersTitleLine(title: String){
             .padding(horizontal = 6.dp, vertical = 6.dp)
     ){
         Text(title,
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.titleMedium
         )
     }
-}
-
-@Composable
-fun OrderIDCenterTitle(orderID:String){
-    Text(text = stringResource(R.string.order) + " #$orderID", style = MaterialTheme.typography.bodyLarge,
-        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
-        textAlign = TextAlign.Center
-    )
 }
 
 @Composable
@@ -114,16 +106,13 @@ fun OrderPaymentInfo(paymentMethod: PaymentMethods) {
 }
 
 @Composable
-fun OrderInfo(
-    orderID: String,
-    orderDate: String
-){
+fun OrderInfo(orderID: String, orderDate: String){
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text(text = stringResource(R.string.order) + " " + orderID)
+        Text(text = stringResource(R.string.order) + " #$orderID")
         Text(text = orderDate)
     }
 }
