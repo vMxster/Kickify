@@ -214,12 +214,13 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.MyOrders> {
-            MyOrdersScreen(navController, settingsViewModel, ordersViewModel, achievementsViewModel)
+            MyOrdersScreen(navController, settingsViewModel, ordersViewModel, achievementsViewModel, productsViewModel)
         }
 
         composable<KickifyRoute.OrderDetails> { backStackEntry ->
             val route = backStackEntry.toRoute<KickifyRoute.OrderDetails>()
-            OrderDetailsScreen(navController, achievementsViewModel, route.orderID.toString())
+            OrderDetailsScreen(navController, settingsViewModel, ordersViewModel,
+                achievementsViewModel, productsViewModel, route.orderID.toString())
         }
 
         composable<KickifyRoute.TakeProfilePhoto> {

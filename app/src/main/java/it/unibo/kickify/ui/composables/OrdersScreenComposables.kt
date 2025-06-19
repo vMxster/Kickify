@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,11 +21,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import it.unibo.kickify.R
 import it.unibo.kickify.data.models.PaymentMethods
 
@@ -31,8 +35,7 @@ import it.unibo.kickify.data.models.PaymentMethods
 fun OrdersTitleLine(title: String){
     Row(
         modifier = Modifier.fillMaxWidth()
-            .padding(horizontal = 6.dp)
-            .padding(vertical = 6.dp)
+            .padding(horizontal = 6.dp, vertical = 6.dp)
     ){
         Text(title,
             style = MaterialTheme.typography.bodyLarge
@@ -42,16 +45,10 @@ fun OrdersTitleLine(title: String){
 
 @Composable
 fun OrderIDCenterTitle(orderID:String){
-    Row(
-        modifier = Modifier.fillMaxWidth()
-            .padding(top = 6.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ){
-        Text(orderID,
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
+    Text(text = stringResource(R.string.order) + " #$orderID", style = MaterialTheme.typography.bodyLarge,
+        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+        textAlign = TextAlign.Center
+    )
 }
 
 @Composable
@@ -75,32 +72,44 @@ fun OrderCardContainer(
 
             items()
 
-            OrderPaymentInfo(paymentMethod, totalPrice)
+            OrderPaymentInfo(paymentMethod)
 
-            TextButton(
-                onClick = { actionDetailsButton() }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = stringResource(R.string.trackOrder))
+                TextButton(
+                    onClick = { actionDetailsButton() }
+                ) {
+                    Text(text = stringResource(R.string.trackOrder))
+                }
+                Text(text = stringResource(R.string.myordersScreen_total) + " €%.2f".format(totalPrice),
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.End
+                )
             }
         }
     }
 }
 
 @Composable
-fun OrderPaymentInfo(paymentMethod: PaymentMethods, totalPrice: Float) {
+fun OrderPaymentInfo(paymentMethod: PaymentMethods) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.Start,
         modifier = Modifier.fillMaxWidth()
     ) {
         Image(
             paymentMethodIcon(paymentMethod),
             contentDescription = "",
-            modifier = Modifier.size(50.dp)
-                .padding(start = 6.dp)
+            modifier = Modifier.size(50.dp).padding(horizontal = 6.dp)
         )
-        Text(stringResource(R.string.myordersScreen_paidWith) + " " + paymentMethod.visibleName)
-        Text(text = stringResource(R.string.myordersScreen_total) + " €%.2f".format(totalPrice))
+        Text(
+            stringResource(R.string.myordersScreen_paidWith) + " " + paymentMethod.visibleName,
+            modifier = Modifier.fillMaxWidth(fraction = 0.8f),
+            textAlign = TextAlign.Start
+        )
     }
 }
 
@@ -121,6 +130,7 @@ fun OrderInfo(
 
 @Composable
 fun OrderItem(
+    imageUrl: String,
     productName: String,
     productSize: String,
     qty: Int,
@@ -133,12 +143,13 @@ fun OrderItem(
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
     ) {
-        Image(
+        AsyncImage(
+            model = imageUrl,
             modifier = Modifier.fillMaxWidth(fraction = 0.3f)
                 .size(100.dp)
                 .clip(RoundedCornerShape(8.dp)),
-            painter = painterResource(id = R.drawable.nike_zoom),
             contentDescription = "",
+            placeholder = rememberVectorPainter(Icons.Outlined.Image)
         )
         Spacer(modifier = Modifier.width(12.dp))
         Column {
