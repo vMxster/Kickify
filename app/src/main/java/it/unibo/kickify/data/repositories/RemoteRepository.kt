@@ -36,7 +36,6 @@ import it.unibo.kickify.data.models.PaymentMethodInfo
 import it.unibo.kickify.utils.RemoteResponseParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 import kotlin.collections.component1
@@ -456,10 +455,11 @@ class RemoteRepository(
             )
             val response = makeRequest("tracking_handler.php", params)
             val jsonObject = JSONObject(response)
+            val trackingObject = jsonObject.getJSONObject("tracking")
             if (!RemoteResponseParser.parseSuccess(jsonObject)) {
                 return@withContext Result.failure(Exception(RemoteResponseParser.parseError(jsonObject)))
             }
-            val tracking = RemoteResponseParser.parseOrderTracking(jsonObject)
+            val tracking = RemoteResponseParser.parseOrderTracking(trackingObject)
             Result.success(tracking)
         } catch (e: Exception) {
             Log.e(tag, "Errore durante il recupero del tracking dell'ordine", e)
