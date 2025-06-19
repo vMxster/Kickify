@@ -36,7 +36,7 @@ fun ProductListScreen(
     achievementsViewModel: AchievementsViewModel,
     title: String? = null
 ) {
-    val titleString = title ?: stringResource(R.string.allShoes)
+    val titleString = title ?: stringResource(R.string.exploreShoes)
 
     val productList by productsViewModel.products.collectAsStateWithLifecycle()
     val popularProducts by productsViewModel.popularProducts.collectAsStateWithLifecycle()

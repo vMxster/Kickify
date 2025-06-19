@@ -77,7 +77,7 @@
     <string name="shopCategory_men">Man</string>
     <string name="shopCategory_women">Woman</string>
     <string name="shopCategory_kids">Kids</string>
-    <string name="allShoes">All Shoes</string>
+    <string name="exploreShoes">Explore Shoes</string>
     <string name="mensShoes">Men\'s Shoes</string>
     <string name="womensShoes">Women\'s Shoes</string>
     <string name="kidsShoes">Kids\' Shoes</string>
@@ -122,7 +122,7 @@
     <string name="prodDetails_addReview">Add Review</string>
     <string name="prodDetails_rating">Rating</string>
     <string name="prodDetails_comment">Comment</string>
-    <string name="prodDetails_typeInComment">Type in a comment</string>
+    <string name="prodDetails_typeInComment">Type in your comment</string>
     <string name="prodDetails_typeinValidRating">Type in a valid number between 0.0 and 5.0</string>
     <string name="prodDetails_deleteReview">Delete review</string>
     <string name="prodDetails_selectSizeAndColor">Select size and color before adding product to cart.</string>
