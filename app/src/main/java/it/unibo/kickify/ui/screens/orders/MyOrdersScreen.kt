@@ -86,7 +86,7 @@ fun MyOrdersScreen(
 
             items(orders){ orderDetails ->
                 OrderCardContainer(
-                    orderID = "#${orderDetails.orderId}",
+                    orderID = "${orderDetails.orderId}",
                     orderDate = orderDetails.orderDate,
                     paymentMethod = PaymentMethods.getFromString(orderDetails.paymentMethod)
                         ?: PaymentMethods.PAYPAL,
