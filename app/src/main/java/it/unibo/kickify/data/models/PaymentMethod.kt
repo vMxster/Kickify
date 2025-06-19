@@ -19,15 +19,21 @@ enum class PaymentMethods (val visibleName: String){
 
 @Serializable
 sealed class PaymentMethodInfo {
+    abstract fun getType(): String
+
     @Serializable
     data class CreditCard(
         val id: Int,
         val brand: String, val last4: String,
         val expirationMonth: Int, val expirationYear: Int
-    ) : PaymentMethodInfo()
+    ) : PaymentMethodInfo() {
+        override fun getType(): String = brand
+    }
 
     @Serializable
-    data class PayPal(val id: Int, val email: String) : PaymentMethodInfo()
+    data class PayPal(val id: Int, val email: String) : PaymentMethodInfo() {
+        override fun getType(): String = "PayPal"
+    }
 
     companion object{
         private fun isValidEmail(email: String): Boolean {

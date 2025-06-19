@@ -2,7 +2,9 @@ package it.unibo.kickify.ui.screens.cart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import it.unibo.kickify.data.database.Address
 import it.unibo.kickify.data.database.CartWithProductInfo
+import it.unibo.kickify.data.models.PaymentMethodInfo
 import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.data.repositories.SettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -161,6 +163,33 @@ class CartViewModel(
                 }
             } catch (e: Exception) {
                 _errorMessage.value = e.message
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun placeOrder(address: Address, paymentMethod: PaymentMethodInfo) {
+        _isLoading.value = true
+        viewModelScope.launch {
+            try {
+                val result = appRepository.placeOrder(
+                    street = address.street,
+                    city = address.city,
+                    civic = address.civic,
+                    cap = address.cap,
+                    email = _email.value,
+                    total = _total.value,
+                    paymentMethod = paymentMethod.getType(),
+                    shippingType = "Express"
+                )
+                if (result.isSuccess) {
+                    loadCartInternal(_email.value)
+                } else {
+                    _errorMessage.value = result.exceptionOrNull()?.message
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Errore durante la creazione dell'ordine: ${e.message}"
             } finally {
                 _isLoading.value = false
             }

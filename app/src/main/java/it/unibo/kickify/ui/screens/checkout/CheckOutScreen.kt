@@ -180,7 +180,14 @@ fun CheckOutScreen(
                     total = totalCost,
                     checkoutButtonEnabled = enabledCheckoutButton,
                     onButtonClickAction = {
-                        showLoading = true
+                        selectedAddress?.let {
+                            selectedPaymentMethod?.let { it1 ->
+                                cartViewModel.placeOrder(
+                                    address = it,
+                                    paymentMethod = it1
+                                )
+                            }
+                        }
                     }
                 )
             }

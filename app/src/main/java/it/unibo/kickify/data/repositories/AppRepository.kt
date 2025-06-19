@@ -458,9 +458,9 @@ class AppRepository(
         giftLastName: String? = null,
         street: String,
         city: String,
-        civic: Int,
-        cap: Int
-    ) = withContext(Dispatchers.IO) {
+        civic: String,
+        cap: String
+    ): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
             val remoteResult = remoteRepository.placeOrder(email, total, paymentMethod,
                 shippingType, isGift, giftFirstName, giftLastName,
@@ -472,6 +472,9 @@ class AppRepository(
                 cartRepository.getCartByEmail(email).cartId.let {
                     cartRepository.clearCart(it)
                 }
+                Result.success(true)
+            } else {
+                Result.failure(Exception("Errore durante la creazione dell'ordine"))
             }
         } catch (e: Exception) {
             Log.e(tag, "Errore in placeOrder", e)

@@ -438,8 +438,8 @@ class RemoteRepository(
         giftLastName: String? = null,
         street: String,
         city: String,
-        civic: Int,
-        cap: Int,
+        civic: String,
+        cap: String,
     ): Result<Int> = withContext(Dispatchers.IO) {
         try {
             val params = mutableMapOf(
@@ -453,8 +453,8 @@ class RemoteRepository(
                 "giftLastName" to (giftLastName ?: ""),
                 "street" to street,
                 "city" to city,
-                "civic" to civic.toString(),
-                "cap" to cap.toString()
+                "civic" to civic,
+                "cap" to cap
             )
 
             if (isGift) {

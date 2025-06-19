@@ -1145,7 +1145,7 @@ class DatabaseHelper {
             // when adding a new non default address, previous check is not required
             $query = "INSERT INTO INDIRIZZO (Email, Via, NumeroCivico, CAP, Citta, Provincia, Nazione, Predefinito) VALUES (?,?,?,?,?,?,?,?)";
             $stmt = $this->db->prepare($query);
-            $stmt->bind_param("ssiisssi", $email, $via, $civico, $cap, $citta, $provincia, $nazione, $predefinito);
+            $stmt->bind_param("sssssssi", $email, $via, $civico, $cap, $citta, $provincia, $nazione, $predefinito);
             $stmt->execute();
 
             $this->db->commit();
