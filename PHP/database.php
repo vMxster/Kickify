@@ -1469,10 +1469,11 @@ class DatabaseHelper {
     }
 
     // Get all items in cart
+    // Get all items in cart
     public function getCartItems($cartId) {
-        $query = "SELECT c.* 
-                  FROM comprendere c 
-                  WHERE c.ID_Carrello = ?";
+        $query = "SELECT c.*, p.Prezzo 
+                    FROM comprendere c LEFT JOIN PRODOTTO p ON c.ID_Prodotto = p.ID_Prodotto
+                    WHERE c.ID_Carrello = ?";
         $stmt = $this->db->prepare($query);
         $stmt->bind_param("i", $cartId);
         $stmt->execute();
