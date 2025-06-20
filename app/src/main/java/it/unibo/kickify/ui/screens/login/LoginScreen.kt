@@ -101,13 +101,17 @@ fun LoginScreen(
     var passwordVisibility by remember { mutableStateOf(false) }
     val passwordFocusRequester = remember { FocusRequester() }
 
-    val credentialManager = remember { CredentialManager.create(ctx) }
+    val credentialManager = remember {
+        val manager = CredentialManager.create(ctx)
+        manager
+    }
 
     // Funzione per gestire l'accesso con Google
     fun signInWithGoogle() {
         val googleIdOption = GetGoogleIdOption.Builder()
             .setServerClientId("897714702292-ngm2eni5m4c06j32u3uu68ggifm10oj6.apps.googleusercontent.com")
             .setFilterByAuthorizedAccounts(false)
+            .setAutoSelectEnabled(true)
             .build()
 
         val request = GetCredentialRequest.Builder()
@@ -172,7 +176,7 @@ fun LoginScreen(
     LaunchedEffect(isLoggedIn) {
         if (isLoggedIn && loggedInUser != null) {
             settingsViewModel.setUserAccount(
-                userid = email,
+                userid = loggedInUser?.email ?: "",
                 username = "${loggedInUser?.name} ${loggedInUser?.surname}"
             )
             onLoginSuccess()

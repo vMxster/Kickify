@@ -77,7 +77,7 @@ class LoginViewModel(
                 val jsonPayload = JSONObject(decodedPayload)
 
                 // Estrai i dati dell'utente dal payload
-                val email = jsonPayload.optString("email", "")
+                val email = jsonPayload.optString("email", "").lowercase()
                 val name = jsonPayload.optString("given_name", "")
                 val surname = jsonPayload.optString("family_name", "")
 

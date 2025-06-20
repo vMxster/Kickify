@@ -572,16 +572,15 @@ class AppRepository(
             if (remoteResult.isSuccess) {
                 val user = remoteResult.getOrNull()
                 user?.let {
-                    val existingUser = userRepository.getUserProfile(email.lowercase())
+                    val existingUser = userRepository.getUserProfile(email)
                     if (existingUser != null) {
-                        val updatedUser = it.copy(password = existingUser.password)
-                        userRepository.registerUser(updatedUser)
+                        Log.d(tag, "Utente già esistente, nessuna modifica necessaria")
                     } else {
                         userRepository.registerUser(it)
                     }
                     oAuthUserRepository.insertUserOAuth(
                         UserOAuth(
-                            email = it.email,
+                            email = email,
                             provider = "Google",
                             providerUserId = idToken,
                             dataLink = LocalDate.now().toString(),
