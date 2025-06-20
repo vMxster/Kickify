@@ -91,16 +91,24 @@ fun NotificationScreen(
                 return Pair(null, inputString)
             }
 
+            val notificationTypesGoToProductPageOnClick = listOf(
+                NotificationType.ProductBackinStock, NotificationType.FlashSale, NotificationType.RequestedProductReview
+            )
+            val notificationTypesGoToOrderPageOnClick = listOf(
+                NotificationType.OrderPlaced, NotificationType.OrderShipped, NotificationType.OrderDelivered
+            )
+
             if(errorMessage == null){
                 val notificationGrouped = notificationList.groupBy { convertDateFormat(it.date) }
                 for ((date, notifications) in notificationGrouped.entries){
                     NotificationTitleLine(date)
                     for(n in notifications) {
                         val updatedMsg = extractNumberAndGetString(n.message)
-                        val productId = updatedMsg.first
+                        val codeInNotification = updatedMsg.first
                         val msg = updatedMsg.second
+                        val notificationType = NotificationType.getTypeFromString(n.type, n.message)
                         NotificationItem(
-                            notificationType = NotificationType.getTypeFromString(n.type),
+                            notificationType = notificationType,
                             notificationText = msg,
                             colorDot = if (n.state == "Unread") BluePrimary else Color.Gray,
                             onClick = {
@@ -110,8 +118,13 @@ fun NotificationScreen(
                                         notificationIds = listOf(n.notificationId)
                                     )
                                     notificationViewModel.getNotifications(email)
-                                    if(productId != null){
-                                        navController.navigate(KickifyRoute.ProductDetails(productId))
+                                    if(notificationType in notificationTypesGoToProductPageOnClick
+                                        && codeInNotification != null){
+                                        navController.navigate(KickifyRoute.ProductDetails(codeInNotification))
+                                    }
+                                    if(notificationType in notificationTypesGoToOrderPageOnClick
+                                        && codeInNotification != null){
+                                        navController.navigate(KickifyRoute.OrderDetails(codeInNotification))
                                     }
                                 }
                             }

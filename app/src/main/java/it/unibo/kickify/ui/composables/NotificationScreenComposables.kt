@@ -63,6 +63,7 @@ fun NotificationItem(
                         NotificationType.ItemsInCart -> stringResource(R.string.notificationscreen_productsInCart)
                         NotificationType.OrderPlaced -> stringResource(R.string.orderPlaced)
                         NotificationType.RequestedProductReview -> stringResource(R.string.notificationscreen_productReviewRequested)
+                        NotificationType.OrderDelivered -> stringResource(R.string.delivered)
                     },
                     style = MaterialTheme.typography.titleMedium
                 )
@@ -83,12 +84,13 @@ fun NotificationItem(
 private fun NotificationImageFromType(notificationType: NotificationType){
     Image(
         painter = when(notificationType){
-                NotificationType.ProductBackinStock -> painterResource(R.drawable.stock_light)
-                NotificationType.OrderShipped -> painterResource(R.drawable.order_light)
-                NotificationType.FlashSale -> painterResource(R.drawable.sale_light)
-                NotificationType.ItemsInCart -> painterResource(R.drawable.cart_light)
-                NotificationType.OrderPlaced -> painterResource(R.drawable.pack_light)
-                NotificationType.RequestedProductReview -> painterResource(R.drawable.review_light)
+            NotificationType.ProductBackinStock -> painterResource(R.drawable.stock_light)
+            NotificationType.OrderShipped -> painterResource(R.drawable.order_light)
+            NotificationType.FlashSale -> painterResource(R.drawable.sale_light)
+            NotificationType.ItemsInCart -> painterResource(R.drawable.cart_light)
+            NotificationType.OrderPlaced -> painterResource(R.drawable.pack_light)
+            NotificationType.RequestedProductReview -> painterResource(R.drawable.review_light)
+            NotificationType.OrderDelivered -> painterResource(R.drawable.order_light)
         },
         contentDescription = "",
         contentScale = ContentScale.Fit,
