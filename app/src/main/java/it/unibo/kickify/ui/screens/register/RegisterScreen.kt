@@ -1,7 +1,5 @@
 package it.unibo.kickify.ui.screens.register
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,6 +24,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -55,38 +55,72 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import it.unibo.kickify.R
-import it.unibo.kickify.data.repositories.AppRepository
 import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
+import it.unibo.kickify.ui.screens.login.LoginViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
 import it.unibo.kickify.ui.theme.MediumGray
 import it.unibo.kickify.utils.LoginRegisterUtils
 import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
 
 @Composable
 fun RegisterScreen(
     navController: NavController,
     settingsViewModel: SettingsViewModel,
-    achievementsViewModel: AchievementsViewModel
+    achievementsViewModel: AchievementsViewModel,
+    loginViewModel: LoginViewModel
 ) {
+    val registeredSuccessful by loginViewModel.registeredSuccessful.collectAsStateWithLifecycle()
+    val isLoggedIn by loginViewModel.isLoggedIn.collectAsStateWithLifecycle()
+    val loggedInUser by loginViewModel.loggedInUser.collectAsStateWithLifecycle()
+    val message by loginViewModel.message.collectAsStateWithLifecycle()
+    val isLoading by loginViewModel.isLoading.collectAsStateWithLifecycle()
+
+    val snackBarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
     val ctx = LocalContext.current
+
+    val registerAction: () -> Unit = {
+        navController.navigate(KickifyRoute.Home) {
+            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+        }
+    }
+
+    // if registered successfully, go back to login
+    LaunchedEffect(registeredSuccessful) {
+        if (registeredSuccessful) {
+            navController.navigate(KickifyRoute.Login) {
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+            }
+        }
+    }
+
+    LaunchedEffect(message) {
+        message?.let { message ->
+            snackBarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Long,
+                actionLabel = ctx.getString(R.string.ok))
+            loginViewModel.dismissMessage()
+        }
+    }
+
     ScreenTemplate(
         screenTitle = "",
         navController = navController,
         showTopAppBar = true,
         bottomAppBarContent = { },
         showModalDrawer = false,
+        showLoadingOverlay = isLoading,
+        snackBarHostState = snackBarHostState,
         achievementsViewModel = achievementsViewModel
     ) {
         val registerScreenModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)
-
-        val appRepo = koinInject<AppRepository>()
-        val coroutineScope = rememberCoroutineScope()
 
         var name by rememberSaveable { mutableStateOf("") }
         var lastname by rememberSaveable { mutableStateOf("") }
@@ -105,12 +139,6 @@ fun RegisterScreen(
         val passwordFocusRequester = remember { FocusRequester() }
 
         val focusManager = LocalFocusManager.current
-
-        val registerAction: () -> Unit = {
-            navController.navigate(KickifyRoute.Home) {
-                popUpTo(KickifyRoute.Login) { inclusive = true }
-            }
-        }
 
         LaunchedEffect(Unit){
             nameFocusRequester.requestFocus()
@@ -317,27 +345,20 @@ fun RegisterScreen(
 
             Button(
                 onClick = {
-                    coroutineScope.launch {
-                        if(LoginRegisterUtils.isValidEmail(email)
-                            && LoginRegisterUtils.isValidPassword(password)
-                            && LoginRegisterUtils.isValidNameLastname(name)
-                            && LoginRegisterUtils.isValidNameLastname(lastname)) {
-                            val registerRes = appRepo.register(
-                                email = email, firstName = name,
-                                lastName = lastname, password = password
-                            )
-                            if (registerRes.isSuccess) {
-                                Toast.makeText(ctx, "Register successful", Toast.LENGTH_LONG).show()
-                                settingsViewModel.setUserAccount(
-                                    userid = email, username = "$name $lastname"
-                                )
-                                Log.i("LOGIN", "userid: $email - username: '$name $lastname'")
-                                registerAction()
-                            } else {
-                                Toast.makeText(ctx, "Register ERROR", Toast.LENGTH_LONG).show()
-                            }
-                        } else {
-                            Toast.makeText(ctx, "Check all fields are valid", Toast.LENGTH_LONG).show()
+                    if(LoginRegisterUtils.isValidEmail(email)
+                        && LoginRegisterUtils.isValidPassword(password)
+                        && LoginRegisterUtils.isValidNameLastname(name)
+                        && LoginRegisterUtils.isValidNameLastname(lastname)) {
+                        loginViewModel.register(
+                            email = email, firstName = name,
+                            lastName = lastname, password = password
+                        )
+                    } else {
+                        coroutineScope.launch {
+                            snackBarHostState.showSnackbar(
+                                message = ctx.getString(R.string.checkAllFieldsAreCorrect),
+                                duration = SnackbarDuration.Long,
+                                actionLabel = ctx.getString(R.string.ok))
                         }
                     }
                 },

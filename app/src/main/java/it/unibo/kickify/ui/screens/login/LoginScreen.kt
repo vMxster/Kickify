@@ -88,7 +88,7 @@ fun LoginScreen(
 
     val isLoading by loginViewModel.isLoading.collectAsStateWithLifecycle()
     val isLoggedIn by loginViewModel.isLoggedIn.collectAsStateWithLifecycle()
-    val errorMessage by loginViewModel.errorMessage.collectAsStateWithLifecycle()
+    val message by loginViewModel.message.collectAsStateWithLifecycle()
     val loggedInUser by loginViewModel.loggedInUser.collectAsStateWithLifecycle()
 
     var email by rememberSaveable { mutableStateOf("") }
@@ -192,14 +192,14 @@ fun LoginScreen(
         }
     }
 
-    // show error if present
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let { message ->
+    // show message if present
+    LaunchedEffect(message) {
+        message?.let { message ->
             snackBarHostState.showSnackbar(
                 message = message,
                 duration = SnackbarDuration.Long,
                 actionLabel = ctx.getString(R.string.ok))
-            loginViewModel.dismissError()
+            loginViewModel.dismissMessage()
         }
     }
 

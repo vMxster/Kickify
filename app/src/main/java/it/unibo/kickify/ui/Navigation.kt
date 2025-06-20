@@ -203,7 +203,7 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.Register> {
-            RegisterScreen(navController, settingsViewModel, achievementsViewModel)
+            RegisterScreen(navController, settingsViewModel, achievementsViewModel, loginViewModel)
         }
 
         composable<KickifyRoute.Settings> {

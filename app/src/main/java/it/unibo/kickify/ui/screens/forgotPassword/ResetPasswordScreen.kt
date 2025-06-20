@@ -76,7 +76,7 @@ fun ResetPasswordScreen(
 
     val gotoLogin: () -> Unit = {
         navController.navigate(KickifyRoute.Login) {
-            popUpTo(KickifyRoute.ResetPasswordScreen) { inclusive = true }
+            popUpTo(navController.graph.startDestinationId) { inclusive = true }
             launchSingleTop = true
         }
     }

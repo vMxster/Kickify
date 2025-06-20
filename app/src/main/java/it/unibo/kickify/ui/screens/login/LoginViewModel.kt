@@ -21,14 +21,17 @@ class LoginViewModel(
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
 
-    private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+    private val _message = MutableStateFlow<String?>(null)
+    val message: StateFlow<String?> = _message.asStateFlow()
 
     private val _loggedInUser = MutableStateFlow<User?>(null)
     val loggedInUser: StateFlow<User?> = _loggedInUser.asStateFlow()
 
+    private val _registerSuccessful = MutableStateFlow(false)
+    val registeredSuccessful: StateFlow<Boolean> = _registerSuccessful.asStateFlow()
+
     fun login(email: String, password: String) {
-        _errorMessage.value = null
+        _message.value = null
         _isLoading.value = true
         _isLoggedIn.value = false
 
@@ -37,26 +40,61 @@ class LoginViewModel(
                 val result = appRepository.login(email, password)
                 result.onSuccess { user ->
                     _isLoggedIn.value = true
-                    _errorMessage.value = null
+                    _message.value = null
                     _loggedInUser.value = user
 
                 }.onFailure { exception ->
                     _isLoggedIn.value = false
                     _loggedInUser.value = null
-                    _errorMessage.value = exception.message ?: "Unknown login error"
+                    _message.value = exception.message ?: "Unknown login error"
                 }
             } catch (e: Exception) {
                 _isLoggedIn.value = false
                 _loggedInUser.value = null
-                _errorMessage.value = e.message ?: "Unexpected error."
+                _message.value = e.message ?: "Unexpected error."
             } finally {
                 _isLoading.value = false
             }
         }
     }
 
+    fun register(
+        email: String, firstName: String,
+        lastName: String, password: String
+    ) {
+        _message.value = null
+        _isLoading.value = true
+        _isLoggedIn.value = false
+        _registerSuccessful.value = false
+
+        viewModelScope.launch {
+            try {
+                val result = appRepository.register(email, firstName, lastName, password)
+                result.onSuccess {
+                    _isLoggedIn.value = true
+                    _message.value = "Registration successful"
+                    _registerSuccessful.value = true
+
+                }.onFailure { exception ->
+                    _isLoggedIn.value = false
+                    _loggedInUser.value = null
+                    _registerSuccessful.value = false
+                    _message.value = exception.message ?: "Unknown login error"
+                }
+            } catch (e: Exception) {
+                _isLoggedIn.value = false
+                _loggedInUser.value = null
+                _registerSuccessful.value = false
+                _message.value = e.message ?: "Unexpected error."
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+
     fun loginWithGoogle(idToken: String) {
-        _errorMessage.value = null
+        _message.value = null
         _isLoading.value = true
         _isLoggedIn.value = false
 
@@ -66,7 +104,7 @@ class LoginViewModel(
                 // Decodificare il token JWT per estrarre le informazioni
                 val tokenParts = idToken.split(".")
                 if (tokenParts.size != 3) {
-                    _errorMessage.value = "Formato del token non valido"
+                    _message.value = "Formato del token non valido"
                     return@launch
                 }
 
@@ -84,7 +122,7 @@ class LoginViewModel(
                 if (email.isEmpty() || name.isEmpty() || surname.isEmpty()) {
                     _isLoading.value = false
                     _isLoggedIn.value = false
-                    _errorMessage.value = "Dati insufficienti dal token Google"
+                    _message.value = "Dati insufficienti dal token Google"
                     return@launch
                 }
 
@@ -99,33 +137,35 @@ class LoginViewModel(
                 result.onSuccess { user ->
                     _isLoggedIn.value = true
                     Log.d("LoginViewModel", "Login con Google riuscito, isLoggedIn: ${_isLoggedIn.value}")
-                    _errorMessage.value = null
+                    _message.value = null
                     _loggedInUser.value = user
                 }.onFailure { exception ->
                     Log.e("LoginViewModel", "Fallimento login con Google: ${exception.message}")
                     _isLoggedIn.value = false
                     _loggedInUser.value = null
-                    _errorMessage.value = exception.message ?: "Unknown login error"
+                    _message.value = exception.message ?: "Unknown login error"
                 }
             } catch (e: Exception) {
                 Log.e("LoginViewModel", "Eccezione in loginWithGoogle: ${e.message}")
                 _isLoggedIn.value = false
                 _loggedInUser.value = null
-                _errorMessage.value = e.message ?: "Errore imprevisto"
+                _message.value = e.message ?: "Errore imprevisto"
             } finally {
                 _isLoading.value = false
             }
         }
     }
 
-    fun dismissError() {
-        _errorMessage.value = null
+    fun dismissMessage() {
+        _message.value = null
+        _registerSuccessful.value = false
     }
 
     fun clearData(){
         _isLoading.value = false
         _isLoggedIn.value = false
-        _errorMessage.value = null
+        _message.value = null
         _loggedInUser.value = null
+        _registerSuccessful.value = false
     }
 }
