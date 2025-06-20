@@ -1,6 +1,5 @@
 package it.unibo.kickify.ui.screens.login
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -137,7 +136,10 @@ fun LoginScreen(
                                 ?: throw Exception("Token non trovato nel bundle")
                         } catch (e: Exception) {
                             val errorMsg = "Impossibile estrarre il token: ${e.message}"
-                            Toast.makeText(ctx, errorMsg, Toast.LENGTH_LONG).show()
+                            snackBarHostState.showSnackbar(
+                                message = errorMsg,
+                                actionLabel = ctx.getString(R.string.ok),
+                                duration = SnackbarDuration.Long)
                             null
                         }
                     }
@@ -147,24 +149,30 @@ fun LoginScreen(
                 if (idToken != null) {
                     loginViewModel.loginWithGoogle(idToken)
                 } else {
-                    Toast.makeText(ctx, "Token non disponibile", Toast.LENGTH_SHORT).show()
+                    snackBarHostState.showSnackbar(
+                        message = "Token non disponibile",
+                        actionLabel = ctx.getString(R.string.ok),
+                        duration = SnackbarDuration.Long)
                 }
             } catch (e: GetCredentialException) {
                 when (e) {
                     is GetCredentialCancellationException ->
-                        Toast.makeText(ctx, "Autenticazione annullata", Toast.LENGTH_SHORT).show()
-                    else -> Toast.makeText(
-                        ctx,
-                        "Errore durante l'autenticazione: ${e.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        snackBarHostState.showSnackbar(
+                            message = "Autenticazione annullata",
+                            actionLabel = ctx.getString(R.string.ok),
+                            duration = SnackbarDuration.Long
+                        )
+                    else -> snackBarHostState.showSnackbar(
+                        message = "Errore durante l'autenticazione: ${e.message}",
+                        actionLabel = ctx.getString(R.string.ok),
+                        duration = SnackbarDuration.Long
+                    )
                 }
             } catch (e: Exception) {
-                Toast.makeText(
-                    ctx,
-                    "Errore imprevisto: ${e.message}",
-                    Toast.LENGTH_LONG
-                ).show()
+                snackBarHostState.showSnackbar(
+                    message = "Errore imprevisto: ${e.message}",
+                    actionLabel = ctx.getString(R.string.ok),
+                    duration = SnackbarDuration.Long)
             }
         }
     }
