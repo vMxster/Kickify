@@ -162,7 +162,7 @@ fun CheckOutScreen(
                             onEditInformation = { showAddressSelectorDialog = true }
                         )
                         AddressOnMapBox(
-                            address = selectedAddress?.let { getAddressText(it) } ?: "",
+                            searchAddressOrCoordinates = selectedAddress?.let { getAddressText(it) } ?: "",
                             zoomLevel = 19.0,
                             showAddressLabelIfAvailable = false
                         )

@@ -111,6 +111,12 @@ fun OrderDetailsScreen(
 
             HorizontalDivider(thickness = 3.dp, modifier = Modifier.padding(vertical = 6.dp))
 
+            // Modifica per la barra di progressione
+            val orderPlacedInfo = currentOrderTracking?.trackingStates?.find { it.status == "Placed" }
+            val inProgressInfo = currentOrderTracking?.trackingStates?.find { it.status == "In progress" }
+            val shippedInfo = currentOrderTracking?.trackingStates?.find { it.status == "Shipped" }
+            val deliveredInfo = currentOrderTracking?.trackingStates?.find { it.status == "Delivered" }
+
             OrdersTitleLine(stringResource(R.string.orderDetails))
             Row (
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 4.dp),
@@ -118,7 +124,7 @@ fun OrderDetailsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(text = stringResource(R.string.expectedDeliveryDate))
-                Text(text = currentOrderTracking?.orderInfo?.estimatedArrival ?: stringResource(R.string.notAvailable))
+                Text(text = deliveredInfo?.estimatedArrival ?: stringResource(R.string.notAvailable))
             }
             Row (
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 4.dp),
@@ -132,42 +138,37 @@ fun OrderDetailsScreen(
 
             OrdersTitleLine(stringResource(R.string.orderStatus))
 
-            // Modifica per la barra di progressione
-            val orderPlacedInfo = currentOrderTracking?.trackingStates?.find { it.status == "Placed" }
-            val inProgressInfo = currentOrderTracking?.trackingStates?.find { it.status == "In progress" }
-            val shippedInfo = currentOrderTracking?.trackingStates?.find { it.status == "Shipped" }
-            val deliveredInfo = currentOrderTracking?.trackingStates?.find { it.status == "Delivered" }
-
             // Determina lo stato attuale dell'ordine
-            val currentStepIndex = when {
-                deliveredInfo != null -> 4
-                shippedInfo != null -> 3
-                inProgressInfo != null -> 2
-                orderPlacedInfo != null -> 1
-                else -> 0
-            }
-
-            // Determina la data di arrivo da visualizzare
-            val arrivalDateToShow = if (!deliveredInfo?.actualArrival.isNullOrEmpty()) {
-                deliveredInfo?.actualArrival
-            } else {
-                deliveredInfo?.estimatedArrival ?: stringResource(R.string.notAvailable)
-            }
+            val values = listOf(orderPlacedInfo?.actualArrival, inProgressInfo?.actualArrival,
+                shippedInfo?.actualArrival, deliveredInfo?.actualArrival)
+            // step progress bar index is 0-based
+            val currentStepIndex = values.mapIndexed { _, s ->  s != "null" }.count { it } -1
 
             StepProgressBar(
                 steps = listOf(
-                    stringResource(R.string.orderPlaced) + "\n" + (orderPlacedInfo?.timestamp ?: stringResource(R.string.notAvailable)),
-                    stringResource(R.string.inProgress) + "\n" + (inProgressInfo?.timestamp ?: stringResource(R.string.notAvailable)),
-                    stringResource(R.string.shipped) + "\n" + (shippedInfo?.timestamp ?: stringResource(R.string.notAvailable)),
-                    stringResource(R.string.delivered) + "\n" + arrivalDateToShow
+                    stringResource(R.string.orderPlaced) + "\n" + displayEstimatedOrActualDateTime(orderPlacedInfo?.estimatedArrival, orderPlacedInfo?.actualArrival),
+                    stringResource(R.string.inProgress) + "\n" + displayEstimatedOrActualDateTime(inProgressInfo?.estimatedArrival, inProgressInfo?.actualArrival),
+                    stringResource(R.string.shipped) + "\n" + displayEstimatedOrActualDateTime(shippedInfo?.estimatedArrival, shippedInfo?.actualArrival),
+                    stringResource(R.string.delivered) + "\n" + displayEstimatedOrActualDateTime(deliveredInfo?.estimatedArrival, deliveredInfo?.actualArrival)
                 ),
                 currentStep = currentStepIndex
             )
 
             // Modifica per la posizione del pacco
             OrdersTitleLine(stringResource(R.string.parcelLocation))
-            AddressOnMapBox(currentOrderTracking?.orderInfo?.currentLocation ?: "Via Cavalcavia, 345, 47521 Cesena, Italia",
+            AddressOnMapBox(currentOrderTracking?.orderInfo?.currentLocation ?: "",
                 zoomLevel = 18.0, showAddressLabelIfAvailable = true)
         }
     }
+}
+
+@Composable
+fun displayEstimatedOrActualDateTime(estimated: String?, actual: String?): String{
+    if(actual != "null" && estimated != "null"){
+        return "$actual"
+    }
+    if(actual == "null" && estimated != "null"){
+        return stringResource(R.string.expected) + ": $estimated"
+    }
+    return stringResource(R.string.notAvailable)
 }

@@ -121,7 +121,7 @@ fun InformationSectionTitle(sectionTitle: String){
 
 @Composable
 fun AddressOnMapBox(
-    address: String,
+    searchAddressOrCoordinates: String,
     zoomLevel: Double,
     showAddressLabelIfAvailable: Boolean
 ){
@@ -133,15 +133,41 @@ fun AddressOnMapBox(
 
     var newCoord by remember { mutableStateOf(defaultCoordinates) }
 
-    LaunchedEffect(address) {
-        coroutineScope.launch {
-            val tmp = osmDataSource.searchPlaces(address).firstOrNull()
-            if (tmp != null) {
-                foundOsmPlaceString = tmp.displayName
-                newCoord = Coordinates(tmp.latitude, tmp.longitude)
+    fun parseCoordinateString(input: String): Coordinates? {
+        if (!input.contains(',')) {
+            return null
+        }
+        val parts = input.split(',')
+        if (parts.size != 2) {
+            return null
+        }
+        val latitude = parts[0].trim().toDoubleOrNull()
+        val longitude = parts[1].trim().toDoubleOrNull()
 
+        return if (latitude != null && longitude != null) {
+            Coordinates(latitude, longitude)
+        } else {
+            null
+        }
+    }
+
+    LaunchedEffect(searchAddressOrCoordinates) {
+        coroutineScope.launch {
+            val searchCoords = parseCoordinateString(searchAddressOrCoordinates)
+
+            if(searchCoords == null) { // if given invalid coordinates -> search as address
+                val tmp = osmDataSource.searchPlaces(searchAddressOrCoordinates).firstOrNull()
+                if (tmp != null) {
+                    foundOsmPlaceString = tmp.displayName
+                    newCoord = Coordinates(tmp.latitude, tmp.longitude)
+
+                } else {
+                    foundOsmPlaceString = ctx.getString(R.string.unavailableAddress)
+                }
             } else {
-                foundOsmPlaceString = ctx.getString(R.string.unavailableAddress)
+                val tmp = osmDataSource.getPlace(searchCoords)
+                foundOsmPlaceString = tmp.displayName
+                newCoord = searchCoords
             }
         }
     }
