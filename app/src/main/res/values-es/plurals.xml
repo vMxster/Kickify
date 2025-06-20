@@ -1,0 +1,7 @@
+<resources>
+    <plurals name="secretAchievementsHint">
+        <item quantity="one">Queda un logro secreto por desbloquear. Intenta explorar todas las páginas y menús de la aplicación.</item>
+        <item quantity="other">Quedan %d logros secretos por desbloquear. Intenta explorar todas las páginas y menús de la aplicación.</item>
+        <item quantity="many">Quedan %d logros secretos por desbloquear. Intenta explorar todas las páginas y menús de la aplicación.</item>
+    </plurals>
+</resources>

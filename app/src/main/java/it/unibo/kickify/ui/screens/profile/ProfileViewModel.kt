@@ -72,8 +72,6 @@ class ProfileViewModel(
         viewModelScope.launch {
             try {
                 val result = appRepository.getUserAddress(email)
-                println("get user address list da app repo: issuccess: ${result.isSuccess}"
-                + result)
                 result.onSuccess { list ->
                     _addressList.value = list.toList()
                     _errorMessage.value = null

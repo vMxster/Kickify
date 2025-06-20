@@ -1,0 +1,7 @@
+<resources>
+    <plurals name="secretAchievementsHint">
+        <item quantity="one">C\'è un ultimo obiettivo segreto da sbloccare. Prova a esplorare tutte le pagine e i menu dell\'app.</item>
+        <item quantity="other">Ci sono %d obiettivi segreti da sbloccare. Prova a esplorare tutte le pagine e i menu dell\'app.</item>
+        <item quantity="many">Ci sono %d obiettivi segreti da sbloccare. Prova a esplorare tutte le pagine e i menu dell\'app.</item>
+    </plurals>
+</resources>

@@ -1,0 +1,6 @@
+<resources>
+    <plurals name="secretAchievementsHint">
+        <item quantity="one">Unum ultimum effectum occultum nondum reseratum est. Conare omnes paginas et tabulas applicationis explorare.</item>
+        <item quantity="other">%d effecta occulta nondum reserata sunt. Conare omnes paginas et tabulas applicationis explorare.</item>
+    </plurals>
+</resources>
