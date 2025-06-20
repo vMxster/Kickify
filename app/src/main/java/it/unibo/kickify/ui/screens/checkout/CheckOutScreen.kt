@@ -49,6 +49,7 @@ import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.cart.CartViewModel
 import it.unibo.kickify.ui.screens.profile.ProfileViewModel
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
+import it.unibo.kickify.ui.theme.BluePrimary
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -70,6 +71,7 @@ fun CheckOutScreen(
     val subtotal by cartViewModel.subTotal.collectAsStateWithLifecycle()
     val shipping by cartViewModel.shippingCost.collectAsStateWithLifecycle()
     val totalCost by cartViewModel.total.collectAsStateWithLifecycle()
+    val showDialog by cartViewModel.checkOutCompleted.collectAsStateWithLifecycle()
 
     LaunchedEffect(userEmail) {
         profileViewModel.getUserAddress(userEmail)
@@ -87,7 +89,6 @@ fun CheckOutScreen(
         showLoadingOverlay = isLoadingCart || isLoadingProfile
     ) {
         var showLoading: Boolean by rememberSaveable { mutableStateOf(false) }
-        var showDialog by rememberSaveable { mutableStateOf(false) }
 
         var showAddressSelectorDialog by rememberSaveable { mutableStateOf(false) }
         var showPaymentMethodSelectorDialog by rememberSaveable { mutableStateOf(false) }
@@ -105,7 +106,14 @@ fun CheckOutScreen(
             isLoading = showLoading,
             onLoadingComplete = {
                 showLoading = false
-                showDialog = true
+                selectedAddress?.let {
+                    selectedPaymentMethod?.let { it1 ->
+                        cartViewModel.placeOrder(
+                            address = it,
+                            paymentMethod = it1
+                        )
+                    }
+                }
             }
         ) {
             Column(
@@ -179,16 +187,7 @@ fun CheckOutScreen(
                     shipping = shipping,
                     total = totalCost,
                     checkoutButtonEnabled = enabledCheckoutButton,
-                    onButtonClickAction = {
-                        selectedAddress?.let {
-                            selectedPaymentMethod?.let { it1 ->
-                                cartViewModel.placeOrder(
-                                    address = it,
-                                    paymentMethod = it1
-                                )
-                            }
-                        }
-                    }
+                    onButtonClickAction = { showLoading = true }
                 )
             }
 
@@ -221,11 +220,12 @@ fun CheckOutScreen(
                     mainMessage = stringResource(R.string.cartscreen_paymentSuccessful),
                     dismissButtonText = stringResource(R.string.cartscreen_backToShopping),
                     onDismissRequest = {
+                        cartViewModel.dismissCompletedCheckout()
                         achievementsViewModel.achieveAchievement(3)
                         navController.navigate(KickifyRoute.Home) {
                             popUpTo(KickifyRoute.Home) { inclusive = true }
                         }
-                    },
+                    }
                 )
             }
         }
@@ -259,7 +259,7 @@ fun LoadingAnimation(
             ) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
-                    color = Color.White
+                    color = BluePrimary
                 )
             }
         }

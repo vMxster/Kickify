@@ -36,8 +36,11 @@ class CartViewModel(
     private val _total = MutableStateFlow(0.0)
     val total: StateFlow<Double> = _total.asStateFlow()
 
-    private var _email = MutableStateFlow("")
+    private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email.asStateFlow()
+
+    private val _checkoutCompleted = MutableStateFlow(false)
+    val checkOutCompleted: StateFlow<Boolean> = _checkoutCompleted.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -185,6 +188,7 @@ class CartViewModel(
                 )
                 if (result.isSuccess) {
                     loadCartInternal(_email.value)
+                    _checkoutCompleted.value = true
                 } else {
                     _errorMessage.value = result.exceptionOrNull()?.message
                 }
@@ -194,6 +198,10 @@ class CartViewModel(
                 _isLoading.value = false
             }
         }
+    }
+
+    fun dismissCompletedCheckout(){
+        _checkoutCompleted.value = false
     }
 
     private fun calculateTotals() {
