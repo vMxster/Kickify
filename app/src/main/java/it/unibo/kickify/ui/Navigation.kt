@@ -106,6 +106,8 @@ fun KickifyNavGraph(
 
     val startDestination by settingsViewModel.startDestination.collectAsStateWithLifecycle()
 
+    val userEmail by settingsViewModel.userId.collectAsStateWithLifecycle()
+
     if (startDestination == AppStartDestination.LOADING) {
         Box(modifier = Modifier.fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
@@ -219,6 +221,8 @@ fun KickifyNavGraph(
 
         composable<KickifyRoute.OrderDetails> { backStackEntry ->
             val route = backStackEntry.toRoute<KickifyRoute.OrderDetails>()
+            ordersViewModel.getOrderTracking(route.orderID)
+            ordersViewModel.getOrdersWithProducts(userEmail)
             OrderDetailsScreen(navController, settingsViewModel, ordersViewModel,
                 achievementsViewModel, productsViewModel, route.orderID.toString())
         }
