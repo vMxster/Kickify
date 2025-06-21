@@ -197,6 +197,7 @@
     <string name="biometricAuthLoginWithEmailAndPsw">Iniciar sesión con Correo electrónico y Contraseña</string>
     <string name="biometricAuthRetry">Reintentar autenticación biométrica</string>
     <string name="changedPasswordSuccessfully">Contraseña cambiada con éxito</string>
+    <string name="nowLoginWithNewPassword">Ahora puedes iniciar sesión con tu nueva contraseña</string>
     <string name="emptyWishlist">Lista de deseos vacía.</string>
     <string name="errorLoadingData">Occurrió un error al cargar los datos.</string>
     <string name="otp_missing_digits">Introduce el código OTP recibido.</string>

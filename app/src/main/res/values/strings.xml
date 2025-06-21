@@ -236,6 +236,7 @@
     <string name="savePhoto">Save Photo</string>
     <string name="changePassword">Change Password</string>
     <string name="changedPasswordSuccessfully">Password changed successfully</string>
+    <string name="nowLoginWithNewPassword">Now you can log in with the new password</string>
     <string name="changePasswordError">An error occurred. Password not changed</string>
     <string name="biometricAuthTitle">Unlock Kickify</string>
     <string name="biometricAuthSubtitle">Use fingerprint or face to unlock</string>

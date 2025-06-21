@@ -18,6 +18,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,7 +57,7 @@ fun ResetPasswordScreen(
     forgotPasswordOTPViewModel: ForgotPasswordOTPViewModel,
     achievementsViewModel: AchievementsViewModel
 ) {
-
+    val snackBarHostState = remember { SnackbarHostState() }
     val ctx = LocalContext.current
 
     val isLoading by forgotPasswordOTPViewModel.isLoading.collectAsStateWithLifecycle()
@@ -76,7 +78,7 @@ fun ResetPasswordScreen(
 
     val gotoLogin: () -> Unit = {
         navController.navigate(KickifyRoute.Login) {
-            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+            popUpTo<KickifyRoute.ResetPasswordScreen> { inclusive = true }
             launchSingleTop = true
         }
     }
@@ -88,7 +90,12 @@ fun ResetPasswordScreen(
 
     LaunchedEffect(successMessage) {
         if(successMessage == "Password cambiata con successo. Effettua il login."){
-            delay(3500)
+            snackBarHostState.showSnackbar(
+                message = ctx.getString(R.string.changedPasswordSuccessfully) + "\n" +
+                        ctx.getString(R.string.nowLoginWithNewPassword),
+                duration = SnackbarDuration.Long,
+                actionLabel = ctx.getString(R.string.ok)
+            )
             gotoLogin()
         }
     }
@@ -100,6 +107,7 @@ fun ResetPasswordScreen(
         bottomAppBarContent = { },
         showModalDrawer = false,
         showLoadingOverlay = isLoading,
+        snackBarHostState = snackBarHostState,
         achievementsViewModel = achievementsViewModel
     ) {
         val resetScreenModifier = Modifier.fillMaxWidth()
@@ -240,9 +248,9 @@ fun ResetPasswordScreen(
             errorMessage?.let {
                 Text(it, modifier = resetScreenModifier, textAlign = TextAlign.Center)
             }
-            successMessage?.let {
+            /*successMessage?.let {
                 Text(it, modifier = resetScreenModifier, textAlign = TextAlign.Center)
-            }
+            }*/
         }
     }
 }

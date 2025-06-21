@@ -199,6 +199,7 @@
     <string name="biometricAuthLoginWithEmailAndPsw">Intra Cursu Electronico et tessera</string>
     <string name="biometricAuthRetry">Repete adprobationem biometricam</string>
     <string name="changedPasswordSuccessfully">Tessera mutata feliciter</string>
+    <string name="nowLoginWithNewPassword">Nunc initiare sessionis novā tesserā potes.</string>
     <string name="emptyWishlist">Tabula desideratōrum vacuă est.</string>
     <string name="errorLoadingData">Error accidit dum data capta est.</string>
     <string name="otp_missing_digits">Ingrede Codicem OTP.</string>

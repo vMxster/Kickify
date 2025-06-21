@@ -202,6 +202,7 @@
     <string name="biometricAuthLoginWithEmailAndPsw">Accedi con Email e Password</string>
     <string name="biometricAuthRetry">Riprova autenticazione biometrica</string>
     <string name="changedPasswordSuccessfully">Password cambiata con successo</string>
+    <string name="nowLoginWithNewPassword">Ora puoi accedere con la nuova password</string>
     <string name="emptyWishlist">Lista dei desideri vuota.</string>
     <string name="errorLoadingData">Errore durante il caricamento dei dati.</string>
     <string name="otp_missing_digits">Digita il OTP ricevuto.</string>
