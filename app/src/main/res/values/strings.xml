@@ -39,7 +39,7 @@
     <string name="signup_button">Sign Up</string>
     <string name="signup_alreadyPartOfCrew">Already Part Of The Crew?</string>
     <string name="forgotpsw_title">Reset Your Password In A Snap!</string>
-    <string name="forgotpsw_text">Enter your email - we\'ll send a secure link to get you back on track.</string>
+    <string name="forgotpsw_text">Enter your email - we\'ll send a secure code to get you back on track.</string>
     <string name="otpScreen_text">Type in the OTP Code we sent you.</string>
     <string name="otpScreen_otp">OTP</string>
     <string name="otp_missing_digits">Type in the received OTP code.</string>

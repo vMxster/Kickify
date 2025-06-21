@@ -66,7 +66,7 @@ fun AppBar(
                     painterResource(R.drawable.kickify_light_banner),
                     "logo",
                     contentScale = ContentScale.FillWidth,
-                    modifier = Modifier.height(40.dp),
+                    modifier = Modifier.height(64.dp),
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
                 )
 

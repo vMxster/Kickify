@@ -88,7 +88,7 @@ fun ResetPasswordScreen(
 
     LaunchedEffect(successMessage) {
         if(successMessage == "Password cambiata con successo. Effettua il login."){
-            delay(5000)
+            delay(3500)
             gotoLogin()
         }
     }
@@ -103,8 +103,7 @@ fun ResetPasswordScreen(
         achievementsViewModel = achievementsViewModel
     ) {
         val resetScreenModifier = Modifier.fillMaxWidth()
-            .padding(horizontal = 24.dp)
-            .padding(vertical = 8.dp)
+            .padding(horizontal = 24.dp, vertical = 6.dp)
 
         Column(
             modifier = Modifier.fillMaxSize()
@@ -170,7 +169,6 @@ fun ResetPasswordScreen(
                 },
                 modifier = resetScreenModifier.focusRequester(passwordFocusRequester)
             )
-            Spacer(modifier = Modifier.height(6.dp))
 
             Text(
                 text = stringResource(R.string.confirmPassword),
@@ -191,10 +189,13 @@ fun ResetPasswordScreen(
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        if(password != confirmPassword){
-                            confirmPswError = ctx.getString(R.string.confirmPasswordNoMatch)
-                        } else {
+                        if(!LoginRegisterUtils.isValidPassword(confirmPassword)){
+                            confirmPswError = ctx.getString(R.string.invalidPswMessage)
+                        }
+                        if(password == confirmPassword){
                             focusManager.clearFocus()
+                        } else {
+                            confirmPswError = ctx.getString(R.string.confirmPasswordNoMatch)
                         }
                     }
                 ),
@@ -216,15 +217,17 @@ fun ResetPasswordScreen(
                 modifier = resetScreenModifier.focusRequester(confirmPswFocusRequester)
             )
 
-            Spacer(modifier = Modifier.height(6.dp))
-
             Button(
                 onClick = {
-                    if(LoginRegisterUtils.isValidPassword(password)
-                        && password == confirmPassword){
-                        forgotPasswordOTPViewModel.resetPassword(password)
-                    } else {
+                    if(password != confirmPassword) {
                         confirmPswError = ctx.getString(R.string.confirmPasswordNoMatch)
+
+                    } else if(!LoginRegisterUtils.isValidPassword(password)
+                        || !LoginRegisterUtils.isValidPassword(confirmPassword)){
+                        confirmPswError = ctx.getString(R.string.invalidPswMessage)
+
+                    } else {
+                        forgotPasswordOTPViewModel.resetPassword(password)
                     }
                 },
                 modifier = resetScreenModifier,

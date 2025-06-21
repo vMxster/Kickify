@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -69,7 +68,6 @@ import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.register.LoginRegisterMethodDividerRow
 import it.unibo.kickify.ui.screens.settings.SettingsViewModel
-import it.unibo.kickify.ui.theme.MediumGray
 import it.unibo.kickify.utils.LoginRegisterUtils
 import kotlinx.coroutines.launch
 
@@ -358,12 +356,10 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(15.dp))
 
             LoginRegisterMethodDividerRow()
-            Button(
+            TextButton(
                 onClick = { signInWithGoogle() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MediumGray)
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = 32.dp)
             ) {
                 Image(
                     painter = painterResource(R.drawable.google_icon),
@@ -372,7 +368,7 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     text = stringResource(R.string.signin_signup_continueGoogle),
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
 

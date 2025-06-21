@@ -39,7 +39,7 @@
     <string name="signup_button">Iscriviti</string>
     <string name="signup_alreadyPartOfCrew">Fai già parte della Crew?</string>
     <string name="forgotpsw_title">Reimposta la tua password in un attimo!</string>
-    <string name="forgotpsw_text">Inserisci la tua email - ti invieremo un link sicuro per rimetterti in pista.</string>
+    <string name="forgotpsw_text">Inserisci la tua email - ti invieremo un codice sicuro per rimetterti in pista.</string>
     <string name="otpScreen_text">Digita il codice OTP che ti abbiamo inviato.</string>
     <string name="otpScreen_otp">OTP</string>
     <string name="resetpsw_setNewPassword">Imposta la tua nuova password.</string>

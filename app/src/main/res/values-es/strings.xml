@@ -39,7 +39,7 @@
     <string name="signup_button">Registrarse</string>
     <string name="signup_alreadyPartOfCrew">¿Ya eres parte del equipo?</string>
     <string name="forgotpsw_title">¡Restablece tu contraseña en un instante!</string>
-    <string name="forgotpsw_text">Introduce tu correo electrónico; te enviaremos un enlace seguro para que vuelvas a la normalidad.</string>
+    <string name="forgotpsw_text">Introduce tu correo electrónico; te enviaremos un código seguro para que vuelvas a la normalidad.</string>
     <string name="otpScreen_text">Introduce el código OTP que te hemos enviado.</string>
     <string name="otpScreen_otp">OTP</string>
     <string name="resetpsw_setNewPassword">Establece tu nueva contraseña.</string>

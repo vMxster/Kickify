@@ -39,7 +39,7 @@
     <string name="signup_button">Subscribere</string>
     <string name="signup_alreadyPartOfCrew">Iam pars Cohortis es?</string>
     <string name="forgotpsw_title">Tesseram tuam cito restitue!</string>
-    <string name="forgotpsw_text">Ingrede Cursum Electronicum tuum – mittemus tibi nexum securum ut in via redeas.</string>
+    <string name="forgotpsw_text">Ingrede Cursum Electronicum tuum – mittemus tibi codicem securum ut in via redeas.</string>
     <string name="otpScreen_text">Ingrede Codicem OTP quem misimus tibi.</string>
     <string name="otpScreen_otp">OTP</string>
     <string name="resetpsw_setNewPassword">Novam tesseram tuam constitue.</string>
