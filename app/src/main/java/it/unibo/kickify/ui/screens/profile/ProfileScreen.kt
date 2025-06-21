@@ -129,17 +129,6 @@ fun ProfileScreen(
                     Language.getLanguageStringFromCode(appLang))
             }
 
-            ProfileActionRow(
-                title = stringResource(R.string.myordersScreen_title),
-                onButtonClickAction = { navController.navigate(KickifyRoute.MyOrders) },
-                buttonText = stringResource(R.string.homescreen_seeAll),
-            )
-            ProfileActionRow(
-                title = stringResource(R.string.wishlist_title),
-                onButtonClickAction = { navController.navigate(KickifyRoute.Wishlist) },
-                buttonText = stringResource(R.string.view)
-            )
-
             ProfileCardContainer(
                 cardTitle = stringResource(R.string.address),
                 actionIcon = Icons.Outlined.Add,

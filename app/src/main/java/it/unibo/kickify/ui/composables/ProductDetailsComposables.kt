@@ -191,10 +191,11 @@ fun ColorsList(
         for ((colorString, available) in colorAvailability.entries){
             val color = parseColorName(colorString)
             val borderColor = if (selectedColor == color) BluePrimary else {
-                if (color == Color.White && !isSystemInDarkTheme()) Color.Black
-                else if (color == Color.White && isSystemInDarkTheme()) Color.White
+                if (!isSystemInDarkTheme()) Color.Black
+                else if (isSystemInDarkTheme()) Color.White
                 else Color.Transparent
             }
+            val borderWidth = if(selectedColor == color) 6.dp else 1.dp
 
             if(available) { // if color is available
                 Button(
@@ -208,7 +209,7 @@ fun ColorsList(
                     shape = CircleShape,
                     modifier = Modifier.size(44.dp)
                         .border(
-                            width = 3.dp,
+                            width = borderWidth,
                             color = borderColor,
                             shape = CircleShape
                         )
