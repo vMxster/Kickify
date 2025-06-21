@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -91,13 +93,13 @@ fun OTPScreen(
         achievementsViewModel = achievementsViewModel
     ) {
         val otpScreenModifier = Modifier.fillMaxWidth()
-            .padding(horizontal = 24.dp)
-            .padding(vertical = 8.dp)
+            .padding(horizontal = 24.dp, vertical = 8.dp)
 
         Column(
             modifier = Modifier.fillMaxSize()
                 .padding(top = 20.dp)
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = 8.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
