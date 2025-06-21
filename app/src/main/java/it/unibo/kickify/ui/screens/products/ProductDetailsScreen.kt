@@ -122,7 +122,7 @@ fun ProductDetailsScreen(
         isInWishlist = isInWishlist,
         onToggleWishlist = { productsViewModel.toggleWishlist(productId) }
     ) {
-        val sheetState = rememberModalBottomSheetState()
+        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         var showBottomSheet by remember { mutableStateOf(false) }
         var showFullscreenImage by remember { mutableStateOf(false) }
         var showAddtoCartDialog by remember { mutableStateOf(false) }
@@ -394,12 +394,11 @@ fun ProductDetailsScreen(
                             Button(
                                 modifier = reviewModifier,
                                 onClick = {
-                                    showBottomSheet = false
                                     if(comment.isEmpty() || comment.isBlank()){
                                         isErrorComment = true
                                         errorMessageComment = ctx.getString(R.string.prodDetails_typeInComment)
                                     }
-                                    if(rating.toDouble() <= 0.0 || rating.toDouble() >= 5.0){
+                                    if(rating.isEmpty() || rating.isBlank() || rating.toDouble() <= 0.0 || rating.toDouble() >= 5.0){
                                         isErrorRating = true
                                         errorMessageRating = ctx.getString(R.string.prodDetails_typeinValidRating)
                                     }
@@ -408,6 +407,7 @@ fun ProductDetailsScreen(
                                         productsViewModel.addReviewOfProduct(
                                             email, productId, rating.toDouble(), comment
                                         )
+                                        showBottomSheet = false
                                     }
                                 }
                             ) {

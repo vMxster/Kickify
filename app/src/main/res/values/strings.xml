@@ -22,8 +22,7 @@
     <string name="passwordEmptyError">Type in your password.</string>
     <string name="showHidePsw">Show/Hide Password</string>
     <string name="invalidEmailMessage">Type in a valid email address</string>
-    <string name="invalidPswMessage">The password must be at least 10 characters long\n
-    and must contain at least \n1 lowercase character, 1 uppercase character,\n1 digit and 1 symbol</string>
+    <string name="invalidPswMessage">The password must be at least 10 characters long\nand must contain at least \n1 lowercase character,\n1 uppercase character,\n1 digit and 1 symbol</string>
     <string name="invalidNameMessage">Type in your name</string>
     <string name="invalidLastnameMessage">Type in your last name</string>
     <string name="loginGoogle">Login in with Google</string>

@@ -1,6 +1,5 @@
 package it.unibo.kickify.ui.screens.register
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -19,7 +17,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,7 +39,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -62,33 +58,22 @@ import it.unibo.kickify.ui.KickifyRoute
 import it.unibo.kickify.ui.composables.ScreenTemplate
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import it.unibo.kickify.ui.screens.login.LoginViewModel
-import it.unibo.kickify.ui.screens.settings.SettingsViewModel
-import it.unibo.kickify.ui.theme.MediumGray
 import it.unibo.kickify.utils.LoginRegisterUtils
 import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterScreen(
     navController: NavController,
-    settingsViewModel: SettingsViewModel,
     achievementsViewModel: AchievementsViewModel,
     loginViewModel: LoginViewModel
 ) {
     val registeredSuccessful by loginViewModel.registeredSuccessful.collectAsStateWithLifecycle()
-    val isLoggedIn by loginViewModel.isLoggedIn.collectAsStateWithLifecycle()
-    val loggedInUser by loginViewModel.loggedInUser.collectAsStateWithLifecycle()
     val message by loginViewModel.message.collectAsStateWithLifecycle()
     val isLoading by loginViewModel.isLoading.collectAsStateWithLifecycle()
 
     val snackBarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val ctx = LocalContext.current
-
-    val registerAction: () -> Unit = {
-        navController.navigate(KickifyRoute.Home) {
-            popUpTo(navController.graph.startDestinationId) { inclusive = true }
-        }
-    }
 
     // if registered successfully, go back to login
     LaunchedEffect(registeredSuccessful) {
@@ -366,23 +351,6 @@ fun RegisterScreen(
             ) {
                 Text(
                     text = stringResource(R.string.signup_button),
-                )
-            }
-            Spacer(modifier = Modifier.height(15.dp))
-
-            LoginRegisterMethodDividerRow()
-            Button(
-                onClick = { /* google oauth login */ },
-                modifier = registerScreenModifier,
-                colors = ButtonDefaults.buttonColors(containerColor = MediumGray)
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.google_icon),
-                    contentDescription = "Login with Google"
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    text = stringResource(R.string.signin_signup_continueGoogle),
                 )
             }
             Spacer(modifier = Modifier.height(15.dp))
