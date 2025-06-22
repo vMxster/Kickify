@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "897714702292-4t9954vhq7rhd994b13l9gucrar6hf1s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "it.unibo.kickify",
+            "certificate_hash": "a65f1ad30bfb9ca2a362914452ba7effcca4df70"
+          }
+        },
+        {
           "client_id": "897714702292-r7r0ri17933sgoka7vhgh25pfqne4952.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
