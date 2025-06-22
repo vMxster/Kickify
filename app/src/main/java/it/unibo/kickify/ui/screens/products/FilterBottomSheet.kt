@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -26,7 +28,6 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberRangeSliderState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -64,7 +65,8 @@ fun FilterScreen(
 
     ModalBottomSheet(
         onDismissRequest = { onDismissRequest() },
-        sheetState = sheetState
+        sheetState = sheetState,
+        contentWindowInsets = { WindowInsets.safeDrawing }
     ){
         val sizeList = listOf(37, 38, 39, 40, 41, 42, 43, 44, 45, 46)
         val brandsList = listOf("Adidas", "Nike", "Puma")
@@ -72,7 +74,7 @@ fun FilterScreen(
             Color.Black,
             Color.Blue,
             Color.Green,
-            Color(0xFF800080), // Viola
+            Color.Yellow,
             Color.Red,
             Color.White
         )

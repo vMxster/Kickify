@@ -15,6 +15,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import it.unibo.kickify.PushNotificationManager
 import it.unibo.kickify.camerax.CameraXUtils
 import it.unibo.kickify.ui.screens.achievements.AchievementsScreen
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
@@ -103,6 +104,7 @@ fun KickifyNavGraph(
     val ordersViewModel = koinViewModel<OrdersViewModel>()
     val cartViewModel = koinViewModel<CartViewModel>()
     val profileViewModel = koinViewModel<ProfileViewModel>()
+    val pushNotificationManager = koinInject<PushNotificationManager>()
 
     val startDestination by settingsViewModel.startDestination.collectAsStateWithLifecycle()
 
@@ -207,7 +209,7 @@ fun KickifyNavGraph(
         }
 
         composable<KickifyRoute.Settings> {
-            SettingsScreen(navController, settingsViewModel, achievementsViewModel)
+            SettingsScreen(navController, settingsViewModel, achievementsViewModel, pushNotificationManager)
         }
 
         composable<KickifyRoute.Wishlist> {

@@ -55,19 +55,18 @@ import it.unibo.kickify.ui.composables.SettingsTitleLine
 import it.unibo.kickify.ui.composables.ThemeChooserRow
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
 import kotlinx.coroutines.delay
-import org.koin.compose.koinInject
 
 @Composable
 fun SettingsScreen(
     navController: NavController,
     settingsViewModel: SettingsViewModel,
-    achievementsViewModel: AchievementsViewModel
+    achievementsViewModel: AchievementsViewModel,
+    pushNotificationManager: PushNotificationManager
 ) {
     val ctx = LocalContext.current
     val themeState by settingsViewModel.theme.collectAsStateWithLifecycle()
     val biometricLoginState by settingsViewModel.biometricLogin.collectAsStateWithLifecycle()
     val pushNotificationState by settingsViewModel.enabledPushNotification.collectAsStateWithLifecycle()
-    val pushNotificationManager = koinInject<PushNotificationManager>()
     val languageState by settingsViewModel.appLanguage.collectAsStateWithLifecycle()
     val userid by settingsViewModel.userId.collectAsStateWithLifecycle()
     val username by settingsViewModel.userName.collectAsStateWithLifecycle()

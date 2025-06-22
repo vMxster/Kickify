@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat
 
 class PushNotificationManager(private val context: Context) {
     private val channelID = "kickifyNotifications1"
-    private val notificationManager = this.context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager//this.context.getSystemService(NotificationManager::class.java)
+    private val notificationManager = this.context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     private var lastUsedNotificationID = 0
 
