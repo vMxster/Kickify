@@ -124,7 +124,7 @@ fun ProfileScreen(
                     style = MaterialTheme.typography.titleMedium
                 )
                 TextInformationRow(if(user == null) userEmail else "${user?.email}")
-                TextInformationRow("${stringResource(R.string.phone)}:", user?.phone ?: "-")
+                TextInformationRow("${stringResource(R.string.phone)}:", if(user?.phone != "null") user?.phone else "-")
                 TextInformationRow("${stringResource(R.string.language)}:",
                     Language.getLanguageStringFromCode(appLang))
             }

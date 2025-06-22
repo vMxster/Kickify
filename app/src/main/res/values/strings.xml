@@ -143,6 +143,7 @@
     <string name="nationAddress">Nation</string>
     <string name="setDefaultAddress">Set as default address</string>
     <string name="addNewAddress">Add new address</string>
+    <string name="addedNewAddress">Address added successfully</string>
     <string name="saveAddress">Save address</string>
     <string name="missingFields">Fill in all fields.</string>
     <string name="chooseShippingAddress">Choose shipping address</string>
@@ -153,6 +154,7 @@
     <string name="choosePaymentMethod">Choose Payment Method</string>
     <string name="noPaymentMethodSelected">No Payment method selected</string>
     <string name="addPaymentMethod">Add Payment Method</string>
+    <string name="addedPaymentMethod">Payment Method added successfully</string>
     <string name="checkAllFieldsAreCorrect">Check all fields are correct.</string>
     <string name="cardExpires">Expires</string>
     <string name="creditCard">Credit Card</string>

@@ -215,6 +215,7 @@
     <string name="nationAddress">Cīvĭtās</string>
     <string name="setDefaultAddress">Constitue ut domicilium praeferendum.</string>
     <string name="addNewAddress">Adde novam inscriptionem cursualis</string>
+    <string name="addedNewAddress">inscriptionem cursualis addita feliciter</string>
     <string name="default_string">Praeferendum</string>
     <string name="confirm">Confirma</string>
     <string name="cancel">Cancella</string>
@@ -235,6 +236,7 @@
     <string name="choosePaymentMethod">Selige rationem solutionis</string>
     <string name="noPaymentMethodSelected">Nulla ratio solutionis selecta</string>
     <string name="addPaymentMethod">Adde rationem solutionis</string>
+    <string name="addedPaymentMethod">Rationem solutionis addita felicter</string>
     <string name="checkAllFieldsAreCorrect">Inspice omnia spatia recta esse.</string>
     <string name="creditCard">Charta crediti</string>
     <string name="creditCard_brand">Editor chartae crediti</string>

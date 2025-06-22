@@ -93,7 +93,8 @@ fun SectionTitle(
     title: String,
     buttonIcon: ImageVector? = null,
     iconDescription: String? = null,
-    onButtonClick: () -> Unit = {}
+    onButtonClick: () -> Unit = {},
+    showButton: Boolean = false
 ){
     Spacer(Modifier.height(10.dp))
     Row(
@@ -107,7 +108,7 @@ fun SectionTitle(
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
-        if(buttonIcon != null){
+        if(showButton && buttonIcon != null){
             IconButton(onClick = onButtonClick) {
                 Icon(buttonIcon, contentDescription = iconDescription)
             }

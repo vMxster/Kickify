@@ -123,29 +123,42 @@ fun EditProfileScreen(
         if(modifiedPassword && errorMessageProfile == null){
             snackBarHostState.showSnackbar(
                 message = ctx.getString(R.string.changedPasswordSuccessfully),
-                duration = SnackbarDuration.Long
+                duration = SnackbarDuration.Long,
+                actionLabel = ctx.getString(R.string.ok)
             )
         }
         if(modifiedPassword && errorMessageProfile != null){
             snackBarHostState.showSnackbar(
                 message = ctx.getString(R.string.changePasswordError),
-                duration = SnackbarDuration.Long
+                duration = SnackbarDuration.Long,
+                actionLabel = ctx.getString(R.string.ok)
             )
         }
         profileViewModel.resetChangedPassword()
         profileViewModel.dismissError()
     }
 
-    LaunchedEffect(addressModified) {
-        if(addressModified){
+    LaunchedEffect(addressModified, errorMessageProfile) {
+        if(addressModified && errorMessageProfile == null){
+            profileViewModel.getUserAddress(userEmail)
+            snackBarHostState.showSnackbar(
+                message = ctx.getString(R.string.addedNewAddress),
+                duration = SnackbarDuration.Long,
+                actionLabel = ctx.getString(R.string.ok)
+            )
             profileViewModel.resetModifiedAddress()
             navController.popBackStack()
         }
     }
 
-    LaunchedEffect(modifiedPaymentMethods) {
-        if(modifiedPaymentMethods){
+    LaunchedEffect(modifiedPaymentMethods, errorMessageProfile) {
+        if(modifiedPaymentMethods && errorMessageProfile == null){
             profileViewModel.getPaymentMethods(userEmail)
+            snackBarHostState.showSnackbar(
+                message = ctx.getString(R.string.addedPaymentMethod),
+                duration = SnackbarDuration.Long,
+                actionLabel = ctx.getString(R.string.ok)
+            )
             profileViewModel.resetModifiedPayment()
             navController.popBackStack()
         }
@@ -155,7 +168,8 @@ fun EditProfileScreen(
         errorMessageProfile?.let {
             snackBarHostState.showSnackbar(
                 message = it,
-                duration = SnackbarDuration.Long
+                duration = SnackbarDuration.Long,
+                actionLabel = ctx.getString(R.string.ok)
             )
         }
     }
@@ -164,7 +178,8 @@ fun EditProfileScreen(
         errorMessageSettings?.let {
             snackBarHostState.showSnackbar(
                 message = it,
-                duration = SnackbarDuration.Long
+                duration = SnackbarDuration.Long,
+                actionLabel = ctx.getString(R.string.ok)
             )
         }
     }
@@ -737,7 +752,8 @@ fun AddPaymentMethodSection(
     userEmail: String
 ){
     var selectedMethodType by remember { mutableStateOf("CreditCard") }
-    val cardBrands = remember { PaymentMethods.entries.filter { it != PaymentMethods.PAYPAL }.map { it.visibleName } }
+    val cardBrands = remember { PaymentMethods.entries.filter {
+        it != PaymentMethods.PAYPAL && it != PaymentMethods.UNKNOWN }.map { it.visibleName } }
 
     // values for credit card
     var creditCardBrand by remember { mutableStateOf(cardBrands[0]) }

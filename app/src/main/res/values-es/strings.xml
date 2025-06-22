@@ -215,6 +215,7 @@
     <string name="achievement_enableBiometricLogin">Habilitar inicio de sesión biométrico</string>
     <string name="default_string">Predeterminado</string>
     <string name="addNewAddress">Añadir nueva dirección</string>
+    <string name="addedNewAddress">Nueva dirección añadida.</string>
     <string name="confirm">Confirmar</string>
     <string name="cancel">Cancelar</string>
     <string name="noPopularShoesError">No se encontraron zapatos que respeten los filtros</string>
@@ -234,6 +235,7 @@
     <string name="choosePaymentMethod">Elegir Método de Pago</string>
     <string name="noPaymentMethodSelected">No se ha seleccionado método de pago</string>
     <string name="addPaymentMethod">Añadir Método de Pago</string>
+    <string name="addedPaymentMethod">Método de Pago añadido</string>
     <string name="checkAllFieldsAreCorrect">Verifica que todos los campos sean correctos.</string>
     <string name="creditCard">Tarjeta de Crédito</string>
     <string name="creditCard_brand">Emisor de Tarjeta de Crédito</string>

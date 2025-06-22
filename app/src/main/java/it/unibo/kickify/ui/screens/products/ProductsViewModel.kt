@@ -83,6 +83,9 @@ class ProductsViewModel(
     private val _filteredProducts = MutableStateFlow<Result<Map<Product, Image>>>(Result.success(emptyMap()))
     val filteredProducts: StateFlow<Result<Map<Product, Image>>> = _filteredProducts
 
+    private val _canUserReview = MutableStateFlow(false)
+    val canUserReview: StateFlow<Boolean> = _canUserReview.asStateFlow()
+
     init {
         viewModelScope.launch {
             databaseReadyManager.isDatabaseReady.collectLatest { isReady ->
@@ -275,6 +278,25 @@ class ProductsViewModel(
                 _productReviews.value = result
             } catch (e: Exception) {
                 _productReviews.value = Result.failure(e)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun canUserReview(email: String, productId: Int) {
+        _isLoading.value = true
+        viewModelScope.launch {
+            try {
+                val result = repository.canUserReview(email, productId)
+                result.onSuccess { res ->
+                    _canUserReview.value = res
+                }.onFailure {
+                    _canUserReview.value = false
+                }
+
+            } catch (e: Exception) {
+                _canUserReview.value = false
             } finally {
                 _isLoading.value = false
             }

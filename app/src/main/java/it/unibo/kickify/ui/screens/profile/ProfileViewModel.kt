@@ -205,9 +205,11 @@ class ProfileViewModel(
                     )
                     result.onSuccess {
                         _errorMessage.value = null
+                        _paymentMethodsListModified.value = true
                         getPaymentMethods(userEmail)
                     }.onFailure { exception ->
                         _errorMessage.value = exception.message ?: "Unknown error"
+                        _paymentMethodsListModified.value = false
                     }
                 } else if(paymentMethodInfo is PaymentMethodInfo.CreditCard){
                     val result = appRepository.addUserPaymentMethod(
@@ -224,6 +226,7 @@ class ProfileViewModel(
                         getPaymentMethods(userEmail)
                     }.onFailure { exception ->
                         _errorMessage.value = exception.message ?: "Unknown error"
+                        _paymentMethodsListModified.value = false
                     }
                 }
             } catch (e: Exception) {

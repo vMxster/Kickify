@@ -84,6 +84,7 @@ fun ProductDetailsScreen(
     val productImages by productsViewModel.productImages.collectAsStateWithLifecycle()
     val isLoading by productsViewModel.isLoading.collectAsStateWithLifecycle()
     val email by cartViewModel.email.collectAsStateWithLifecycle()
+    val canUserReview by productsViewModel.canUserReview.collectAsStateWithLifecycle()
 
     val list = productList.getOrNull() ?: emptyMap()
     val prodInfo = list.entries.firstOrNull { entry -> entry.key.productId == productId }
@@ -109,6 +110,7 @@ fun ProductDetailsScreen(
         productsViewModel.loadProductDetails(productId)
         productsViewModel.getProductImages(productId)
         productsViewModel.isInWishlist(productId)
+        productsViewModel.canUserReview(email, productId)
     }
 
     ScreenTemplate(
@@ -253,7 +255,8 @@ fun ProductDetailsScreen(
                     title = stringResource(R.string.prodDetails_reviews),
                     buttonIcon = Icons.Outlined.Add,
                     iconDescription = stringResource(R.string.prodDetails_addReview),
-                    onButtonClick = { showBottomSheet = true }
+                    onButtonClick = { showBottomSheet = true },
+                    showButton = canUserReview
                 )
                 if(reviews.isNotEmpty()){
                     reviews.forEach { r ->

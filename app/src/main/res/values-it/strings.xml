@@ -221,11 +221,13 @@
     <string name="nationAddress">Nazione</string>
     <string name="setDefaultAddress">Imposta come indirizzo predefinito</string>
     <string name="addNewAddress">Aggiungi nuovo indirizzo</string>
+    <string name="addedNewAddress">Nuovo indirizzo aggiunto</string>
     <string name="achievement_enableBiometricLogin">Abilita login biometrico</string>
     <string name="achievement_androidLikeEasterEgg">Questo non è Android</string>
     <string name="default_string">Default</string>
     <string name="noPaymentMethodSelected">Nessun metodo di pagamento selezionato</string>
     <string name="addPaymentMethod">Aggiungi metodo di pagamento</string>
+    <string name="addedPaymentMethod">Metodo di pagamento aggiunto</string>
     <string name="choosePaymentMethod">Scegli metodo di pagamento</string>
     <string name="missingFields">Compila tutti i campi.</string>
     <string name="chooseShippingAddress">Scegli indirizzo di spedizione</string>
