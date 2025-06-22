@@ -188,6 +188,8 @@ fun ColorsList(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ){
+        Spacer(Modifier.width(6.dp))
+
         for ((colorString, available) in colorAvailability.entries){
             val color = parseColorName(colorString)
             val borderColor = if (selectedColor == color) BluePrimary else {
