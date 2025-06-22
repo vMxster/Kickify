@@ -190,7 +190,8 @@ fun CheckOutScreen(
                     shipping = shipping,
                     total = totalCost,
                     checkoutButtonEnabled = enabledCheckoutButton,
-                    onButtonClickAction = { showLoading = true }
+                    onButtonClickAction = { showLoading = true },
+                    buttonText = stringResource(R.string.payment)
                 )
             }
 

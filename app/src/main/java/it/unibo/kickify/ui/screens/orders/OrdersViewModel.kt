@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class OrdersViewModel(
     private val appRepository: AppRepository
@@ -105,5 +107,19 @@ class OrdersViewModel(
 
     fun dismissError() {
         _errorMessage.value = null
+    }
+
+    fun convertDateFormat(dateString: String?): String? {
+        if(dateString.isNullOrEmpty() || dateString.isBlank()){
+            return null
+        }
+        try {
+            val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            val dateTime = LocalDateTime.parse(dateString, inputFormatter)
+            val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+            return dateTime.format(outputFormatter)
+        } catch (e: Exception){
+            return null
+        }
     }
 }

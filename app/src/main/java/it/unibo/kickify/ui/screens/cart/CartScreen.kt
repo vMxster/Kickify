@@ -132,7 +132,8 @@ fun CartScreen(
                 shipping = shippingCost,
                 total = total,
                 checkoutButtonEnabled = enableCheckOutBtn,
-                onButtonClickAction = { navController.navigate(KickifyRoute.Checkout) }
+                onButtonClickAction = { navController.navigate(KickifyRoute.Checkout) },
+                buttonText = stringResource(R.string.cartscreen_checkOutBtn)
             )
         }
     }

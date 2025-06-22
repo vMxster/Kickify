@@ -87,7 +87,7 @@ fun MyOrdersScreen(
             items(orders){ orderDetails ->
                 OrderCardContainer(
                     orderID = "${orderDetails.orderId}",
-                    orderDate = orderDetails.orderDate,
+                    orderDate = ordersViewModel.convertDateFormat(orderDetails.orderDate) ?: "",
                     paymentMethod = PaymentMethods.getFromString(orderDetails.paymentMethod)
                         ?: PaymentMethods.PAYPAL,
                     totalPrice = orderDetails.totalCost.toFloat(),

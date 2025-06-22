@@ -87,7 +87,9 @@ fun OrderDetailsScreen(
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            OrderInfo(orderID, orderDate = currentOrderTracking?.orderInfo?.orderDate ?: "")
+            OrderInfo(orderID, orderDate = ordersViewModel.convertDateFormat(
+                currentOrderTracking?.orderInfo?.orderDate) ?: ""
+            )
 
             val orderDet = orders.find { it.orderId == orderID.toInt() }
             if(orderDet != null) {
@@ -124,7 +126,7 @@ fun OrderDetailsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(text = stringResource(R.string.expectedDeliveryDate))
-                Text(text = deliveredInfo?.estimatedArrival ?: stringResource(R.string.notAvailable))
+                Text(text = ordersViewModel.convertDateFormat(deliveredInfo?.estimatedArrival) ?: stringResource(R.string.notAvailable))
             }
             Row (
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 4.dp),
@@ -144,6 +146,18 @@ fun OrderDetailsScreen(
             // step progress bar index is 0-based
             val currentStepIndex = values.mapIndexed { _, s ->  s != "null" }.count { it } -1
 
+            @Composable
+            fun displayEstimatedOrActualDateTime(estimated: String?, actual: String?): String{
+                if(actual != "null" && estimated != "null"){
+                    return ordersViewModel.convertDateFormat(actual) ?: stringResource(R.string.notAvailable)
+                }
+                if(actual == "null" && estimated != "null"){
+                    return stringResource(R.string.expected) + ": " +
+                            (ordersViewModel.convertDateFormat(estimated) ?: stringResource(R.string.notAvailable))
+                }
+                return stringResource(R.string.notAvailable)
+            }
+
             StepProgressBar(
                 steps = listOf(
                     stringResource(R.string.orderPlaced) + "\n" + displayEstimatedOrActualDateTime(orderPlacedInfo?.estimatedArrival, orderPlacedInfo?.actualArrival),
@@ -162,13 +176,3 @@ fun OrderDetailsScreen(
     }
 }
 
-@Composable
-fun displayEstimatedOrActualDateTime(estimated: String?, actual: String?): String{
-    if(actual != "null" && estimated != "null"){
-        return "$actual"
-    }
-    if(actual == "null" && estimated != "null"){
-        return stringResource(R.string.expected) + ": $estimated"
-    }
-    return stringResource(R.string.notAvailable)
-}

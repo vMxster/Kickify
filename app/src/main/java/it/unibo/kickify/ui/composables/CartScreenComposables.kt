@@ -169,7 +169,8 @@ fun QuantityManagerRow(
 fun CartAndCheckoutResume(
     subTotal: Double, shipping: Double, total: Double,
     checkoutButtonEnabled: Boolean,
-    onButtonClickAction: () -> Unit
+    onButtonClickAction: () -> Unit,
+    buttonText: String
 ){
     Card(
         modifier = Modifier.height(180.dp).fillMaxWidth()
@@ -219,7 +220,7 @@ fun CartAndCheckoutResume(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = checkoutButtonEnabled
                 ) {
-                    Text(stringResource(R.string.cartscreen_checkOutBtn))
+                    Text(buttonText)
                 }
             }
         }
