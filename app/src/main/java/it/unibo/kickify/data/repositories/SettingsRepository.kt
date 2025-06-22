@@ -26,7 +26,8 @@ class SettingsRepository(
         private val ENABLED_PUSH_NOTIFICATION = booleanPreferencesKey("enabled_pushNotification")
         private val APP_LANG = stringPreferencesKey("app_lang")
         private val ONBOARDING_COMPLETED = booleanPreferencesKey("completed_onboarding")
-        private val LAST_ACCESS = stringPreferencesKey("last_access")
+        private val LAST_ACCESS_PRODUCTS = stringPreferencesKey("last_access_products")
+        private val LAST_ACCESS_ORDERS = stringPreferencesKey("last_access_orders")
     }
 
     // get userid
@@ -102,16 +103,28 @@ class SettingsRepository(
         it[ENABLED_PUSH_NOTIFICATION] = enabled
     }
 
-    // get last access
-    val lastAccess: Flow<String> = dataStore.data.map { preferences ->
-        preferences[LAST_ACCESS] ?: "1970-01-01 00:00:00"
+    // get last access products
+    val productsLastAccess: Flow<String> = dataStore.data.map { preferences ->
+        preferences[LAST_ACCESS_PRODUCTS] ?: "1970-01-01 00:00:00"
     }
 
-    // set last access
-    suspend fun setLastAccess() = dataStore.edit { preferences ->
+    // set last access products
+    suspend fun setProductsLastAccess() = dataStore.edit { preferences ->
         val currentTime = Date()
         val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        preferences[LAST_ACCESS] = formatter.format(currentTime)
+        preferences[LAST_ACCESS_PRODUCTS] = formatter.format(currentTime)
+    }
+
+    // get last access orders
+    val ordersLastAccess: Flow<String> = dataStore.data.map { preferences ->
+        preferences[LAST_ACCESS_ORDERS] ?: "1970-01-01 00:00:00"
+    }
+
+    // set last access orders
+    suspend fun setOrdersLastAccess() = dataStore.edit { preferences ->
+        val currentTime = Date()
+        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        preferences[LAST_ACCESS_ORDERS] = formatter.format(currentTime)
     }
 
     // get app language

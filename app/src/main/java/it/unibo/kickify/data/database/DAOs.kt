@@ -328,6 +328,13 @@ interface OrderDao {
     """)
     suspend fun getOrdersWithProducts(email: String): List<OrderProductDetails>
 
+    @Query("""
+        SELECT COUNT(*) FROM ORDINE o 
+        JOIN PRODOTTO_ORDINE po ON o.ID_Ordine = po.ID_Ordine 
+        WHERE o.Email = :email AND po.ID_Prodotto = :productId
+    """)
+    suspend fun canUserReview(email: String, productId: Int): Int
+
     @Transaction
     suspend fun getOrderTracking(orderId: Int): OrderDetailedTracking {
         val rawData = getOrderTrackingRawData(orderId)
@@ -447,39 +454,6 @@ interface WishlistDao {
         AND ID_Prodotto = :productId
     """)
     suspend fun isInWishlist(email: String, productId: Int): Int
-}
-
-@Dao
-interface ReviewDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addReview(review: Review): Long
-
-    @Query("""
-        SELECT r.*, u.Nome, u.Cognome 
-        FROM RECENSIONE r 
-        JOIN UTENTE u ON r.Email = u.Email 
-        WHERE r.ID_Prodotto = :productId AND r.Data_Recensione > :lastAccess 
-        ORDER BY r.Data_Recensione DESC
-    """)
-    suspend fun getProductReviews(productId: Int, lastAccess: String): List<ReviewWithUserInfo>
-
-    @Query("""
-        DELETE FROM RECENSIONE WHERE Email = :email 
-        AND ID_Prodotto = :productId
-    """)
-    suspend fun deleteReview(email: String, productId: Int): Int
-
-    @Query("""
-        SELECT AVG(Voto) FROM RECENSIONE 
-        WHERE ID_Prodotto = :productId
-    """)
-    suspend fun getProductRating(productId: Int): Double
-
-    @Query("""
-        SELECT COUNT(*) FROM ORDINE o 
-        JOIN PRODOTTO_ORDINE po ON o.ID_Ordine = po.ID_Ordine 
-        WHERE o.Email = :email AND po.ID_Prodotto = :productId""")
-    suspend fun canUserReview(email: String, productId: Int): Int
 }
 
 @Dao

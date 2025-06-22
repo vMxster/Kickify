@@ -28,7 +28,6 @@ import it.unibo.kickify.data.repositories.local.OAuthUserRepository
 import it.unibo.kickify.data.repositories.local.OrderRepository
 import it.unibo.kickify.data.repositories.local.ProductCartRepository
 import it.unibo.kickify.data.repositories.local.ProductRepository
-import it.unibo.kickify.data.repositories.local.ReviewRepository
 import it.unibo.kickify.data.repositories.local.UserRepository
 import it.unibo.kickify.data.repositories.local.VersionRepository
 import it.unibo.kickify.utils.ImageStorageManager
@@ -44,7 +43,6 @@ class AppRepository(
     private val userRepository: UserRepository,
     private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
-    private val reviewRepository: ReviewRepository,
     private val imageRepository: ImageRepository,
     private val productCartRepository: ProductCartRepository,
     private val versionRepository: VersionRepository,
@@ -52,15 +50,15 @@ class AppRepository(
     private val oAuthUserRepository: OAuthUserRepository
 ) {
     private val tag = "AppRepository"
-    private val lastAccess = settingsRepository.lastAccess
+    private val productsLastAccess = settingsRepository.productsLastAccess
+    private val ordersLastAccess = settingsRepository.ordersLastAccess
     private var productsLoaded = false
     private var historyLoaded = false
-    private var ordersLoaded = false
 
     // PRODOTTI
     suspend fun getProducts(): Result<Map<Product, Image>> = withContext(Dispatchers.IO) {
         try {
-            val remoteResult = remoteRepository.getProducts(lastAccess.first())
+            val remoteResult = remoteRepository.getProducts(productsLastAccess.first())
 
             if (remoteResult.isSuccess) {
                 val remoteProducts = remoteResult.getOrNull() ?: emptyList()
@@ -100,7 +98,7 @@ class AppRepository(
             }
             val productsWithImages = productRepository.getProductsWithImage()
             productsLoaded = true
-            checkAndUpdateLastAccess()
+            setProductsLastAccess()
             Result.success(productsWithImages)
         } catch (e: Exception) {
             Log.e(tag, "Errore in getProducts", e)
@@ -159,7 +157,7 @@ class AppRepository(
     suspend fun getProductsHistory(): Result<List<HistoryProduct>> =
         withContext(Dispatchers.IO) {
             try {
-                val remoteResult = remoteRepository.getProductsHistory(lastAccess.first())
+                val remoteResult = remoteRepository.getProductsHistory(productsLastAccess.first())
                 if (remoteResult.isSuccess) {
                     val remoteHistory = remoteResult.getOrNull() ?: emptyList()
                     if (remoteHistory.isNotEmpty()) {
@@ -167,7 +165,7 @@ class AppRepository(
                     }
                 }
                 historyLoaded = true
-                checkAndUpdateLastAccess()
+                setProductsLastAccess()
                 Result.success(
                     productRepository.getProductsHistory()
                 )
@@ -371,7 +369,7 @@ class AppRepository(
     // ORDINI
     suspend fun getOrders(email: String): Result<List<Order>> = withContext(Dispatchers.IO) {
         try {
-            val remoteResult = remoteRepository.getOrders(email, lastAccess.first())
+            val remoteResult = remoteRepository.getOrders(email, ordersLastAccess.first())
             if (remoteResult.isSuccess) {
                 val remoteOrders = remoteResult.getOrNull() ?: emptyList()
                 if (remoteOrders.isNotEmpty()) {
@@ -383,8 +381,7 @@ class AppRepository(
                     }
                 }
             }
-            ordersLoaded = true
-            checkAndUpdateLastAccess()
+            settingsRepository.setOrdersLastAccess()
             Result.success(
                 orderRepository.getOrders(email)
             )
@@ -437,7 +434,7 @@ class AppRepository(
             val remoteResult = remoteRepository.getOrderTracking(orderId)
             if (remoteResult.isSuccess) {
                 val remoteTracking = remoteResult.getOrNull()
-                remoteTracking?.forEach() {
+                remoteTracking?.forEach {
                     orderRepository.insertTrackingInfo(it)
                 }
             }
@@ -509,14 +506,10 @@ class AppRepository(
         }
     }
 
-    suspend fun getProductRating(productId: Int): Result<Double> = withContext(Dispatchers.IO) {
-        Result.success(remoteRepository.getProductRating(productId))
-    }
-
     suspend fun canUserReview(email: String, productId: Int): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
             Result.success(
-                reviewRepository.canUserReview(email, productId)
+                orderRepository.canUserReview(email, productId)
             )
         } catch (e: Exception) {
             Log.e(tag, "Errore in canUserReview", e)
@@ -682,20 +675,11 @@ class AppRepository(
         remoteRepository.verifyOTP(email.lowercase(), otp)
     }
 
-    private fun resetLoadingTracking() {
-        productsLoaded = false
-        historyLoaded = false
-        ordersLoaded = false
-    }
-
-    private suspend fun checkAndUpdateLastAccess() {
-        if (productsLoaded && historyLoaded && ordersLoaded) {
-            setLastAccessNow()
-            resetLoadingTracking()
+    private suspend fun setProductsLastAccess() {
+        if (productsLoaded && historyLoaded) {
+            settingsRepository.setProductsLastAccess()
+            productsLoaded = false
+            historyLoaded = false
         }
-    }
-
-    private suspend fun setLastAccessNow() = withContext(Dispatchers.IO) {
-        settingsRepository.setLastAccess()
     }
 }

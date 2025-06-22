@@ -22,4 +22,7 @@ class OrderRepository(
 
     suspend fun insertTrackingInfo(trackingShipping: TrackingShipping) =
         orderDao.insertTrackingInfo(trackingShipping)
+
+    suspend fun canUserReview(email: String, productId: Int): Boolean =
+        orderDao.canUserReview(email, productId) > 0
 }

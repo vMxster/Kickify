@@ -22,7 +22,6 @@ import it.unibo.kickify.data.repositories.local.OAuthUserRepository
 import it.unibo.kickify.data.repositories.local.OrderRepository
 import it.unibo.kickify.data.repositories.local.ProductCartRepository
 import it.unibo.kickify.data.repositories.local.ProductRepository
-import it.unibo.kickify.data.repositories.local.ReviewRepository
 import it.unibo.kickify.data.repositories.local.UserRepository
 import it.unibo.kickify.data.repositories.local.VersionRepository
 import it.unibo.kickify.ui.screens.achievements.AchievementsViewModel
@@ -80,7 +79,6 @@ val appModule = module {
     single { UserRepository(userDao = get<KickifyDatabase>().userDao()) }
     single { CartRepository(cartDao = get<KickifyDatabase>().cartDao()) }
     single { OrderRepository(orderDao = get<KickifyDatabase>().orderDao()) }
-    single { ReviewRepository(reviewDao = get<KickifyDatabase>().reviewDao()) }
     single { VersionRepository(versionDao = get<KickifyDatabase>().versionDao()) }
     single { SettingsRepository(dataStore = get()) }
     single { AchievementsRepository(dataStore = get()) }
@@ -92,7 +90,7 @@ val appModule = module {
             get(), get(), get(),
             get(), get(), get(),
             get(), get(), get(),
-            get(), get(), get())
+            get(), get())
     }
 
     viewModel { SettingsViewModel(get(), get()) }
