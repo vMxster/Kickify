@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,7 +45,6 @@ fun ProductListScreen(
     val filterState by productsViewModel.filterState.collectAsStateWithLifecycle()
     val isLoading by productsViewModel.isLoading.collectAsStateWithLifecycle()
 
-    val sheetState = rememberModalBottomSheetState()
     var showFilterSheet by remember { mutableStateOf(false) }
 
     val displayProducts = when {
@@ -88,21 +86,6 @@ fun ProductListScreen(
             productsViewModel.resetFilters()
         }
     ) {
-        if (showFilterSheet) {
-            FilterScreen(
-                onDismissRequest = { showFilterSheet = false },
-                sheetState = sheetState,
-                initialFilterState = filterState,
-                onApplyFilter = { newFilterState ->
-                    productsViewModel.updateFilters(newFilterState)
-                    showFilterSheet = false
-                },
-                onResetFilter = {
-                    productsViewModel.resetFilters()
-                }
-            )
-        }
-
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,

@@ -38,6 +38,7 @@ import it.unibo.kickify.R
 import it.unibo.kickify.data.models.Achievement
 import it.unibo.kickify.ui.composables.BottomBar
 import it.unibo.kickify.ui.composables.ScreenTemplate
+import it.unibo.kickify.ui.theme.BluePrimary
 
 @Composable
 fun AchievementsScreen(
@@ -121,18 +122,18 @@ fun AchievementRow(achievement: Achievement) {
         ) {
             Text(
                 text = stringResource(achievement.titleResId),
-                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp)
             )
             Text(
                 text = stringResource(achievement.descriptionResId),
-                style = TextStyle(fontSize = 14.sp)
+                style = TextStyle(fontSize = 15.sp)
             )
             Text(
                 text = if (!achievement.achieved) stringResource(R.string.notAchieved_achievement)
                 else stringResource(R.string.achieved_achievement) + " ${achievement.achievedDate}",
                 style = TextStyle(
-                    fontSize = 12.sp,
-                    color = if (!achievement.achieved) Color.Red else Color.Green
+                    fontSize = 15.sp,
+                    color = if (!achievement.achieved) Color.Red else BluePrimary
                 )
             )
         }

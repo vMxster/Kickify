@@ -51,6 +51,9 @@ fun MyOrdersScreen(
     LaunchedEffect(userEmail) {
         ordersViewModel.getOrders(userEmail.lowercase())
         ordersViewModel.getOrdersWithProducts(userEmail.lowercase())
+        orderDetails.forEach { o ->
+            ordersViewModel.getOrderTracking(o.orderId)
+        }
     }
 
     ScreenTemplate(
@@ -78,7 +81,7 @@ fun MyOrdersScreen(
             modifier = Modifier.fillMaxSize()
                 .padding(horizontal = 10.dp)
         ) {
-            if (orders.isEmpty()) {
+            if (orders.isEmpty() && !isLoading) {
                 item {
                     Text(stringResource(R.string.noOrdersFound))
                 }

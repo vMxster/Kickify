@@ -157,7 +157,7 @@ fun AppBar(
                             sheetState.hide()
                         }
                     },
-                    onResetFilter = {}
+                    onResetFilter = { onResetFilter?.invoke() }
                 )
             }
 
