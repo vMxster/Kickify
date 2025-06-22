@@ -13,7 +13,7 @@ class ImageStorageManager(private val context: Context) {
     }
 
     private fun saveImageLocally(url: String, bytes: ByteArray): String {
-        val fileName = "img_${System.currentTimeMillis()}.jpg"
+        val fileName = url.substringAfterLast("/").takeIf { it.isNotEmpty() } ?: "img_${System.currentTimeMillis()}.png"
         val file = File(context.filesDir, fileName)
         file.writeBytes(bytes)
         return file.absolutePath
