@@ -106,6 +106,25 @@ class SettingsViewModel(
         repository.setUserName(value)
     }
 
+    fun setUserImgFromUrl(imgUrl: String){
+        _errorMessage.value = null
+        _successMessage.value = null
+        _isLoading.value = true
+
+        viewModelScope.launch {
+            try {
+                if(imgUrl.isNotBlank() && imgUrl.isNotEmpty()){
+                    repository.setUserImgFilename(imgUrl)
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = e.message ?: "Unexpected error."
+
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
     fun setUserImg(email: String, imgFile: ByteArray, mimeType: String){
         _errorMessage.value = null
         _successMessage.value = null
@@ -162,9 +181,10 @@ class SettingsViewModel(
         repository.setOnboardingCompleted(completed)
     }
 
-    fun setUserAccount(userid: String, username: String) = viewModelScope.launch {
+    fun setUserAccount(userid: String, username: String, imgUrl: String) = viewModelScope.launch {
         this@SettingsViewModel.setUserId(userid)
         this@SettingsViewModel.setUserName(username)
+        this@SettingsViewModel.setUserImgFromUrl(imgUrl)
         repository.setUserLoggedIn(true)
     }
 

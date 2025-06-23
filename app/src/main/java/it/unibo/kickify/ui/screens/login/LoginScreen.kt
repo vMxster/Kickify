@@ -183,7 +183,8 @@ fun LoginScreen(
         if (isLoggedIn && loggedInUser != null) {
             settingsViewModel.setUserAccount(
                 userid = loggedInUser?.email ?: "",
-                username = "${loggedInUser?.name} ${loggedInUser?.surname}"
+                username = "${loggedInUser?.name} ${loggedInUser?.surname}",
+                imgUrl = "https://kickify.altervista.org" + loggedInUser?.urlPhoto
             )
             onLoginSuccess()
             loginViewModel.clearData()
